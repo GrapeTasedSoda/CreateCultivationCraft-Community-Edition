@@ -1,7 +1,5 @@
 # Create: Cultivation Craft — Community Edition
 
-> **Bilingual README** — English follows, then Chinese.
-> **双语说明** — 英文在前，中文在后。
 
 ---
 
