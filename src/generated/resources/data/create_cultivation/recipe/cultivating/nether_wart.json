@@ -1,0 +1,22 @@
+{
+  "type": "create_cultivation:cultivating",
+  "crop_block": "minecraft:nether_wart",
+  "irrigant": "minecraft:lava",
+  "ingredients": [
+    {
+      "item": "minecraft:nether_wart"
+    }
+  ],
+  "processingDuration": 36000,
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:nether_wart"
+    },
+    {
+      "chance": 0.25,
+      "count": 2,
+      "id": "minecraft:nether_wart"
+    }
+  ]
+}
