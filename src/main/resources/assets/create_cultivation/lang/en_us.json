@@ -1,6 +1,7 @@
 {
   "creativetab.create_cultivation.main_tab": "Create: Cultivation Craft",
   "block.create_cultivation.cultivation_base": "Cultivation Base",
+  "container.create_cultivation.cultivation_base": "Cultivation Base",
   "block.create_cultivation.cultivation_tank": "Cultivation Tank",
   "create_cultivation.ponder.cultivation.header": "Cultivation Machine",
   "create_cultivation.ponder.cultivation.text_1": "The Cultivation Base needs to be used with a Cultivation Tank. Place the Cultivation Base below the Cultivation Tank and supply it with Stress to start working.",

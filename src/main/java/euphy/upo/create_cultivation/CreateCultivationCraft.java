@@ -28,6 +28,7 @@ public class CreateCultivationCraft {
         modContainer.registerConfig(ModConfig.Type.COMMON, CCConfig.SPEC);
         CCBlocks.register();
         CCBlockEntities.register();
+        CCMenuTypes.register();
         CCCreativeModeTabs.register(modEventBus);
         CCRecipes.register(modEventBus);
         REGISTRATE.registerEventListeners(modEventBus);

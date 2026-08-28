@@ -7,9 +7,15 @@ import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBloc
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import euphy.upo.create_cultivation.registry.CCBlocks;
+import euphy.upo.create_cultivation.registry.CCMenuTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +29,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CultivationBaseBlockEntity extends KineticBlockEntity {
+public class CultivationBaseBlockEntity extends KineticBlockEntity implements MenuProvider {
+
+    public static final int SLOT_COUNT = 8;
 
     private final ItemStackHandler itemHandler = createItemHandler();
     private boolean isHarvesting = false;
@@ -43,7 +51,7 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity {
     }
 
     private ItemStackHandler createItemHandler() {
-        return new ItemStackHandler(8) {
+        return new ItemStackHandler(SLOT_COUNT) {
             @Override
             public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
                 if (!isHarvesting) {
@@ -240,6 +248,16 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity {
         for (ItemStack stack : stacks) {
             ItemHandlerHelper.insertItemStacked(itemHandler, stack, false);
         }
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("container.create_cultivation.cultivation_base");
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new CultivationBaseMenu(CCMenuTypes.CULTIVATION_BASE.get(), containerId, playerInventory, this);
     }
 
     public void updateWorkingState() {
