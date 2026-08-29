@@ -6,6 +6,8 @@ import com.simibubi.create.compat.jei.category.CreateRecipeCategory;
 import com.simibubi.create.content.processing.recipe.ProcessingOutput;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 
+import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
+import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import euphy.upo.create_cultivation.registry.CCBlocks;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -17,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.material.Fluid;
@@ -38,6 +42,11 @@ public abstract class AbstractCultivatingCategory<T extends Recipe<RecipeInput>>
 	private static final int MACHINE_X = 84;
 	private static final int OUTPUT_X = 104;
 	private static final int OUTPUT_Y = 24;
+	/** Catalyst indicator, right of centre above the arrow. */
+	private static final int CATALYST_X = 50;
+	private static final int CATALYST_Y = 10;
+	/** Width of the empty background used at registration (177 px). */
+	private static final int CATEGORY_WIDTH = 177;
 
 	protected AbstractCultivatingCategory(Info<T> info) {
 		super(info);
@@ -69,6 +78,11 @@ public abstract class AbstractCultivatingCategory<T extends Recipe<RecipeInput>>
 				.addItemStack(output.getStack())
 				.addRichTooltipCallback(addStochasticTooltip(output));
 		}
+
+		// Catalyst indicator above the arrow: display only, no focus matching.
+		builder.addSlot(RecipeIngredientRole.RENDER_ONLY, CATALYST_X, CATALYST_Y)
+			.setBackground(getRenderedSlot(), -1, -1)
+			.addItemStack(getCatalystDisplay(recipe));
 	}
 
 	@Override
@@ -79,11 +93,40 @@ public abstract class AbstractCultivatingCategory<T extends Recipe<RecipeInput>>
 		gui.renderItem(new ItemStack(CCBlocks.CULTIVATION_TANK.get()), MACHINE_X, 8);
 		gui.renderItem(new ItemStack(CCBlocks.CULTIVATION_BASE.get()), MACHINE_X, 28);
 
-		// Base growth time.
+		// Base growth time, right-aligned so it never overlaps the catalyst
+		// indicator above the arrow.
 		String time = formatDuration(getDuration(recipe));
 		Component timeText = Component.translatable("create_cultivation.jei.growth_time", time)
 			.withStyle(ChatFormatting.GRAY);
-		gui.drawString(Minecraft.getInstance().font, timeText, 1, 4, 0xFFFFFF, false);
+		int timeX = CATEGORY_WIDTH - Minecraft.getInstance().font.width(timeText) - 2;
+		gui.drawString(Minecraft.getInstance().font, timeText, timeX, 4, 0xFFFFFF, false);
+	}
+
+	/**
+	 * The catalyst item this recipe expects in the base's catalyst slot. Falls
+	 * back to bone meal when the recipe does not define one, mirroring the
+	 * machine's own fallback in {@code CultivationBaseBlockEntity#isCatalyst}.
+	 */
+	private static ItemStack getCatalystDisplay(Recipe<?> recipe) {
+		Ingredient catalyst = getCatalystIngredient(recipe);
+		if (catalyst == null || catalyst.isEmpty()) {
+			return new ItemStack(Items.BONE_MEAL);
+		}
+		ItemStack[] items = catalyst.getItems();
+		if (items.length == 0 || items[0].isEmpty()) {
+			return new ItemStack(Items.BONE_MEAL);
+		}
+		return items[0].copy();
+	}
+
+	private static Ingredient getCatalystIngredient(Recipe<?> recipe) {
+		if (recipe instanceof CultivatingRecipe cultivating) {
+			return cultivating.getCatalyst();
+		}
+		if (recipe instanceof StackingCultivatingRecipe stacking) {
+			return stacking.getCatalyst();
+		}
+		return null;
 	}
 
 	/** Formats a duration in ticks into something like "1m30s". */

@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlock;
+import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import euphy.upo.create_cultivation.config.CCConfig;
@@ -174,7 +175,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         if (level == null || level.isClientSide || !isController()) return;
 
         if (isWatered) {
-            if (wateredTickCounter-- <= 0) {
+            if (--wateredTickCounter <= 0) {
                 isWatered = false;
                 setChanged();
                 notifyUpdate();
@@ -195,7 +196,10 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             }
 
             if (!isMature()) {
-                float speedMultiplier = getSpeedMultiplier() * CCConfig.GROWTH_RATE.get().floatValue();
+                float speedMultiplier = getSpeedMultiplier() * CCConfig.GROWTH_RATE.get().floatValue() * getCatalystMultiplier();
+                if (isWatered && isCatalystBoostActive()) {
+                    speedMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get().floatValue();
+                }
                 if (speedMultiplier > 0) {
                     growthAccumulator += speedMultiplier;
                     int pointsToApply = (int) growthAccumulator;
@@ -230,6 +234,27 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             return Mth.lerp(Mth.clamp((speed - 32) / (256 - 32), 0, 1), 1.0f, 2.0f);
         }
         return 0;
+    }
+
+    /**
+     * Growth multiplier granted by the cultivation base's catalyst slot, or 1.0
+     * when there is no base below or no catalyst boost is active.
+     */
+    private float getCatalystMultiplier() {
+        BlockEntity beBelow = level.getBlockEntity(worldPosition.below());
+        if (beBelow instanceof CultivationBaseBlockEntity baseBE) {
+            return baseBE.getCatalystGrowthMultiplier();
+        }
+        return 1.0f;
+    }
+
+    /** Whether the cultivation base below currently has an active catalyst boost. */
+    private boolean isCatalystBoostActive() {
+        BlockEntity beBelow = level.getBlockEntity(worldPosition.below());
+        if (beBelow instanceof CultivationBaseBlockEntity baseBE) {
+            return baseBE.isCatalystBoostActive();
+        }
+        return false;
     }
 
 
@@ -388,6 +413,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             compound.putFloat("GrowthAccumulator", growthAccumulator);
             if (isWatered) {
                 compound.putBoolean("Watered", true);
+                compound.putInt("WateredTicks", wateredTickCounter);
             }
         }
 
@@ -421,6 +447,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             harvestCooldown = compound.getInt("HarvestCooldown");
             growthAccumulator = compound.getFloat("GrowthAccumulator");
             isWatered = compound.getBoolean("Watered");
+            wateredTickCounter = compound.getInt("WateredTicks");
         }
 
         this.updateConnectivity = compound.contains("Uninitialized");

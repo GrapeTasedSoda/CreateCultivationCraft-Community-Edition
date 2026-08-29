@@ -29,12 +29,18 @@ public class CultivatingRecipeParams extends ProcessingRecipeParams {
     public int height;
     /** The fluid that waters this crop. {@code null} means the default (water). */
     public Fluid irrigant;
+    /** The catalyst item accepted by the base's catalyst slot. {@code null} means the default (bone meal). */
+    public Ingredient catalyst;
+    /** How many boosted ticks one catalyst item lasts. */
+    public int catalystUse;
 
     public CultivatingRecipeParams() {
         super();
         this.cropBlock = Blocks.AIR;
         this.height = 1;
         this.irrigant = null;
+        this.catalyst = null;
+        this.catalystUse = 600;
     }
 
     public static final MapCodec<CultivatingRecipeParams> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -54,8 +60,10 @@ public class CultivatingRecipeParams extends ProcessingRecipeParams {
             Codec.INT.optionalFieldOf("processingDuration", 100).forGetter(p -> p.processingDuration),
             BuiltInRegistries.BLOCK.byNameCodec().fieldOf("crop_block").forGetter(p -> ((CultivatingRecipeParams)p).cropBlock),
             Codec.INT.optionalFieldOf("height", 1).forGetter(p -> ((CultivatingRecipeParams)p).height),
-            BuiltInRegistries.FLUID.byNameCodec().optionalFieldOf("irrigant").forGetter(p -> Optional.ofNullable(p.irrigant))
-    ).apply(instance, (ingredients, results, duration, cropBlock, height, irrigant) -> {
+            BuiltInRegistries.FLUID.byNameCodec().optionalFieldOf("irrigant").forGetter(p -> Optional.ofNullable(p.irrigant)),
+            Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(p -> Optional.ofNullable(((CultivatingRecipeParams)p).catalyst)),
+            Codec.INT.optionalFieldOf("catalyst_use", 600).forGetter(p -> ((CultivatingRecipeParams)p).catalystUse)
+    ).apply(instance, (ingredients, results, duration, cropBlock, height, irrigant, catalyst, catalystUse) -> {
         CultivatingRecipeParams params = new CultivatingRecipeParams();
         ingredients.forEach(either -> either.ifRight(params.ingredients::add).ifLeft(params.fluidIngredients::add));
         results.forEach(either -> either.ifRight(params.results::add).ifLeft(params.fluidResults::add));
@@ -63,6 +71,8 @@ public class CultivatingRecipeParams extends ProcessingRecipeParams {
         params.cropBlock = cropBlock;
         params.height = height;
         params.irrigant = irrigant.orElse(null);
+        params.catalyst = catalyst.orElse(null);
+        params.catalystUse = catalystUse;
         return params;
     }));
 
@@ -78,6 +88,11 @@ public class CultivatingRecipeParams extends ProcessingRecipeParams {
         if (this.irrigant != null) {
             ByteBufCodecs.registry(Registries.FLUID).encode(buffer, this.irrigant);
         }
+        buffer.writeBoolean(this.catalyst != null);
+        if (this.catalyst != null) {
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, this.catalyst);
+        }
+        buffer.writeInt(this.catalystUse);
     }
 
     @Override
@@ -86,5 +101,7 @@ public class CultivatingRecipeParams extends ProcessingRecipeParams {
         this.cropBlock = BuiltInRegistries.BLOCK.get(buffer.readResourceLocation());
         this.height = buffer.readInt();
         this.irrigant = buffer.readBoolean() ? ByteBufCodecs.registry(Registries.FLUID).decode(buffer) : null;
+        this.catalyst = buffer.readBoolean() ? Ingredient.CONTENTS_STREAM_CODEC.decode(buffer) : null;
+        this.catalystUse = buffer.readInt();
     }
 }

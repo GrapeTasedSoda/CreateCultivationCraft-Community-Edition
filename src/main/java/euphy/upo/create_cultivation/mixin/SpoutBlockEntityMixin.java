@@ -48,6 +48,13 @@ public abstract class SpoutBlockEntityMixin {
             BlockState controllerState = controller.getBlockState();
             if (controllerState.getValue(CultivationTankBlock.WORKING) && controllerState.getValue(CultivationTankBlock.PLANTED)) {
 
+                // Do not re-water while the tank is already watered: the watered
+                // state has a duration (wateredDuration), and re-watering every
+                // tick would keep resetting the countdown forever and waste fluid.
+                if (controller.isWatered()) {
+                    return;
+                }
+
                 FluidStack fluidInTank = this.tank.getPrimaryHandler().getFluid();
                 Fluid irrigant = tankBE.getIrrigantFluid();
                 boolean fluidOk = irrigant == null || irrigant == Fluids.WATER

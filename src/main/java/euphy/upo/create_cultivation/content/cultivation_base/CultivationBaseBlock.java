@@ -3,12 +3,16 @@ package euphy.upo.create_cultivation.content.cultivation_base;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel;
 import com.simibubi.create.foundation.block.IBE;
+import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlock;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
 import euphy.upo.create_cultivation.registry.CCBlockEntities;
+import euphy.upo.create_cultivation.registry.CCBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -74,17 +78,53 @@ public class CultivationBaseBlock extends HorizontalKineticBlock implements IBE<
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        // Only open the GUI with an empty main hand, so wrenches, placement and
-        // other item interactions keep working (mirrors the Cultivation Tank).
-        if (!player.getMainHandItem().isEmpty()) {
-            return InteractionResult.PASS;
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hitResult) {
+        // Placing a cultivation tank directly on top of the base: right-click
+        // with the tank item to build the tank at pos.above() instead of
+        // opening any GUI. The GUI stays reachable with an empty hand or any
+        // other item.
+        if (stack.is(CCBlocks.CULTIVATION_TANK.get().asItem()) && level.getBlockState(pos.above()).isAir()) {
+            if (!level.isClientSide) {
+                BlockState tankState = CCBlocks.CULTIVATION_TANK.getDefaultState()
+                    .setValue(CultivationTankBlock.TOP, true)
+                    .setValue(CultivationTankBlock.BOTTOM, false);
+                level.setBlock(pos.above(), tankState, 3);
+                if (!player.getAbilities().instabuild) {
+                    stack.consume(1, player);
+                }
+                BlockEntity placedBE = level.getBlockEntity(pos.above());
+                if (placedBE instanceof CultivationTankBlockEntity placedTank) {
+                    placedTank.updateWorkingState();
+                }
+                level.playSound(null, pos,
+                    CCBlocks.CULTIVATION_TANK.get().defaultBlockState().getSoundType().getPlaceSound(),
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.8f, 1.0f);
+            }
+            return ItemInteractionResult.SUCCESS;
         }
 
+        // Open the GUI regardless of what the player is holding, so the catalyst
+        // slot can be filled straight from the hotbar. Normal right-click opens
+        // the menu; sneak-right-click keeps default item behaviour for wrenches.
+        if (!player.isShiftKeyDown()) {
+            if (level.isClientSide) {
+                return ItemInteractionResult.SUCCESS;
+            }
+            if (level.getBlockEntity(pos) instanceof CultivationBaseBlockEntity blockEntity) {
+                player.openMenu(blockEntity, pos);
+            }
+            return ItemInteractionResult.CONSUME;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        // Empty hand: open the GUI directly (no sneak needed).
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
-
         if (level.getBlockEntity(pos) instanceof CultivationBaseBlockEntity blockEntity) {
             player.openMenu(blockEntity, pos);
         }

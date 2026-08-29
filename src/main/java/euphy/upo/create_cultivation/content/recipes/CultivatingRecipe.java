@@ -5,6 +5,7 @@ import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
 import euphy.upo.create_cultivation.registry.CCRecipes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -45,6 +46,16 @@ public class CultivatingRecipe extends ProcessingRecipe<RecipeInput, Cultivating
 
     public Fluid getIrrigant() {
         return this.params.irrigant;
+    }
+
+    @Override
+    public Ingredient getCatalyst() {
+        return this.params.catalyst;
+    }
+
+    @Override
+    public int getCatalystUse() {
+        return this.params.catalystUse;
     }
 
     @Override

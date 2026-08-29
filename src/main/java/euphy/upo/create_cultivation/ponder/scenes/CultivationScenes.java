@@ -1,7 +1,9 @@
 package euphy.upo.create_cultivation.ponder.scenes;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.fluids.spout.SpoutBlockEntity;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
+import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
 import euphy.upo.create_cultivation.registry.CCBlocks;
 import net.createmod.catnip.math.Pointing;
@@ -12,153 +14,186 @@ import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.phys.Vec3;
 
-import static net.minecraft.world.item.Items.WHEAT;
-import static net.minecraft.world.item.Items.WHEAT_SEEDS;
-
+/**
+ * Ponder scenes describing the full gameplay loop of the cultivation machine:
+ * assembly, planting, growth & harvest, catalyst boost, watering bonus, output
+ * extraction, display links and tank stacking.
+ */
 public class CultivationScenes {
-    public static void cultivating(SceneBuilder builder, SceneBuildingUtil util){
+
+    /**
+     * Main storyboard attached to both the base and the tank: demonstrates the
+     * complete machine loop from assembly to harvest.
+     */
+    public static void cultivating(SceneBuilder builder, SceneBuildingUtil util) {
         CreateSceneBuilder scene = new CreateSceneBuilder(builder);
         scene.title("cultivation", "栽培");
         scene.configureBasePlate(0, 0, 3);
         scene.showBasePlate();
+        scene.idle(10);
+
+        // Chapter 1: assembly. The base sits at (1,1,1) with the tank above it.
+        ElementLink<WorldSectionElement> machine =
+            scene.world().showIndependentSection(util.select().fromTo(1, 1, 1, 1, 2, 1), Direction.DOWN);
         scene.idle(15);
+        scene.overlay().showText(80)
+            .text("栽培机由栽培基座和栽培罐组成：把基座放在下方，作物种在栽培罐中。")
+            .pointAt(Vec3.atCenterOf(util.grid().at(1, 1, 1)))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(90);
 
-        ElementLink<WorldSectionElement> init_tank = scene.world().showIndependentSection(util.select().position(1, 2, 1), Direction.DOWN);
+        // Shaft + cogwheel power the base at 16 RPM.
+        scene.world().showSection(util.select().fromTo(2, 1, 1, 2, 1, 1), Direction.DOWN);
+        scene.idle(10);
+        scene.world().setKineticSpeed(util.select().fromTo(1, 1, 1, 2, 1, 1), 16);
+        scene.idle(20);
+        scene.overlay().showText(70)
+            .text("底座需要应力驱动；转速越高，作物长得越快（最高两倍速）。")
+            .pointAt(Vec3.atCenterOf(util.grid().at(2, 1, 1)))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(80);
 
-        scene.world().showSection(util.select().fromTo(1, 1, 1, 2, 1, 1), Direction.DOWN);
-        scene.world().moveSection(init_tank, util.vector().of(0, 0, 0), 4);
-        scene.idle(15);
-        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 1, 2, 1, 1), 16);
-        scene.world().setKineticSpeed(util.select().fromTo(1, 1, 1, 1, 1, 1), -16);
-        scene.overlay().showText(100)
-                .text("栽培基座需要配合栽培罐使用。把栽培基座放到栽培罐下方，并通入应力，它们就会开始工作")
-                .pointAt(Vec3.atCenterOf(util.grid().at(1, 1, 1)))
-                .placeNearTarget()
-                .attachKeyFrame();
-        scene.idle(110);
-
-        scene.overlay().showControls(util.vector().centerOf(1, 2, 1), Pointing.DOWN, 25)
-                .rightClick()
-                .withItem(WHEAT_SEEDS.getDefaultInstance());
-
+        // Chapter 2: planting.
         BlockPos tankPos = util.grid().at(1, 2, 1);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> {
-            be.plant(new ItemStack(Items.WHEAT_SEEDS));
-        });
+        scene.overlay().showControls(util.vector().centerOf(1, 2, 1), Pointing.DOWN, 25)
+            .rightClick()
+            .withItem(Items.WHEAT_SEEDS.getDefaultInstance());
+        scene.idle(10);
+        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class,
+            be -> be.plant(new ItemStack(Items.WHEAT_SEEDS)));
+        scene.idle(20);
+        scene.overlay().showText(70)
+            .text("手持可种植物品右键栽培罐种下作物；空手右键可以取出种子。")
+            .pointAt(Vec3.atCenterOf(tankPos))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(80);
 
-        scene.idle(45);
+        // Chapter 3: growth & auto-harvest. Push the ponder progress forward so
+        // the crop visibly grows, then show the harvest items flowing out.
+        scene.overlay().showText(70)
+            .text("机器会自动照料作物直至成熟，然后自动收获。")
+            .pointAt(Vec3.atCenterOf(tankPos))
+            .placeNearTarget()
+            .attachKeyFrame();
+        for (int stage = 1; stage <= 9; stage++) {
+            final int s = stage;
+            scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class,
+                be -> be.setPonderProgress(s));
+            scene.idle(10);
+        }
+        scene.idle(30);
 
-        scene.overlay().showText(55)
-                .text("手持可种植物品右键栽培罐，将其种植在内,空手右键可以再取出种子。。")
-                .pointAt(Vec3.atCenterOf(util.grid().at(1, 2, 1)))
-                .placeNearTarget()
-                .attachKeyFrame();
-        scene.idle(65);
-
-        scene.overlay().showText(90)
-                .text("栽培机器会自动照顾并收获作物，如果收获物有可种植物品，栽培机器会自动补种。")
-                .pointAt(Vec3.atCenterOf(util.grid().at(1, 2, 1)))
-                .placeNearTarget();
-
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(1));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(2));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(3));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(4));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(5));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(6));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(7));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(8));scene.idle(10);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(9));scene.idle(40);
-        scene.world().modifyBlockEntity(tankPos, CultivationTankBlockEntity.class, be -> be.setPonderProgress(0));scene.idle(1);
-
-        Selection spoutStack = util.select().fromTo(2, 3, 1, 2, 3, 2);
-        Selection spoutIt = util.select().fromTo(2, 3, 1, 2, 3, 1);
-        ElementLink<WorldSectionElement> spoutIn = scene.world().showIndependentSection(spoutStack, Direction.DOWN);
-        scene.world().moveSection(spoutIn, util.vector().of(-1, 0, 0), 20);scene.idle(25);
-        scene.world().modifyBlockEntityNBT(spoutIt, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));scene.idle(25);
-        scene.world().modifyBlockEntityNBT(spoutIt, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));scene.idle(25);
-        scene.overlay().showText(40)
-                .text("注液器可以浇灌它，收成会更多。")
-                .pointAt(Vec3.atCenterOf(util.grid().at(2, 3, 1)))
-                .placeNearTarget()
-                .attachKeyFrame();
-        scene.idle(45);
-        scene.world().hideIndependentSection(spoutIn, Direction.UP);
-
+        // Harvested items are stored in the base; extract with a funnel.
         scene.world().showSection(util.select().fromTo(0, 1, 1, 0, 1, 1), Direction.DOWN);
         scene.idle(10);
         BlockPos funnel = util.grid().at(0, 1, 1);
-        Vec3 spawnPoint = util.vector().blockSurface(funnel, Direction.DOWN)
-                .add(0, -0.2, 0);
-        scene.overlay().showText(40)
-                .text("收获物会存储在基座中，可以用漏斗或者溜槽提取。")
-                .pointAt(Vec3.atCenterOf(util.grid().at(0, 1, 1)))
-                .placeNearTarget()
-                .attachKeyFrame();
+        Vec3 spawnPoint = util.vector().blockSurface(funnel, Direction.DOWN).add(0, -0.2, 0);
+        scene.overlay().showText(70)
+            .text("收获物存储在基座里，用漏斗或溜槽即可提取。")
+            .pointAt(Vec3.atCenterOf(funnel))
+            .placeNearTarget()
+            .attachKeyFrame();
         scene.idle(25);
         scene.world().flapFunnel(funnel, true);
-        scene.world().createEntity((Level world) -> {
-            ItemEntity entity = new ItemEntity(world, spawnPoint.x, spawnPoint.y, spawnPoint.z, new ItemStack(WHEAT));
-            entity.isNoGravity();
-            return entity;
-        });
+        scene.world().createEntity((Level world) ->
+            new ItemEntity(world, spawnPoint.x, spawnPoint.y, spawnPoint.z, new ItemStack(Items.WHEAT)));
         scene.idle(20);
         scene.world().flapFunnel(funnel, true);
-        scene.world().createEntity((Level world) -> {
-            ItemEntity entity = new ItemEntity(world, spawnPoint.x, spawnPoint.y, spawnPoint.z, new ItemStack(WHEAT_SEEDS));
-            entity.isNoGravity();
-            return entity;
-        });
+        scene.world().createEntity((Level world) ->
+            new ItemEntity(world, spawnPoint.x, spawnPoint.y, spawnPoint.z, new ItemStack(Items.WHEAT_SEEDS)));
+        scene.idle(30);
+
+        // Chapter 4: catalyst. Drop a bone-meal-fed catalyst highlight on the
+        // base GUI-less flow: the base accepts bone meal while working.
+        scene.overlay().showControls(util.vector().centerOf(1, 1, 1), Pointing.DOWN, 30)
+            .rightClick()
+            .withItem(Items.BONE_MEAL.getDefaultInstance());
+        scene.idle(15);
+        scene.world().modifyBlockEntity(util.grid().at(1, 1, 1), CultivationBaseBlockEntity.class,
+            be -> be.getItemHandler().insertItem(CultivationBaseBlockEntity.CATALYST_SLOT, new ItemStack(Items.BONE_MEAL, 8), false));
+        scene.idle(10);
+        scene.overlay().showText(80)
+            .text("在基座界面放入催化剂（默认骨粉）可让作物以3倍速生长，每30秒消耗一份。")
+            .pointAt(Vec3.atCenterOf(util.grid().at(1, 1, 1)))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(90);
+
+        // Chapter 5: watering with a Spout.
+        Selection spoutStack = util.select().fromTo(2, 3, 1, 2, 3, 2);
+        Selection spoutIt = util.select().fromTo(2, 3, 1, 2, 3, 1);
+        ElementLink<WorldSectionElement> spoutIn =
+            scene.world().showIndependentSection(spoutStack, Direction.DOWN);
+        scene.world().moveSection(spoutIn, util.vector().of(-1, 0, 0), 20);
         scene.idle(25);
+        scene.world().modifyBlockEntityNBT(spoutIt, SpoutBlockEntity.class,
+            nbt -> nbt.putInt("ProcessingTicks", 20));
+        scene.idle(25);
+        scene.world().modifyBlockEntityNBT(spoutIt, SpoutBlockEntity.class,
+            nbt -> nbt.putInt("ProcessingTicks", 20));
+        scene.idle(15);
+        scene.overlay().showText(80)
+            .text("用注液器浇灌作物，收获产量提升至2.5倍；催化剂与浇水同时生效时各项再加成50%%。")
+            .pointAt(Vec3.atCenterOf(util.grid().at(2, 3, 1)))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(90);
+        scene.world().hideIndependentSection(spoutIn, Direction.UP);
+        scene.idle(15);
 
-        scene.idle(50);
+        // Chapter 6: display link. Place two at runtime: one beside the tank
+        // (facing away from it) and one beside the base (facing outward).
+        // setBlock only writes the ponder world; the positions must also be
+        // shown as a world section or the blocks exist but never render.
+        BlockPos tankLinkPos = util.grid().at(0, 2, 1);
+        BlockPos baseLinkPos = util.grid().at(1, 1, 0);
+        scene.world().setBlock(tankLinkPos, AllBlocks.DISPLAY_LINK.getDefaultState()
+            .setValue(DirectionalBlock.FACING, Direction.WEST), false);
+        scene.world().setBlock(baseLinkPos, AllBlocks.DISPLAY_LINK.getDefaultState()
+            .setValue(DirectionalBlock.FACING, Direction.NORTH), false);
+        scene.world().showSection(util.select().position(0, 2, 1)
+            .add(util.select().position(1, 1, 0)), Direction.DOWN);
+        scene.idle(10);
+        scene.overlay().showText(80)
+            .text("用显示链接器可以读取作物种类、剩余时间、产物与倍率等信息。")
+            .pointAt(Vec3.atCenterOf(tankLinkPos))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(90);
 
-        Selection actorPrototype = util.select().position(1, 2, 0);
-        ElementLink<WorldSectionElement> actor1 = scene.world().showIndependentSection(actorPrototype, Direction.DOWN);
-        scene.world().moveSection(actor1, util.vector().of(0, 1, 1), 0);
+        // Chapter 7: stacking tanks for taller crops.
+        Selection stackPrototype = util.select().position(1, 2, 0);
+        ElementLink<WorldSectionElement> tank2 =
+            scene.world().showIndependentSection(stackPrototype, Direction.DOWN);
+        scene.world().moveSection(tank2, util.vector().of(0, 1, 1), 0);
         scene.idle(6);
-        ElementLink<WorldSectionElement> actor2 = scene.world().showIndependentSection(actorPrototype, Direction.DOWN);
-        scene.world().moveSection(actor2, util.vector().of(0, 2, 1), 0);
+        ElementLink<WorldSectionElement> tank3 =
+            scene.world().showIndependentSection(stackPrototype, Direction.DOWN);
+        scene.world().moveSection(tank3, util.vector().of(0, 2, 1), 0);
         scene.idle(6);
-        ElementLink<WorldSectionElement> actor3 = scene.world().showIndependentSection(actorPrototype, Direction.DOWN);
-        scene.world().moveSection(actor3, util.vector().of(0, 3, 1), 0);
-        scene.idle(6);
+        scene.effects().indicateSuccess(util.grid().at(1, 3, 1));
+        scene.effects().indicateSuccess(util.grid().at(1, 4, 1));
+        scene.idle(15);
+        scene.overlay().showText(80)
+            .text("向上堆叠栽培罐可以增加种植高度，部分高株作物需要更高结构才能收获。")
+            .pointAt(Vec3.atCenterOf(util.grid().at(1, 3, 1)))
+            .placeNearTarget()
+            .attachKeyFrame();
+        scene.idle(90);
 
-        BlockPos transformationCenter = new BlockPos(1, 3, 1);
-        scene.effects().indicateSuccess(transformationCenter.below());
-        scene.effects().indicateSuccess(transformationCenter);
-        scene.effects().indicateSuccess(transformationCenter.above());
-        scene.idle(3);
-        scene.world().moveSection(actor1, util.vector().of(0, -100, 0), 0);
-        scene.world().moveSection(actor2, util.vector().of(0, -100, 0), 0);
-        scene.world().moveSection(actor3, util.vector().of(0, -100, 0), 0);
-        scene.world().moveSection(init_tank, util.vector().of(0, -100, 0), 0);
-
-        Selection finalStateSelection = util.select().fromTo(2, 1, 0, 2, 4, 0);
-        ElementLink<WorldSectionElement> finalStateActor = scene.world().showIndependentSectionImmediately(finalStateSelection);
-
-        scene.world().moveSection(finalStateActor, util.vector().of(-1, 1, 1), 0);
-        scene.idle(20);
-
-        scene.overlay().showText(90)
-                .text("你可以继续往上堆叠栽培罐来增加高度，有些植物需要足够的高度才能生长收获。")
-                .pointAt(Vec3.atCenterOf(util.grid().at(1, 2, 1)))
-                .placeNearTarget()
-                .attachKeyFrame();
-        scene.idle(100);
-
-
-        scene.overlay().showText(800)
-                .text("你也可以通过数据包自定义")
-                .independent();
-
+        scene.overlay().showText(120)
+            .text("作物配方可用数据包自定义。")
+            .independent();
         scene.markAsFinished();
     }
 }

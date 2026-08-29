@@ -1,6 +1,5 @@
 package euphy.upo.create_cultivation.compat.display;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.simibubi.create.api.behaviour.display.DisplaySource;
@@ -15,10 +14,22 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
- * Create Display Link source for the Cultivation Tank. Shows the current crop
- * type and the remaining base growth time.
+ * Create Display Link source for the Cultivation Tank. Registered twice on the
+ * tank's block entity type (crop mode and time mode) so the display link UI
+ * offers both as separately selectable options.
  */
 public class CultivationDisplaySource extends DisplaySource {
+
+	/** Crop mode: show the type of crop currently planted. */
+	public static final int MODE_CROP = 0;
+	/** Time mode: show the remaining growth time. */
+	public static final int MODE_TIME = 1;
+
+	private final int mode;
+
+	public CultivationDisplaySource(int mode) {
+		this.mode = mode;
+	}
 
 	@Override
 	public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
@@ -47,15 +58,15 @@ public class CultivationDisplaySource extends DisplaySource {
 			return DisplaySource.EMPTY;
 		}
 
+		if (mode == MODE_CROP) {
+			return List.of(cropName);
+		}
+
 		int tankDuration = controller.getInternalProcessingDuration();
 		int progress = controller.getProgress();
 		float ratio = tankDuration > 0 ? Math.min(1f, progress / (float) tankDuration) : 0f;
 		int remainingTicks = (int) ((1f - ratio) * recipeDuration);
-
-		List<MutableComponent> lines = new ArrayList<>();
-		lines.add(cropName);
-		lines.add(Component.translatable("create_cultivation.display_source.time", formatDuration(remainingTicks)));
-		return lines;
+		return List.of(Component.translatable("create_cultivation.display_source.time", formatDuration(remainingTicks)));
 	}
 
 	private static String formatDuration(int ticks) {

@@ -2,6 +2,7 @@ package euphy.upo.create_cultivation.content.recipes;
 
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
@@ -24,6 +25,16 @@ public class CultivatingRecipeBuilder extends ProcessingRecipeBuilder<Cultivatin
 
     public CultivatingRecipeBuilder irrigant(Fluid fluid) {
         this.params.irrigant = fluid;
+        return this;
+    }
+
+    public CultivatingRecipeBuilder catalyst(Ingredient catalyst) {
+        this.params.catalyst = catalyst;
+        return this;
+    }
+
+    public CultivatingRecipeBuilder catalystUse(int ticks) {
+        this.params.catalystUse = ticks;
         return this;
     }
 

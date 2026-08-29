@@ -24,7 +24,7 @@ public class CCBlockEntities {
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 CCBlockEntities.CULTIVATION_BASE.get(),
-                (blockEntity, context) -> blockEntity.getItemHandler()
+                (blockEntity, context) -> blockEntity.getAutomationHandler()
         );
     }
 

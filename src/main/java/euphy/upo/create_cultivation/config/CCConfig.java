@@ -29,6 +29,12 @@ public final class CCConfig {
 	/** How long (in lazy ticks) a "watered" state lasts after a Spout waters the tank. */
 	public static final ModConfigSpec.IntValue WATERED_DURATION;
 
+	/** Extra growth speed multiplier while a valid catalyst is present in the base's catalyst slot. */
+	public static final ModConfigSpec.DoubleValue CATALYST_GROWTH_BONUS;
+
+	/** Extra multiplier applied to both growth speed and yield while the tank is watered AND the catalyst is active. */
+	public static final ModConfigSpec.DoubleValue WATER_CATALYST_SYNERGY_BONUS;
+
 	static {
 		BUILDER.push("general")
 			.comment("General gameplay settings for the cultivation machine.");
@@ -47,14 +53,30 @@ public final class CCConfig {
 			.comment("Settings related to watering the cultivation tank with a Spout.");
 
 		WATERING_YIELD_BONUS = BUILDER
-			.comment("Extra yield multiplier applied on top of cropYieldMultiplier while the tank is watered. 1.0 is the default.")
+			.comment("Extra yield multiplier applied on top of cropYieldMultiplier while the tank is watered. 2.5 means watered harvests produce 2.5x the crops; 1.0 disables the bonus.")
 			.translation("create_cultivation.config.wateringYieldBonus")
-			.defineInRange("wateringYieldBonus", 1.0, 1.0, 10.0);
+			.defineInRange("wateringYieldBonus", 2.5, 1.0, 10.0);
 
 		WATERED_DURATION = BUILDER
-			.comment("How long the 'watered' state lasts (in lazy ticks, ~0.5s each) after a Spout waters the tank.")
+			.comment("How long the 'watered' state lasts (in lazy ticks, ~0.5s each; 20 = 10 seconds) after a Spout waters the tank.")
 			.translation("create_cultivation.config.wateredDuration")
-			.defineInRange("wateredDuration", 2, 1, 600);
+			.defineInRange("wateredDuration", 20, 1, 600);
+
+		BUILDER.pop().push("catalyst")
+			.comment("Settings for the Cultivation Base catalyst slot.");
+
+		CATALYST_GROWTH_BONUS = BUILDER
+			.comment("Growth speed multiplier applied while a valid catalyst is present in the base's catalyst slot. 3.0 means crops grow 3x as fast; 1.0 disables the bonus.")
+			.translation("create_cultivation.config.catalystGrowthBonus")
+			.defineInRange("catalystGrowthBonus", 3.0, 1.0, 10.0);
+
+		BUILDER.pop().push("synergy")
+			.comment("Bonus applied while watering and the catalyst are active at the same time.");
+
+		WATER_CATALYST_SYNERGY_BONUS = BUILDER
+			.comment("Extra multiplier applied to BOTH growth speed and harvest yield while the tank is watered AND the catalyst is active. 1.5 means 50% extra on top of the existing multipliers; 1.0 disables the synergy.")
+			.translation("create_cultivation.config.waterCatalystSynergyBonus")
+			.defineInRange("waterCatalystSynergyBonus", 1.5, 1.0, 10.0);
 
 		BUILDER.pop();
 
