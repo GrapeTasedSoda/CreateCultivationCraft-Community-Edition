@@ -5,6 +5,7 @@
     "item": "minecraft:bamboo"
   },
   "maxHeight": 12,
+  "min_height": 2,
   "processingDuration": 3600,
   "result": {
     "id": "minecraft:bamboo"

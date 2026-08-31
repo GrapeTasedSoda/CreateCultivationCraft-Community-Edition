@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mynethersdelight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "mynethersdelight:warped_fungus_colony",
+  "ingredients": [
+    {
+      "item": "mynethersdelight:warped_fungus_colony"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:warped_fungus"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "minecraft:warped_fungus"
+    },
+    {
+      "count": 1,
+      "id": "mynethersdelight:warped_fungus_colony"
+    }
+  ]
+}

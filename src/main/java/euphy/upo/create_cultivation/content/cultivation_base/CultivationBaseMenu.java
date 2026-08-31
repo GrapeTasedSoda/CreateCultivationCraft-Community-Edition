@@ -33,6 +33,8 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
     private int wateredValue = 0;
     /** Client-side mirror of the synced output-full data slot. */
     private int outputFullValue = 0;
+    /** Client-side mirror of the synced height-mismatch data slot. */
+    private int heightMismatchValue = 0;
 
     /**
      * Client-side constructor, invoked by the networked menu type. The block pos
@@ -125,6 +127,19 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
                 outputFullValue = value;
             }
         });
+
+        // Synced flag: whether the crop cannot grow (orange height alarm).
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return blockEntity != null && blockEntity.isHeightMismatch() ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                heightMismatchValue = value;
+            }
+        });
     }
 
     /** Whether the catalyst boost animation should be shown (client side). */
@@ -140,6 +155,11 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
     /** Whether the output slots are full and the red slot alarm should show. */
     public boolean isOutputFull() {
         return outputFullValue != 0;
+    }
+
+    /** Whether the crop cannot grow (tank too short) and the orange alarm should show. */
+    public boolean isHeightMismatch() {
+        return heightMismatchValue != 0;
     }
 
     private static IItemHandler handlerAt(Inventory playerInventory, BlockPos pos) {

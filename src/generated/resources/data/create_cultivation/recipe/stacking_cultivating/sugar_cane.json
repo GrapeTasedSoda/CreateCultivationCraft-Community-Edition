@@ -5,6 +5,7 @@
     "item": "minecraft:sugar_cane"
   },
   "maxHeight": 4,
+  "min_height": 2,
   "processingDuration": 18000,
   "result": {
     "id": "minecraft:sugar_cane"

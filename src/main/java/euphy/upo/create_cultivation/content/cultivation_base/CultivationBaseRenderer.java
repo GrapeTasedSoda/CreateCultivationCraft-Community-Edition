@@ -50,15 +50,18 @@ public class CultivationBaseRenderer extends KineticBlockEntityRenderer<Cultivat
         if (blockState.getValue(CultivationBaseBlock.WORKING)) {
 
             boolean outputFull = be.isOutputFull();
+            boolean heightMismatch = be.isHeightMismatch();
             SuperByteBuffer glowLayer = CachedBuffers.partial(
-                    outputFull ? CCPartialModels.CULTIVATION_BASE_GLOW_FULL : CCPartialModels.CULTIVATION_BASE_GLOW,
+                    heightMismatch ? CCPartialModels.CULTIVATION_BASE_GLOW_ERROR
+                            : outputFull ? CCPartialModels.CULTIVATION_BASE_GLOW_FULL
+                            : CCPartialModels.CULTIVATION_BASE_GLOW,
                     blockState);
 
 
             int fullbright = 15728880;
 
-            if (outputFull) {
-                // "Breathing" alarm: the red glow pulses between 45% and full
+            if (heightMismatch || outputFull) {
+                // "Breathing" alarm: the glow pulses between 45% and full
                 // brightness and floats slightly, driven by wall-clock time so
                 // the motion stays smooth regardless of server tick rate.
                 double seconds = System.nanoTime() * 1.0e-9;

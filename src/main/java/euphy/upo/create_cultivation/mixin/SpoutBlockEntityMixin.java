@@ -50,10 +50,12 @@ public abstract class SpoutBlockEntityMixin {
             if (controllerState.getValue(CultivationTankBlock.WORKING) && controllerState.getValue(CultivationTankBlock.PLANTED)) {
 
                 // Skip watering while the base below the stack reports a full
-                // output: the machine is paused (no harvests, no catalyst
-                // consumption), so do not waste fluid on it either.
+                // output or a height mismatch: the machine is paused (no
+                // harvests, no catalyst consumption), so do not waste fluid on
+                // it either.
                 BlockEntity baseBelow = level.getBlockEntity(controller.getBlockPos().below());
-                if (baseBelow instanceof CultivationBaseBlockEntity baseBE && baseBE.isOutputFull()) {
+                if (baseBelow instanceof CultivationBaseBlockEntity baseBE
+                        && (baseBE.isOutputFull() || baseBE.isHeightMismatch())) {
                     return;
                 }
 

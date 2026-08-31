@@ -5,6 +5,7 @@
     "item": "minecraft:kelp"
   },
   "maxHeight": 8,
+  "min_height": 2,
   "processingDuration": 10000,
   "result": {
     "id": "minecraft:kelp"

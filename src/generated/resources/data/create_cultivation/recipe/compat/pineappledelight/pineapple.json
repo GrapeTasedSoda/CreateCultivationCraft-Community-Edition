@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "pineapple_delight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "pineapple_delight:pineapple_crop",
+  "ingredients": [
+    {
+      "item": "pineapple_delight:pineapple_crop"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 2,
+      "id": "pineapple_delight:pineapple"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "pineapple_delight:pineapple"
+    }
+  ]
+}

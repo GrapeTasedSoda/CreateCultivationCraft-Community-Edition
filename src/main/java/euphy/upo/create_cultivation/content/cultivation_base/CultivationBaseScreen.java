@@ -73,7 +73,10 @@ public class CultivationBaseScreen extends AbstractContainerScreen<CultivationBa
 
         boolean catalyst = this.menu.isCatalystActive();
         boolean watered = this.menu.isWatered();
-        if (catalyst || watered) {
+        // Height-mismatch pause: the machine is not working on the crop, so
+        // both boost animations stop (mirrors the red-alarm behaviour).
+        boolean paused = this.menu.isOutputFull() || this.menu.isHeightMismatch();
+        if (!paused && (catalyst || watered)) {
             // Both states active: each animation plays 1.5x faster.
             float speedBonus = catalyst && watered ? BOTH_SPEED_BONUS : 1.0f;
             if (watered) {
@@ -127,18 +130,26 @@ public class CultivationBaseScreen extends AbstractContainerScreen<CultivationBa
             // Red alarm border around each output slot while the output is
             // full: 1 px outline drawn just outside the 18x18 slot cell.
             int border = 0x80FF3B3B;
-            for (int row = 0; row < 2; row++) {
-                for (int col = 0; col < 4; col++) {
-                    int x = this.leftPos + 93 + col * 18;
-                    int y = this.topPos + 14 + row * 18;
-                    graphics.fill(x - 1, y - 1, x + 17, y, border);
-                    graphics.fill(x - 1, y + 16, x + 17, y + 17, border);
-                    graphics.fill(x - 1, y - 1, x, y + 17, border);
-                    graphics.fill(x + 16, y - 1, x + 17, y + 17, border);
-                }
-            }
+            renderAlarmBorders(graphics, border);
+        } else if (this.menu.isHeightMismatch()) {
+            // Orange-red alarm border while the crop cannot grow in this tank.
+            int border = 0x80FF4500;
+            renderAlarmBorders(graphics, border);
         }
         this.renderTooltip(graphics, mouseX, mouseY);
+    }
+
+    private void renderAlarmBorders(GuiGraphics graphics, int border) {
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 4; col++) {
+                int x = this.leftPos + 93 + col * 18;
+                int y = this.topPos + 14 + row * 18;
+                graphics.fill(x - 1, y - 1, x + 17, y, border);
+                graphics.fill(x - 1, y + 16, x + 17, y + 17, border);
+                graphics.fill(x - 1, y - 1, x, y + 17, border);
+                graphics.fill(x + 16, y - 1, x + 17, y + 17, border);
+            }
+        }
     }
 
     @Override

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "rusticdelight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "rusticdelight:coffee",
+  "ingredients": [
+    {
+      "item": "rusticdelight:coffee_beans"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 3,
+      "id": "rusticdelight:coffee_beans"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "rusticdelight:coffee_beans"
+    }
+  ]
+}

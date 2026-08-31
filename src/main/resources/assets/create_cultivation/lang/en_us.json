@@ -21,6 +21,7 @@
   "create_cultivation.jade.growth": "Growth Height: %s / %s",
   "create_cultivation.jade.stalled": "Stalled",
   "create_cultivation.jade.output_full": "Output full - harvest paused!",
+  "create_cultivation.jade.height_mismatch": "Tank height does not meet the crop's requirement"
 
   "create_cultivation.config.title": "Create: Cultivation Craft",
   "create_cultivation.config.general": "General",

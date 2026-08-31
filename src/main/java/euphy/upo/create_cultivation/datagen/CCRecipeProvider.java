@@ -492,6 +492,7 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .result(new ProcessingOutput(new ItemStack(Items.SUGAR_CANE, 1), 1.0f))
                 .duration(18000)
                 .maxHeight(4)
+                .minHeight(2)
                 .blockToRender(Blocks.SUGAR_CANE)
         ).build(consumer);
         //仙人掌
@@ -500,6 +501,7 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .result(new ProcessingOutput(new ItemStack(Items.CACTUS, 1), 1.0f))
                 .duration(18000)
                 .maxHeight(4)
+                .minHeight(2)
                 .blockToRender(Blocks.CACTUS)
         ).build(consumer);
         //海带
@@ -508,6 +510,7 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .result(new ProcessingOutput(new ItemStack(Items.KELP, 1), 1.0f))
                 .duration(10000)
                 .maxHeight(8)
+                .minHeight(2)
                 .blockToRender(Blocks.KELP_PLANT)
         ).build(consumer);
         //竹子
@@ -516,6 +519,7 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .result(new ProcessingOutput(new ItemStack(Items.BAMBOO, 1), 1.0f))
                 .duration(3600)
                 .maxHeight(12)
+                .minHeight(2)
                 .blockToRender(Blocks.BAMBOO)
         ).build(consumer);
         //紫颂植株
@@ -524,6 +528,7 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .result(new ProcessingOutput(new ItemStack(Items.CHORUS_FRUIT, 1), 1.0f))
                 .duration(36000)
                 .maxHeight(12)
+                .minHeight(2)
                 .blockToRender(Blocks.CHORUS_PLANT)
         ).build(consumer);
     }

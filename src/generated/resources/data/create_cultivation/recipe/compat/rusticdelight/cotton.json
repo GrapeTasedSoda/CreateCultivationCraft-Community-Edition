@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "rusticdelight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "rusticdelight:cotton",
+  "ingredients": [
+    {
+      "item": "rusticdelight:cotton_seeds"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 2,
+      "id": "rusticdelight:cotton_boll"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "rusticdelight:cotton_boll"
+    },
+    {
+      "count": 1,
+      "id": "rusticdelight:cotton_seeds"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "rusticdelight:cotton_seeds"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "kaleidoscope_tavern"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "kaleidoscope_tavern:grape_crop",
+  "ingredients": [
+    {
+      "item": "kaleidoscope_tavern:grapevine"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 3,
+      "id": "kaleidoscope_tavern:grape"
+    },
+    {
+      "chance": 0.45,
+      "count": 1,
+      "id": "kaleidoscope_tavern:green_grape"
+    },
+    {
+      "count": 1,
+      "id": "kaleidoscope_tavern:grapevine"
+    }
+  ]
+}

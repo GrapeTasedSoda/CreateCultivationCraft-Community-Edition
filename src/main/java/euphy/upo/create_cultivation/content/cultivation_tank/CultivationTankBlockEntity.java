@@ -450,6 +450,18 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             return getCalculatedGrowthStage() >= (TOTAL_GROWTH_STAGES - 1);
         }
         if (controllerBE.recipeMode == RecipeMode.STACK_BASED) {
+            int minHeight = 1;
+            var recipeHolder = controllerBE.getCurrentRecipe();
+            if (recipeHolder.isPresent() && recipeHolder.get().value() instanceof IStackingCultivatingRecipe recipe) {
+                minHeight = recipe.getMinHeight();
+            }
+            // A tank shorter than the crop's minimum can never mature - the
+            // plain min(height, maxHeight) cap previously made a 1-block tank
+            // report a 2+ block crop as instantly "mature". A taller-than-min
+            // but shorter-than-max tank still harvests what actually grew.
+            if (controllerBE.getHeight() < minHeight) {
+                return false;
+            }
             int limit = Math.min(controllerBE.getHeight(), controllerBE.maxHeight);
             return controllerBE.currentHeight >= limit;
         }

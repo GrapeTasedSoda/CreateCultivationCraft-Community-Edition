@@ -5,6 +5,7 @@
     "item": "minecraft:chorus_fruit"
   },
   "maxHeight": 12,
+  "min_height": 2,
   "processingDuration": 36000,
   "result": {
     "id": "minecraft:chorus_fruit"

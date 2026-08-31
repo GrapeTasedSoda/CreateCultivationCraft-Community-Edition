@@ -21,6 +21,7 @@
   "create_cultivation.jade.growth": "生长高度: %s / %s",
   "create_cultivation.jade.stalled": "已停滞",
   "create_cultivation.jade.output_full": "产物槽已满，收获暂停！",
+  "create_cultivation.jade.height_mismatch": "高度不满足栽培需求",
 
   "create_cultivation.config.title": "机械动力：栽培工艺",
   "create_cultivation.config.general": "常规",

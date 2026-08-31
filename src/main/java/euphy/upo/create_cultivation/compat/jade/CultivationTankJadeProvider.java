@@ -2,6 +2,7 @@ package euphy.upo.create_cultivation.compat.jade;
 
 import euphy.upo.create_cultivation.CreateCultivationCraft;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
+import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -35,6 +36,10 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
 
         if (serverData.getBoolean("isMature")) {
             tooltip.add(Component.translatable("create_cultivation.jade.mature"));
+        } else if (serverData.getBoolean("heightMismatch")) {
+            // Height alarm takes precedence over the growth readout: the crop
+            // cannot grow in this tank, so a remaining-time number would lie.
+            tooltip.add(Component.translatable("create_cultivation.jade.height_mismatch"));
         } else {
             String recipeMode = serverData.getString("recipeMode");
             if ("STAGE_BASED".equals(recipeMode)) {
@@ -78,11 +83,15 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
 
         CultivationTankBlockEntity controller = tankBE.getControllerBE();
         if (controller != null && controller.getCurrentRecipe().isPresent()) {
+            boolean mismatch = baseHeightMismatch(controller);
             data.putBoolean("isGrowing", true);
-            data.putBoolean("isMature", controller.isMature());
+            data.putBoolean("heightMismatch", mismatch);
+            // With a too-short tank the crop cannot grow, so the stored
+            // "mature" flag is a false positive - report it as not mature.
+            data.putBoolean("isMature", !mismatch && controller.isMature());
             data.putString("recipeMode", controller.getRecipeMode().name());
 
-            if (!controller.isMature()) {
+            if (!controller.isMature() && !mismatch) {
                 if (controller.getRecipeMode() == CultivationTankBlockEntity.RecipeMode.STAGE_BASED) {
                     // Smooth, tick-accurate remaining points (batched growth
                     // plus the in-flight fraction) divided by the true
@@ -104,6 +113,21 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
                 }
             }
         }
+    }
+
+    /** Height requirement of the recipe vs the built tank stack (server side). */
+    private boolean baseHeightMismatch(CultivationTankBlockEntity controller) {
+        var recipeHolder = controller.getCurrentRecipe();
+        if (recipeHolder.isEmpty()) {
+            return false;
+        }
+        if (recipeHolder.get().value() instanceof StackingCultivatingRecipe recipe) {
+            return controller.getHeight() < recipe.getMinHeight();
+        }
+        if (recipeHolder.get().value() instanceof CultivatingRecipe recipe) {
+            return recipe.getHeight() > 1 && controller.getHeight() < recipe.getHeight();
+        }
+        return false;
     }
 
     @Override

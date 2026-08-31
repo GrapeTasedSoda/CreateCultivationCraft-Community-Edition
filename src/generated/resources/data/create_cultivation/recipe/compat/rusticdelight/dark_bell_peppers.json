@@ -1,0 +1,42 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "rusticdelight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "rusticdelight:dark_bell_peppers",
+  "ingredients": [
+    {
+      "item": "rusticdelight:dark_bell_pepper_seeds"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "chance": 0.45,
+      "count": 1,
+      "id": "rusticdelight:bell_pepper_blue"
+    },
+    {
+      "chance": 0.45,
+      "count": 1,
+      "id": "rusticdelight:bell_pepper_purple"
+    },
+    {
+      "chance": 0.45,
+      "count": 1,
+      "id": "rusticdelight:bell_pepper_black"
+    },
+    {
+      "count": 1,
+      "id": "rusticdelight:dark_bell_pepper_seeds"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "rusticdelight:dark_bell_pepper_seeds"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mynethersdelight"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "mynethersdelight:bullet_pepper",
+  "ingredients": [
+    {
+      "item": "mynethersdelight:bullet_pepper"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 2,
+      "id": "mynethersdelight:bullet_pepper"
+    },
+    {
+      "chance": 0.5,
+      "count": 1,
+      "id": "mynethersdelight:bullet_pepper"
+    }
+  ]
+}

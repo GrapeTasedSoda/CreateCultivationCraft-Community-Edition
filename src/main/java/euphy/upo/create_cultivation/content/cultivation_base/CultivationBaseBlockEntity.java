@@ -21,6 +21,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -45,6 +47,9 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     /** Type of the catalyst currently being consumed (resolved at renewal). */
     @Nullable
     private CCCatalysts.CatalystType activeCatalystType;
+    /** Registry id of the last consumed catalyst; lets an empty slot still report the active boost type after reload. */
+    @Nullable
+    private ResourceLocation lastConsumedCatalystId;
 
     private final ItemStackHandler itemHandler = createItemHandler();
     private final IItemHandler automationHandler = createAutomationHandler();
@@ -53,6 +58,8 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     private int catalystTicks = 0;
     /** Cached "all output slots full" flag, synced to clients when it flips. */
     private boolean outputFull = false;
+    /** Cached "crop needs a taller tank" alarm (orange glow), synced to clients. */
+    private boolean heightMismatch = false;
     public CultivationBaseBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
@@ -76,6 +83,53 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
      */
     public boolean isOutputFull() {
         return outputFull;
+    }
+
+    /**
+     * Whether the planted crop requires a taller tank stack than currently
+     * built (stacking recipes {@code minHeight}, stage recipes {@code height}).
+     * While latched the base lights its orange glow and pauses harvests,
+     * catalyst consumption and watering - the crop cannot grow at all, so any
+     * resource input would be wasted.
+     */
+    public boolean isHeightMismatch() {
+        return heightMismatch;
+    }
+
+    /** Recomputes the cached height-mismatch flag and syncs it on change. */
+    private void updateHeightMismatch() {
+        boolean mismatch = computeHeightMismatch();
+        if (mismatch != heightMismatch) {
+            heightMismatch = mismatch;
+            if (level != null && !level.isClientSide) {
+                sendData();
+            }
+        }
+    }
+
+    private boolean computeHeightMismatch() {
+        if (level == null) {
+            return false;
+        }
+        BlockEntity be = level.getBlockEntity(worldPosition.above());
+        if (!(be instanceof CultivationTankBlockEntity tankBE)) {
+            return false;
+        }
+        CultivationTankBlockEntity controller = tankBE.getControllerBE();
+        if (controller == null) {
+            return false;
+        }
+        var recipeHolder = controller.getCurrentRecipe();
+        if (recipeHolder.isEmpty()) {
+            return false;
+        }
+        if (recipeHolder.get().value() instanceof StackingCultivatingRecipe recipe) {
+            return controller.getHeight() < recipe.getMinHeight();
+        }
+        if (recipeHolder.get().value() instanceof CultivatingRecipe recipe) {
+            return recipe.getHeight() > 1 && controller.getHeight() < recipe.getHeight();
+        }
+        return false;
     }
 
     /**
@@ -289,7 +343,22 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         if (!clientPacket) {
             compound.put("Inventory", itemHandler.serializeNBT(registries));
             compound.putInt("CatalystTicks", catalystTicks);
+            if (catalystTicks > 0) {
+                ItemStack slotStack = itemHandler.getStackInSlot(CATALYST_SLOT);
+                // Persist which catalyst type is currently granting the boost.
+                // With an empty slot this is the last consumed item and must be
+                // remembered, otherwise the multiplier falls back after reload.
+                ResourceLocation itemId = slotStack.isEmpty()
+                        ? lastConsumedCatalystId
+                        : BuiltInRegistries.ITEM.getKey(slotStack.getItem());
+                if (itemId != null) {
+                    compound.putString("ActiveCatalyst", itemId.toString());
+                }
+            }
         }
+        // Synced in update packets too, so the client renderer can show the
+        // orange height alarm without recomputing recipe lookups client-side.
+        compound.putBoolean("HeightMismatch", heightMismatch);
     }
 
     @Override
@@ -306,12 +375,23 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             }
             itemHandler.deserializeNBT(registries, inventoryTag);
             catalystTicks = compound.getInt("CatalystTicks");
+            if (compound.contains("ActiveCatalyst", CompoundTag.TAG_STRING)) {
+                ResourceLocation itemId = ResourceLocation.parse(compound.getString("ActiveCatalyst"));
+                activeCatalystType = BuiltInRegistries.ITEM.getOptional(itemId)
+                        .map(CCCatalysts::getType)
+                        .orElse(null);
+            } else {
+                activeCatalystType = null;
+            }
         }
         // The flag is derived state: recompute on both sides instead of
         // persisting it, so old saves and new code always agree. Plain
         // evaluation (no hysteresis) is fine during load - the alarm will
         // re-latch itself if the prediction overflows.
         outputFull = isOutputSlotsFull(outputFull);
+        // Height alarm arrives from the server via update packets (the recipe
+        // lookup it depends on is not reliable on the client).
+        heightMismatch = compound.getBoolean("HeightMismatch");
     }
 
     @Override
@@ -329,12 +409,17 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         }
 
         if (getBlockState().getValue(CultivationBaseBlock.WORKING)) {
-            // Refresh the alarm every tick while working so a full output is
-            // detected the moment a harvest becomes due, not up to 10 seconds
-            // later on the next lazy tick.
+            // Refresh the alarm every tick while working so a full output or a
+            // height mismatch is detected the moment it arises, not up to 10
+            // seconds later on the next lazy tick.
+            updateHeightMismatch();
             updateOutputFull();
             tickCatalyst();
             tryHarvest();
+        } else if (level != null && !level.isClientSide) {
+            // Not working: make sure cached alarms clear immediately when the
+            // machine stops (power lost / tank removed).
+            updateHeightMismatch();
         }
     }
 
@@ -342,6 +427,12 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     private void tryHarvest() {
         BlockEntity be = level.getBlockEntity(worldPosition.above());
         if (!(be instanceof CultivationTankBlockEntity tankBE)) {
+            return;
+        }
+
+        if (isHeightMismatch()) {
+            // Orange alarm state: the crop cannot grow (tank too short), so
+            // harvesting a "mature" state here would be a false positive.
             return;
         }
 
@@ -561,9 +652,16 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
      * planted crop nothing is consumed.
      */
     private void tickCatalyst() {
-        if (!hasCrop() || !hasCatalyst()) {
-            // No crop or no catalyst: the boost is cancelled immediately.
+        if (!hasCrop()) {
+            // No crop: the machine is not growing anything, so the boost is
+            // cancelled outright - the GUI animations must stop and the timer
+            // must not resume when a new crop is planted.
             catalystTicks = 0;
+            return;
+        }
+        if (isHeightMismatch()) {
+            // Orange alarm: the crop cannot grow, so consumption is paused
+            // (timer frozen, nothing consumed) until the alarm clears.
             return;
         }
         if (isOutputFull()) {
@@ -576,10 +674,17 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             catalystTicks--;
         }
         if (catalystTicks <= 0) {
+            if (!hasCatalyst()) {
+                // Slot drained: the current boost simply expires. Do NOT reset
+                // the timer - the remaining time belongs to the last consumed
+                // item, not to the presence of items in the slot.
+                return;
+            }
             // Renew in the same tick the previous catalyst expires so the boost
             // never lapses (not even for one tick) while more items remain.
             ItemStack catalystStack = itemHandler.getStackInSlot(CATALYST_SLOT);
             activeCatalystType = CCCatalysts.getType(catalystStack.getItem());
+            lastConsumedCatalystId = BuiltInRegistries.ITEM.getKey(catalystStack.getItem());
             catalystStack.shrink(1);
             itemHandler.setStackInSlot(CATALYST_SLOT, catalystStack);
             catalystTicks = currentCatalystDuration();
@@ -672,7 +777,10 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
      * as paused while the output-full alarm is on).
      */
     public boolean isCatalystBoostActive() {
-        return hasCatalyst() && catalystTicks > 0 && !outputFull;
+        // Active while paid-for ticks remain. Empty slot only means no further
+        // renewal; the last consumed item's time must still count, otherwise
+        // a single catalyst would be consumed with no visible effect.
+        return catalystTicks > 0 && !outputFull;
     }
 
     /** Whether the cultivation tank above this base is currently watered. */

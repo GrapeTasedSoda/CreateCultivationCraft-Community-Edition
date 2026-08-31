@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "corn_delight"
+    }
+  ],
+  "type": "create_cultivation:stacking_cultivating",
+  "ingredient": {
+    "item": "corn_delight:corn_seeds"
+  },
+  "result": {
+    "id": "corn_delight:corn",
+    "count": 1
+  },
+  "processingDuration": 12000,
+  "block_to_render": "corn_delight:corn_crop",
+  "stage_by_progress": true,
+  "maxHeight": 2,
+  "min_height": 2
+}
