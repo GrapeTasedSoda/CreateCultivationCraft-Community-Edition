@@ -123,6 +123,21 @@ public class CultivationBaseScreen extends AbstractContainerScreen<CultivationBa
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        if (this.menu.isOutputFull()) {
+            // Red alarm border around each output slot while the output is
+            // full: 1 px outline drawn just outside the 18x18 slot cell.
+            int border = 0x80FF3B3B;
+            for (int row = 0; row < 2; row++) {
+                for (int col = 0; col < 4; col++) {
+                    int x = this.leftPos + 93 + col * 18;
+                    int y = this.topPos + 14 + row * 18;
+                    graphics.fill(x - 1, y - 1, x + 17, y, border);
+                    graphics.fill(x - 1, y + 16, x + 17, y + 17, border);
+                    graphics.fill(x - 1, y - 1, x, y + 17, border);
+                    graphics.fill(x + 16, y - 1, x + 17, y + 17, border);
+                }
+            }
+        }
         this.renderTooltip(graphics, mouseX, mouseY);
     }
 

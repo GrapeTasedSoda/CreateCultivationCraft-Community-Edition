@@ -8,6 +8,9 @@ public class CCPartialModels {
     public static final PartialModel CULTIVATION_BASE_GLOW = PartialModel.of(
             CreateCultivationCraft.asResource("block/cultivation_base_glow"));
 
+    public static final PartialModel CULTIVATION_BASE_GLOW_FULL = PartialModel.of(
+            CreateCultivationCraft.asResource("block/cultivation_base_glow_full"));
+
     public static void init() {
 
     }

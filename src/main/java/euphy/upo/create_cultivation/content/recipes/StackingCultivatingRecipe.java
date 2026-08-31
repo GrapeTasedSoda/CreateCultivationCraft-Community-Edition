@@ -45,6 +45,21 @@ public class StackingCultivatingRecipe extends ProcessingRecipe<RecipeInput, Sta
     }
 
     @Override
+    public int getMinHeight() {
+        return this.params.minHeight;
+    }
+
+    @Override
+    public Block getTopRender() {
+        return this.params.topRender;
+    }
+
+    @Override
+    public boolean isStageByProgress() {
+        return this.params.stageByProgress;
+    }
+
+    @Override
     public int getMaxHeight() {
         return this.params.maxHeight;
     }

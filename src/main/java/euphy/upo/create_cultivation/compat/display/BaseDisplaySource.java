@@ -56,22 +56,22 @@ public class BaseDisplaySource extends DisplaySource {
 		}
 
 		if (mode == MODE_MULTIPLIERS) {
-			double yieldMultiplier = CCConfig.CROP_YIELD.get();
+			// Must mirror the harvest logic exactly: config yield x fertilizer
+			// yield, x watering bonus when watered, x synergy when watered AND
+			// fertilized.
+			double yieldMultiplier = CCConfig.CROP_YIELD.get() * baseBE.getCatalystYieldMultiplier();
 			double growthMultiplier = 0.0;
 
 			BlockEntity beAbove = baseBE.getLevel().getBlockEntity(baseBE.getBlockPos().above());
 			if (beAbove instanceof CultivationTankBlockEntity tankBE) {
-				growthMultiplier = tankBE.getSpeedMultiplier() * CCConfig.GROWTH_RATE.get();
-				if (baseBE.isCatalystBoostActive()) {
-					growthMultiplier *= CCConfig.CATALYST_GROWTH_BONUS.get();
-					if (tankBE.isWatered()) {
-						growthMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
-					}
-				}
+				growthMultiplier = tankBE.getSpeedMultiplier() * CCConfig.GROWTH_RATE.get()
+					* baseBE.getCatalystGrowthMultiplier();
 				if (tankBE.isWatered()) {
+					growthMultiplier *= CCConfig.WATERING_GROWTH_BONUS.get();
 					yieldMultiplier *= CCConfig.WATERING_YIELD_BONUS.get();
 					if (baseBE.isCatalystBoostActive()) {
 						yieldMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
+						growthMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
 					}
 				}
 			}

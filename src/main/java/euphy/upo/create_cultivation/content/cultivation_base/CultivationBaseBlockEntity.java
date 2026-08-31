@@ -2,6 +2,7 @@ package euphy.upo.create_cultivation.content.cultivation_base;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.processing.recipe.ProcessingOutput;
+import euphy.upo.create_cultivation.config.CCCatalysts;
 import euphy.upo.create_cultivation.config.CCConfig;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
@@ -28,6 +29,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 import java.util.ArrayList;
@@ -40,12 +42,17 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     public static final int CATALYST_SLOT = SLOT_COUNT;
     /** How many boosted ticks one catalyst item lasts when the recipe does not specify {@code catalyst_use}. 30 seconds. */
     public static final int DEFAULT_CATALYST_USE = 600;
+    /** Type of the catalyst currently being consumed (resolved at renewal). */
+    @Nullable
+    private CCCatalysts.CatalystType activeCatalystType;
 
     private final ItemStackHandler itemHandler = createItemHandler();
     private final IItemHandler automationHandler = createAutomationHandler();
     private boolean isHarvesting = false;
     /** Remaining boosted ticks backed by the catalyst item currently in the slot. */
     private int catalystTicks = 0;
+    /** Cached "all output slots full" flag, synced to clients when it flips. */
+    private boolean outputFull = false;
     public CultivationBaseBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
@@ -59,6 +66,142 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
 
     public ItemStackHandler getItemHandler() {
         return itemHandler;
+    }
+
+    /**
+     * Whether the next harvest could not place all of its items into the
+     * output slots (predicted with the same math as a real harvest). While
+     * full, the base lights its red "output full" glow, pauses harvests,
+     * catalyst consumption and watering.
+     */
+    public boolean isOutputFull() {
+        return outputFull;
+    }
+
+    /**
+     * Recomputes the cached output-full flag with hysteresis: while latched,
+     * the flag only clears when even a worst-case harvest (watered + fertilizer
+     * both active) would fit. This breaks the feedback loop where pausing
+     * removes the watered/fertilizer bonus from the prediction, shrinks it,
+     * un-pauses the machine, re-watering restores the bonus, and the alarm
+     * oscillates - which kept consuming fertilizer instead of stopping.
+     */
+    private void updateOutputFull() {
+        boolean full = isOutputSlotsFull(outputFull);
+        if (full != outputFull) {
+            outputFull = full;
+            if (level != null && !level.isClientSide) {
+                if (full) {
+                    // Cut the residual watered state the moment the alarm hits
+                    // so watering (and its GUI animation) stops immediately
+                    // instead of lingering for the rest of its duration.
+                    clearTankWatered();
+                }
+                sendData();
+            }
+        }
+    }
+
+    private void clearTankWatered() {
+        if (level == null) {
+            return;
+        }
+        BlockEntity be = level.getBlockEntity(worldPosition.above());
+        if (be instanceof CultivationTankBlockEntity tankBE) {
+            CultivationTankBlockEntity controller = tankBE.getControllerBE();
+            if (controller != null && controller.isWatered()) {
+                controller.setWatered(false);
+            }
+        }
+    }
+
+    private boolean isOutputSlotsFull(boolean worstCase) {
+        // "Full" means the next harvest would overflow: its predicted output
+        // (scaled like a real harvest) cannot fully fit into the output
+        // slots. Partially stacked same-item slots still accept merges, so a
+        // single crop across 7 open slots + 1 empty slot is NOT full; mixed
+        // crops only block when no empty or matching slot can absorb them.
+        // While the alarm is latched the prediction uses the worst case
+        // (watering and fertilizer assumed active) so the machine can never
+        // un-pause itself merely because pausing changed those inputs.
+        List<ItemStack> pending = predictNextHarvest(worstCase);
+        if (pending.isEmpty()) {
+            return false;
+        }
+        return !canInsertAll(pending);
+    }
+
+    /**
+     * Estimates what the next harvest would produce, mirroring the real
+     * harvest math: recipe outputs rolled once (chance included), scaled by
+     * the current unified yield multiplier, minus one item reserved for
+     * replanting. Empty when no harvest is currently due.
+     *
+     * @param worstCase when true, assumes watering is active and the catalyst
+     *                  slot is consuming - the maximum yield the machine could
+     *                  ever produce at this moment. Used to release the
+     *                  output-full latch safely.
+     */
+    private List<ItemStack> predictNextHarvest(boolean worstCase) {
+        List<ItemStack> pending = new ArrayList<>();
+        if (level == null) {
+            return pending;
+        }
+        BlockEntity be = level.getBlockEntity(worldPosition.above());
+        if (!(be instanceof CultivationTankBlockEntity tankBE) || !tankBE.isReadyForHarvest()) {
+            return pending;
+        }
+
+        boolean hasCrop = tankBE.getRecipeMode() != CultivationTankBlockEntity.RecipeMode.NONE;
+        boolean watered = worstCase ? hasCrop : tankBE.isWatered();
+        double catalystYield = getCatalystYieldMultiplier(isCatalystBoostActive() || (worstCase && hasCatalyst()));
+        double yieldMultiplier = CCConfig.CROP_YIELD.get() * catalystYield;
+        if (watered) {
+            yieldMultiplier *= CCConfig.WATERING_YIELD_BONUS.get();
+            if (isCatalystBoostActive() || (worstCase && hasCatalyst())) {
+                yieldMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
+            }
+        }
+
+        var recipeHolder = tankBE.getCurrentRecipe();
+        if (recipeHolder.isEmpty()) {
+            return pending;
+        }
+
+        if (tankBE.getRecipeMode() == CultivationTankBlockEntity.RecipeMode.STAGE_BASED
+                && recipeHolder.get().value() instanceof CultivatingRecipe recipe) {
+            // Same height gate as the real harvest.
+            if (recipe.getHeight() > 1 && tankBE.getHeight() < recipe.getHeight()) {
+                return pending;
+            }
+            Ingredient seedIngredient = recipe.getIngredients().get(0);
+            // Deterministic worst case: chance outputs are counted as if they
+            // always succeed, so the alarm never flickers between lazy ticks.
+            for (ProcessingOutput output : recipe.getRollableResults()) {
+                ItemStack rolled = applyYield(output.getStack().copy(), yieldMultiplier);
+                if (!rolled.isEmpty()) {
+                    pending.add(rolled);
+                }
+            }
+            // Reserve one item for the automatic replant.
+            for (ItemStack stack : pending) {
+                if (seedIngredient.test(stack)) {
+                    stack.shrink(1);
+                    break;
+                }
+            }
+            pending.removeIf(ItemStack::isEmpty);
+        } else if (tankBE.getRecipeMode() == CultivationTankBlockEntity.RecipeMode.STACK_BASED
+                && recipeHolder.get().value() instanceof StackingCultivatingRecipe stackRecipe) {
+            int layers = Math.max(1, tankBE.getCurrentHeight());
+            ItemStack base = stackRecipe.getResult().getStack().copy();
+            int totalCount = (int) Math.floor(base.getCount() * layers * yieldMultiplier);
+            if (totalCount > 0) {
+                base.setCount(totalCount);
+                pending.add(base);
+            }
+        }
+        return pending;
     }
 
     /**
@@ -97,6 +240,7 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
 
             @Override
             protected void onContentsChanged(int slot) {
+                updateOutputFull();
                 setChanged();
             }
         };
@@ -163,6 +307,11 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             itemHandler.deserializeNBT(registries, inventoryTag);
             catalystTicks = compound.getInt("CatalystTicks");
         }
+        // The flag is derived state: recompute on both sides instead of
+        // persisting it, so old saves and new code always agree. Plain
+        // evaluation (no hysteresis) is fine during load - the alarm will
+        // re-latch itself if the prediction overflows.
+        outputFull = isOutputSlotsFull(outputFull);
     }
 
     @Override
@@ -180,6 +329,10 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         }
 
         if (getBlockState().getValue(CultivationBaseBlock.WORKING)) {
+            // Refresh the alarm every tick while working so a full output is
+            // detected the moment a harvest becomes due, not up to 10 seconds
+            // later on the next lazy tick.
+            updateOutputFull();
             tickCatalyst();
             tryHarvest();
         }
@@ -189,6 +342,12 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     private void tryHarvest() {
         BlockEntity be = level.getBlockEntity(worldPosition.above());
         if (!(be instanceof CultivationTankBlockEntity tankBE)) {
+            return;
+        }
+
+        if (isOutputFull()) {
+            // Red alarm state: every output slot is occupied, the harvest
+            // cannot place its items and is skipped entirely.
             return;
         }
 
@@ -224,22 +383,20 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
                 List<ProcessingOutput> results = recipe.getRollableResults();
                 List<ItemStack> rolledResults = new ArrayList<>();
 
-                boolean wasWatered = tankBE.isWatered();
-                if (wasWatered) {
-                    double wateredYield = cropYield * CCConfig.WATERING_YIELD_BONUS.get();
+                // Single unified multiplier: config yield x fertilizer yield,
+                // x watering bonus when watered, x synergy when watered AND
+                // fertilized. Matches the display link multiplier readout.
+                double yieldMultiplier = cropYield * getCatalystYieldMultiplier();
+                if (tankBE.isWatered()) {
+                    yieldMultiplier *= CCConfig.WATERING_YIELD_BONUS.get();
                     if (isCatalystBoostActive()) {
-                        wateredYield *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
-                    }
-                    for (ProcessingOutput output : results) {
-                        ItemStack full = applyYield(output.getStack().copy(), wateredYield);
-                        if (!full.isEmpty()) {
-                            rolledResults.add(full);
-                        }
+                        yieldMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
                     }
                 }
 
+                // Roll each output exactly once (chance included), then scale.
                 for (ProcessingOutput output : results) {
-                    ItemStack rolled = applyYield(output.rollOutput(level.getRandom()), cropYield);
+                    ItemStack rolled = applyYield(output.rollOutput(level.getRandom()), yieldMultiplier);
                     if (!rolled.isEmpty()) {
                         rolledResults.add(rolled);
                     }
@@ -284,7 +441,16 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
 
                 if (harvestedAmount <= 0) return;
 
-                int totalCount = (int) Math.floor(result.getStack().getCount() * harvestedAmount * cropYield);
+                // Same unified multiplier as stage-based harvests so the
+                // display link readout matches actual output.
+                double yieldMultiplier = cropYield * getCatalystYieldMultiplier();
+                if (tankBE.isWatered()) {
+                    yieldMultiplier *= CCConfig.WATERING_YIELD_BONUS.get();
+                    if (isCatalystBoostActive()) {
+                        yieldMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get();
+                    }
+                }
+                int totalCount = (int) Math.floor(result.getStack().getCount() * harvestedAmount * yieldMultiplier);
                 if (totalCount <= 0) {
                     return;
                 }
@@ -359,19 +525,20 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     }
 
     /**
-     * Whether the given stack is a valid catalyst for the crop currently planted
-     * on top of this base. Falls back to bone meal when no crop is planted, so
-     * players can pre-fill the slot before planting.
+     * Whether the given stack is a valid catalyst. Accepts any item registered
+     * in the config catalyst table, plus whatever the planted crop's recipe
+     * lists in its {@code catalyst} ingredient (fallback effects), so players
+     * can pre-fill the slot before planting.
      */
     public boolean isCatalyst(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
         }
-        Ingredient ingredient = getCatalystIngredient();
-        if (ingredient == null) {
-            return stack.is(Items.BONE_MEAL);
+        if (CCCatalysts.isCatalyst(stack.getItem())) {
+            return true;
         }
-        return ingredient.test(stack);
+        Ingredient ingredient = getCatalystIngredient();
+        return ingredient != null && ingredient.test(stack);
     }
 
     /** Whether a crop is currently planted in the tank above this base. */
@@ -399,6 +566,12 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             catalystTicks = 0;
             return;
         }
+        if (isOutputFull()) {
+            // Output full: the machine is paused, so hold the catalyst timer
+            // instead of consuming items for a machine that is not working.
+            // The remaining time resumes when the alarm clears.
+            return;
+        }
         if (catalystTicks > 0) {
             catalystTicks--;
         }
@@ -406,10 +579,22 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             // Renew in the same tick the previous catalyst expires so the boost
             // never lapses (not even for one tick) while more items remain.
             ItemStack catalystStack = itemHandler.getStackInSlot(CATALYST_SLOT);
+            activeCatalystType = CCCatalysts.getType(catalystStack.getItem());
             catalystStack.shrink(1);
             itemHandler.setStackInSlot(CATALYST_SLOT, catalystStack);
-            catalystTicks = getCatalystUse();
+            catalystTicks = currentCatalystDuration();
         }
+    }
+
+    /** Duration for the catalyst currently being consumed: config table first, then recipe override, then fallback. */
+    private int currentCatalystDuration() {
+        ItemStack catalystStack = itemHandler.getStackInSlot(CATALYST_SLOT);
+        CCCatalysts.CatalystType type = activeCatalystType != null ? activeCatalystType
+            : CCCatalysts.getType(catalystStack.getItem());
+        if (type != null) {
+            return type.durationTicks();
+        }
+        return getCatalystUse();
     }
 
     private int getCatalystUse() {
@@ -432,19 +617,62 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     }
 
     /**
-     * Growth speed multiplier granted by the catalyst slot: the configured bonus
-     * while a catalyst item is present and boosted ticks remain, 1.0 otherwise.
+     * Growth speed multiplier granted by the catalyst slot. Config-registered
+     * catalysts use their table multiplier (the item being consumed defines
+     * the boost); items accepted only via a recipe fall back to the built-in
+     * values. No catalyst: 1.0.
      */
     public float getCatalystGrowthMultiplier() {
-        if (isCatalystBoostActive()) {
-            return CCConfig.CATALYST_GROWTH_BONUS.get().floatValue();
+        if (!isCatalystBoostActive()) {
+            return 1.0f;
         }
-        return 1.0f;
+        CCCatalysts.CatalystType type = activeCatalystType;
+        if (type == null) {
+            ItemStack catalystStack = itemHandler.getStackInSlot(CATALYST_SLOT);
+            type = CCCatalysts.getType(catalystStack.getItem());
+        }
+        if (type != null) {
+            return (float) type.growthMultiplier();
+        }
+        return (float) CCCatalysts.FALLBACK.growthMultiplier();
     }
 
-    /** Whether the catalyst slot is actively granting a boost right now (item present and boosted ticks remaining). */
+    /**
+     * Harvest yield multiplier granted by the catalyst slot: the consumed
+     * catalyst's configured yield multiplier while active, 1.0 otherwise.
+     */
+    public double getCatalystYieldMultiplier() {
+        return getCatalystYieldMultiplier(isCatalystBoostActive());
+    }
+
+    /**
+     * Yield multiplier for the catalyst in the slot. With {@code assumeActive}
+     * the configured multiplier is returned even while the boost is paused -
+     * used by worst-case output-full predictions (the machine will consume
+     * again as soon as the alarm clears).
+     */
+    private double getCatalystYieldMultiplier(boolean assumeActive) {
+        if (!assumeActive) {
+            return 1.0;
+        }
+        CCCatalysts.CatalystType type = activeCatalystType;
+        if (type == null) {
+            ItemStack catalystStack = itemHandler.getStackInSlot(CATALYST_SLOT);
+            type = CCCatalysts.getType(catalystStack.getItem());
+        }
+        if (type != null) {
+            return type.yieldMultiplier();
+        }
+        return CCCatalysts.FALLBACK.yieldMultiplier();
+    }
+
+    /**
+     * Whether the catalyst slot is actively granting a boost right now (item
+     * present, boosted ticks remaining, output not full - the boost is treated
+     * as paused while the output-full alarm is on).
+     */
     public boolean isCatalystBoostActive() {
-        return hasCatalyst() && catalystTicks > 0;
+        return hasCatalyst() && catalystTicks > 0 && !outputFull;
     }
 
     /** Whether the cultivation tank above this base is currently watered. */

@@ -123,7 +123,7 @@ public class CultivationScenes {
             be -> be.getItemHandler().insertItem(CultivationBaseBlockEntity.CATALYST_SLOT, new ItemStack(Items.BONE_MEAL, 8), false));
         scene.idle(10);
         scene.overlay().showText(80)
-            .text("在基座界面放入催化剂（默认骨粉）可让作物以3倍速生长，每30秒消耗一份。")
+            .text("在基座界面放入催化剂（如骨粉）可加速生长，每种催化剂的时长和倍率可在配置文件中自定义。")
             .pointAt(Vec3.atCenterOf(util.grid().at(1, 1, 1)))
             .placeNearTarget()
             .attachKeyFrame();

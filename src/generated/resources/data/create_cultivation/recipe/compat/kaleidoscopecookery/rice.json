@@ -2,21 +2,20 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "farmersdelight"
+      "modid": "kaleidoscope_cookery"
     }
   ],
   "type": "create_cultivation:stacking_cultivating",
   "ingredient": {
-    "item": "farmersdelight:rice"
+    "item": "kaleidoscope_cookery:rice"
   },
   "result": {
-    "id": "farmersdelight:rice_panicle",
+    "id": "kaleidoscope_cookery:rice_panicle",
     "count": 2
   },
   "processingDuration": 9000,
-  "block_to_render": "farmersdelight:rice",
-  "top_render": "farmersdelight:rice_panicles",
+  "block_to_render": "kaleidoscope_cookery:rice_crop",
   "stage_by_progress": true,
-  "maxHeight": 2,
+  "maxHeight": 3,
   "min_height": 2
 }

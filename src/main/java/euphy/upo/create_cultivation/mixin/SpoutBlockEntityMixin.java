@@ -4,6 +4,7 @@ import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.fluids.spout.SpoutBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.simibubi.create.foundation.fluid.FluidHelper;
+import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlock;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -47,6 +48,14 @@ public abstract class SpoutBlockEntityMixin {
 
             BlockState controllerState = controller.getBlockState();
             if (controllerState.getValue(CultivationTankBlock.WORKING) && controllerState.getValue(CultivationTankBlock.PLANTED)) {
+
+                // Skip watering while the base below the stack reports a full
+                // output: the machine is paused (no harvests, no catalyst
+                // consumption), so do not waste fluid on it either.
+                BlockEntity baseBelow = level.getBlockEntity(controller.getBlockPos().below());
+                if (baseBelow instanceof CultivationBaseBlockEntity baseBE && baseBE.isOutputFull()) {
+                    return;
+                }
 
                 // Do not re-water while the tank is already watered: the watered
                 // state has a duration (wateredDuration), and re-watering every

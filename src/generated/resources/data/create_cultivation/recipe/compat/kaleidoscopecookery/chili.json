@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "kaleidoscope_cookery"
+    }
+  ],
+  "type": "create_cultivation:cultivating",
+  "crop_block": "kaleidoscope_cookery:chili_crop",
+  "ingredients": [
+    {
+      "item": "kaleidoscope_cookery:chili_seed"
+    }
+  ],
+  "processingDuration": 12000,
+  "results": [
+    {
+      "count": 1,
+      "id": "kaleidoscope_cookery:red_chili"
+    },
+    {
+      "chance": 0.2,
+      "count": 1,
+      "id": "kaleidoscope_cookery:green_chili"
+    },
+    {
+      "count": 1,
+      "id": "kaleidoscope_cookery:chili_seed"
+    }
+  ]
+}

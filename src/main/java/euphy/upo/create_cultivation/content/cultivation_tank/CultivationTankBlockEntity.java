@@ -8,6 +8,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlock;
 import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
+import euphy.upo.create_cultivation.content.recipes.IStackingCultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import euphy.upo.create_cultivation.config.CCConfig;
 import euphy.upo.create_cultivation.registry.CCRecipes;
@@ -194,12 +195,20 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
                 }).orElse(false);
                 if (!canGrow) return;
             }
+            if (recipeMode == RecipeMode.STACK_BASED) {
+                // Stacking crops can require a minimum tank height (e.g. rice
+                // needs at least 2 blocks) before they start growing at all.
+                boolean canGrow = currentRecipe.map(holder -> {
+                    if (holder.value() instanceof IStackingCultivatingRecipe recipe) {
+                        return getHeight() >= recipe.getMinHeight();
+                    }
+                    return true;
+                }).orElse(false);
+                if (!canGrow) return;
+            }
 
             if (!isMature()) {
-                float speedMultiplier = getSpeedMultiplier() * CCConfig.GROWTH_RATE.get().floatValue() * getCatalystMultiplier();
-                if (isWatered && isCatalystBoostActive()) {
-                    speedMultiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get().floatValue();
-                }
+                float speedMultiplier = getGrowthPointsPerLazyTick();
                 if (speedMultiplier > 0) {
                     growthAccumulator += speedMultiplier;
                     int pointsToApply = (int) growthAccumulator;
@@ -222,6 +231,83 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             }
             setChanged();
         }
+    }
+
+    /**
+     * Growth points added per lazy tick (growth settles in batches every
+     * {@code lazyTickRate} game ticks, default 10): kinetic speed × config
+     * growth rate × catalyst × (watering × synergy). Shared by the real
+     * growth code and the Jade tooltip so the displayed countdown matches
+     * actual behavior. Returns 0 when growth is gated (height not reached).
+     */
+    public float getGrowthPointsPerLazyTick() {
+        if (recipeMode == RecipeMode.NONE) {
+            return 0;
+        }
+        // Same gates as the growth code in lazyTick.
+        boolean canGrow = currentRecipe.map(holder -> {
+            if (holder.value() instanceof CultivatingRecipe recipe) {
+                return recipe.getHeight() <= 1 || getHeight() >= recipe.getHeight();
+            }
+            if (holder.value() instanceof IStackingCultivatingRecipe recipe) {
+                return getHeight() >= recipe.getMinHeight();
+            }
+            return true;
+        }).orElse(false);
+        if (!canGrow) {
+            return 0;
+        }
+        float multiplier = getSpeedMultiplier() * CCConfig.GROWTH_RATE.get().floatValue() * getCatalystMultiplier();
+        if (isWatered) {
+            multiplier *= CCConfig.WATERING_GROWTH_BONUS.get().floatValue();
+            if (isCatalystBoostActive()) {
+                multiplier *= CCConfig.WATER_CATALYST_SYNERGY_BONUS.get().floatValue();
+            }
+        }
+        return multiplier;
+    }
+
+    /** Average growth points per game tick (lazy-tick amount ÷ lazy tick rate). */
+    public float getGrowthPointsPerGameTick() {
+        return getGrowthPointsPerLazyTick() / Math.max(1, getLazyTickRate());
+    }
+
+    /**
+     * Tick-accurate remaining growth points. Stage mode: batched progress plus
+     * the in-flight fraction (unsettled accumulator + ticks elapsed since the
+     * last batch). Stacking mode: every unfinished layer counts its full
+     * duration, the current layer only its partial remainder, minus the same
+     * in-flight fraction. Shared by the Jade tooltip and the display link so
+     * both show identical, deterministic numbers.
+     */
+    public float getSmoothRemainingPoints() {
+        CultivationTankBlockEntity c = this;
+        if (recipeMode == RecipeMode.STACK_BASED) {
+            c = getControllerBE() != null ? getControllerBE() : this;
+        }
+
+        float remaining;
+        if (c.recipeMode == RecipeMode.STACK_BASED) {
+            int limit = Math.min(c.getHeight(), c.maxHeight);
+            if (c.currentHeight >= limit) {
+                return 0;
+            }
+            // Unfinished layers at full duration + partial remainder of the
+            // layer currently growing.
+            remaining = (limit - c.currentHeight - 1) * c.processingDuration
+                    + (c.processingDuration - c.progress);
+        } else {
+            remaining = c.processingDuration - c.progress;
+        }
+
+        float perLazyTick = c.getGrowthPointsPerLazyTick();
+        if (perLazyTick <= 0) {
+            return Math.max(0, remaining);
+        }
+        float perGameTick = perLazyTick / Math.max(1, c.getLazyTickRate());
+        int ticksSinceBatch = Math.max(0, c.getLazyTickRate() - c.lazyTickCounter);
+        remaining -= c.growthAccumulator + ticksSinceBatch * perGameTick;
+        return Math.max(0, remaining);
     }
 
     public float getSpeedMultiplier() {

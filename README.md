@@ -55,7 +55,7 @@ Right-click the Cultivation Base (with any item, no need for an empty hand) to o
 
 **Catalyst System**
 
-- Insert catalyst items (bone meal by default) into the base GUI; the machine boosts crop growth by 3x.
+- Insert fertilizer items (bone meal by default) into the base GUI; each fertilizer's duration and multipliers are configurable.
 - One catalyst is consumed every 30 seconds; recipes can override the item type and per-item duration via `catalyst` / `catalyst_use`.
 - The catalyst bar timer is renewed on each insertion, so topping up never loses progress.
 - GUI animations (catalyst arrows / water lines) run on a wall-clock timer and stay immune to server lag and time sync.
@@ -108,10 +108,11 @@ Access via `Mods screen → create_cultivation → Config` or edit `config/creat
 |-----|---------|-------|-------------|
 | `growthRateMultiplier` | 1.0 | 0.05–20 | Crop growth rate multiplier |
 | `cropYieldMultiplier` | 1.0 | 0.1–64 | Crop yield multiplier |
-| `wateringYieldBonus` | 2.5 | 1.0–10 | Extra yield bonus when watered |
+| `wateringYieldBonus` | 1.5 | 1.0–10 | Extra yield bonus when watered |
+| `wateringGrowthBonus` | 2.0 | 1.0–10 | Extra growth speed multiplier when watered |
 | `wateredDuration` | 2 | 1–600 | Watered status duration in ticks |
-| `catalystGrowthBonus` | 3.0 | 1.0–10 | Growth multiplier while a catalyst is active |
-| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | Extra multiplier for growth and yield while watered AND catalyzed |
+| `catalysts` | see below | list | Fertilizer table: `item;durationTicks;growthMultiplier;yieldMultiplier` per entry; defaults: bone meal `600;2.0;1.5`, Farmer's Delight organic compost `1800;4.0;2.0` |
+| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | Extra multiplier for growth and yield while watered AND fertilized |
 
 #### Ponder
 
@@ -181,15 +182,15 @@ Create 自 6.0.7 起移除了 `FluidIngredient` 类，改用 NeoForge 的 `Sized
 
 右键栽培基座（任意物品，无需空手）即可打开界面：
 
-- 8 个产物槽用于存放收获物，另有 1 个专属催化剂槽。
+- 8 个产物槽用于存放收获物，另有 1 个专属肥料槽。
 - 手持栽培罐右键基座会直接把罐子放到基座上方，而不是打开界面。
 
-**催化剂系统**
+**肥料系统**
 
-- 在基座界面放入催化剂物品（默认骨粉），作物生长速度提升至 3 倍。
-- 每隔 30 秒消耗一份催化剂；配方可通过 `catalyst` / `catalyst_use` 字段自定义催化剂种类与单份时长。
-- 催化剂计时器在每次放入时重新续期，中途补货不会损失剩余时间。
-- 基座界面动画（催化剂箭头/水线）基于真实时钟驱动，不受服务器卡顿与时间同步影响。
+- 在基座界面放入肥料物品（默认骨粉），各肥料的时长与倍率可在配置文件中自定义。
+- 每隔 30 秒消耗一份肥料；配方可通过 `catalyst` / `catalyst_use` 字段自定义肥料种类与单份时长。
+- 肥料计时器在每次放入时重新续期，中途补货不会损失剩余时间。
+- 基座界面动画（肥料箭头/水线）基于真实时钟驱动，不受服务器卡顿与时间同步影响。
 
 **JEI 配方显示**
 
@@ -197,8 +198,8 @@ Create 自 6.0.7 起移除了 `FluidIngredient` 类，改用 NeoForge 的 `Sized
 
 - 新增 **栽培（Cultivating）** 与 **堆叠栽培（Stacking Cultivation）** 两个配方分类。
 - 点击种子/作物可查看栽培配方（输入种子 → 输出作物）。
-- 界面显示：浇灌流体、生长时间，以及箭头上方的配方催化剂。
-- 栽培基座与栽培罐注册为 JEI 配方催化剂，点击即可查看相关配方。
+- 界面显示：浇灌流体、生长时间，以及箭头上方的配方肥料。
+- 栽培基座与栽培罐注册为 JEI 配方肥料，点击即可查看相关配方。
 - 不安装 JEI 时不影响模组运行。
 
 **显示连接器联动**
@@ -210,10 +211,10 @@ Create 自 6.0.7 起移除了 `FluidIngredient` 类，改用 NeoForge 的 `Sized
 | 栽培罐 | 作物种类 | 当前作物名称（如 小麦 / 甘蔗） |
 | 栽培罐 | 剩余生长时间 | 生长剩余时间 |
 | 栽培基座 | 基座产物 | 列出已存储的产物种类与数量 |
-| 栽培基座 | 基座催化剂数量 | 如「剩余骨粉：7个」 |
+| 栽培基座 | 基座肥料数量 | 如「剩余骨粉：7个」 |
 | 栽培基座 | 基座倍率 | 当前产物倍率与生产速率，实时数值 |
 
-倍率显示会随机器状态实时更新（浇水、催化剂、转速）。
+倍率显示会随机器状态实时更新（浇水、肥料、转速）。
 
 **流体灌溉系统**
 
@@ -239,14 +240,15 @@ Create 自 6.0.7 起移除了 `FluidIngredient` 类，改用 NeoForge 的 `Sized
 |--------|--------|------|------|
 | `growthRateMultiplier` | 1.0 | 0.05–20 | 作物生长速率倍率 |
 | `cropYieldMultiplier` | 1.0 | 0.1–64 | 作物产出数量倍率 |
-| `wateringYieldBonus` | 2.5 | 1.0–10 | 浇水时额外产出加成 |
+| `wateringYieldBonus` | 1.5 | 1.0–10 | 浇水时额外产出加成 |
+| `wateringGrowthBonus` | 2.0 | 1.0–10 | 浇水时额外生长速度倍率 |
 | `wateredDuration` | 2 | 1–600 | 浇水状态持续刻数 |
-| `catalystGrowthBonus` | 3.0 | 1.0–10 | 催化剂激活时的生长倍率 |
-| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | 浇水与催化剂同时生效时的额外加成倍率 |
+| `catalysts` | 见下 | 列表 | 肥料表：每条格式 `物品;持续刻;生长倍率;产量倍率`，默认含骨粉 `600;2.0;1.5`、农夫乐事有机堆肥 `1800;4.0;2.0` |
+| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | 浇水与肥料同时生效时的额外加成倍率 |
 
 #### Ponder 教学场景
 
-模组内置了覆盖完整玩法的 Ponder 教学场景：组装、动力供应、种植、自动收获、漏斗/溜槽取物、催化剂系统、注液器浇水加成、显示连接器用法与堆叠罐体。对着基座或栽培罐使用 Create 的 ponder 指引即可打开。
+模组内置了覆盖完整玩法的 Ponder 教学场景：组装、动力供应、种植、自动收获、漏斗/溜槽取物、肥料系统、注液器浇水加成、显示连接器用法与堆叠罐体。对着基座或栽培罐使用 Create 的 ponder 指引即可打开。
 
 #### 环境要求
 

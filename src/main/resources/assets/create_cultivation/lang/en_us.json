@@ -9,8 +9,8 @@
   "create_cultivation.ponder.cultivation.text_3": "Right-click the tank with a plantable item to plant a crop; right-click with an empty hand to retrieve the seed.",
   "create_cultivation.ponder.cultivation.text_4": "The machine tends the crop until maturity, then harvests it automatically.",
   "create_cultivation.ponder.cultivation.text_5": "Harvested items are stored in the base and can be extracted with a Funnel or Chute.",
-  "create_cultivation.ponder.cultivation.text_6": "Insert a catalyst (bone meal by default) in the base GUI to make crops grow 3x as fast; one item is consumed every 30 seconds.",
-  "create_cultivation.ponder.cultivation.text_7": "Water the crops with a Spout to boost harvest yield to 2.5x; running water and catalyst together grants an extra 50%% to both bonuses.",
+  "create_cultivation.ponder.cultivation.text_6": "Insert a catalyst (bone meal by default) in the base GUI to boost growth; each catalyst's duration and multipliers are configurable.",
+  "create_cultivation.ponder.cultivation.text_7": "Water the crops with a Spout to double growth speed and boost harvest yield to 1.5x; running water and fertilizer together grants an extra 50%% to both bonuses.",
   "create_cultivation.ponder.cultivation.text_8": "A Display Link can read the crop type, remaining time, stored outputs and current multipliers.",
   "create_cultivation.ponder.cultivation.text_9": "Stack Cultivation Tanks upwards for taller crops; some tall plants need a taller structure to grow and be harvested.",
   "create_cultivation.ponder.cultivation.text_10": "Crop recipes can be customized with data packs.",
@@ -20,6 +20,7 @@
   "create_cultivation.jade.time_remaining": "Time Remaining: %s seconds",
   "create_cultivation.jade.growth": "Growth Height: %s / %s",
   "create_cultivation.jade.stalled": "Stalled",
+  "create_cultivation.jade.output_full": "Output full - harvest paused!",
 
   "create_cultivation.config.title": "Create: Cultivation Craft",
   "create_cultivation.config.general": "General",
@@ -27,9 +28,10 @@
   "create_cultivation.config.cropYieldMultiplier": "Crop Yield Multiplier",
   "create_cultivation.config.watering": "Watering",
   "create_cultivation.config.wateringYieldBonus": "Watering Yield Bonus",
+  "create_cultivation.config.wateringGrowthBonus": "Watering Growth Bonus",
   "create_cultivation.config.wateredDuration": "Watered Duration (lazy ticks)",
   "create_cultivation.config.catalyst": "Catalyst",
-  "create_cultivation.config.catalystGrowthBonus": "Catalyst Growth Bonus",
+  "create_cultivation.config.catalysts": "Catalyst List",
   "create_cultivation.config.synergy": "Water + Catalyst Synergy",
   "create_cultivation.config.waterCatalystSynergyBonus": "Water + Catalyst Synergy Bonus",
 
@@ -48,5 +50,6 @@
   "create_cultivation.display_source.base_growth_rate": "Growth Rate: %sx",
   "create_cultivation.display_source.base_empty": "No Output",
   "create_cultivation.display_source.empty": "Empty",
-  "create_cultivation.display_source.time": "Time: %s"
+  "create_cultivation.display_source.time": "Time: %s",
+  "create_cultivation.display_source.stalled": "Stalled"
 }

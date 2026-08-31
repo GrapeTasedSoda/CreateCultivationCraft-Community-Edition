@@ -62,10 +62,15 @@ public class CultivationDisplaySource extends DisplaySource {
 			return List.of(cropName);
 		}
 
-		int tankDuration = controller.getInternalProcessingDuration();
-		int progress = controller.getProgress();
-		float ratio = tankDuration > 0 ? Math.min(1f, progress / (float) tankDuration) : 0f;
-		int remainingTicks = (int) ((1f - ratio) * recipeDuration);
+		// Same source of truth as the Jade tooltip: tick-accurate remaining
+		// growth points (batched + in-flight fraction, stacking-aware) divided
+		// by the true per-game-tick rate, so both displays agree.
+		float remainingPoints = controller.getSmoothRemainingPoints();
+		float pointsPerGameTick = controller.getGrowthPointsPerGameTick();
+		if (pointsPerGameTick <= 1.0e-5f) {
+			return List.of(Component.translatable("create_cultivation.display_source.stalled"));
+		}
+		int remainingTicks = Math.round(remainingPoints / pointsPerGameTick);
 		return List.of(Component.translatable("create_cultivation.display_source.time", formatDuration(remainingTicks)));
 	}
 

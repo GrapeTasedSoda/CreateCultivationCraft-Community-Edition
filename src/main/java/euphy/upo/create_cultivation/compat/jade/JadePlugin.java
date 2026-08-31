@@ -1,5 +1,7 @@
 package euphy.upo.create_cultivation.compat.jade;
 
+import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlock;
+import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlock;
 import euphy.upo.create_cultivation.content.cultivation_tank.CultivationTankBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
@@ -14,11 +16,13 @@ public class JadePlugin implements IWailaPlugin {
     public void register(IWailaCommonRegistration registration) {
 
         registration.registerBlockDataProvider(CultivationTankJadeProvider.INSTANCE, CultivationTankBlockEntity.class);
+        registration.registerBlockDataProvider(CultivationBaseJadeProvider.INSTANCE, CultivationBaseBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
 
         registration.registerBlockComponent(CultivationTankJadeProvider.INSTANCE, CultivationTankBlock.class);
+        registration.registerBlockComponent(CultivationBaseJadeProvider.INSTANCE, CultivationBaseBlock.class);
     }
 }

@@ -23,8 +23,23 @@ public class StackingCultivatingRecipeBuilder extends ProcessingRecipeBuilder<St
         return this;
     }
 
+    public StackingCultivatingRecipeBuilder minHeight(int height) {
+        this.params.minHeight = height;
+        return this;
+    }
+
     public StackingCultivatingRecipeBuilder blockToRender(Block block) {
         this.params.blockToRender = block;
+        return this;
+    }
+
+    public StackingCultivatingRecipeBuilder topRender(Block block) {
+        this.params.topRender = block;
+        return this;
+    }
+
+    public StackingCultivatingRecipeBuilder stageByProgress(boolean stageByProgress) {
+        this.params.stageByProgress = stageByProgress;
         return this;
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChorusPlantBlock;
 import net.minecraft.world.level.block.DoublePlantBlock;
@@ -103,35 +104,80 @@ public class CultivationTankRenderer implements BlockEntityRenderer<CultivationT
 
         controller.getCurrentRecipe().ifPresent(recipeHolder -> {
             if (recipeHolder.value() instanceof StackingCultivatingRecipe recipe) {
-                Block blockToRender = recipe.getBlockToRender();
-                BlockState renderState = blockToRender.defaultBlockState();
-
                 int plantHeight = controller.getCurrentHeight();
 
                 BlockPos controllerPos = controller.getBlockPos();
                 BlockPos currentBlockPos = blockEntity.getBlockPos();
                 int yOffset = currentBlockPos.getY() - controllerPos.getY();
 
-                if (yOffset < plantHeight) {
-                    poseStack.pushPose();
-
-                    poseStack.translate(0.5, 0.0625, 0.5);
-                    float scaleXZ = 12.0f / 16.0f;
-                    poseStack.scale(scaleXZ, 1.0f, scaleXZ);
-                    poseStack.translate(-0.5, (double) -1 /16, -0.5);
-
-
-                    if (blockToRender instanceof ChorusPlantBlock) {
-                        boolean connectUp = yOffset < plantHeight - 1;
-                        boolean connectDown = yOffset > 0;
-                        renderState = renderState.setValue(ChorusPlantBlock.UP, connectUp)
-                                .setValue(ChorusPlantBlock.DOWN, connectDown);
-                    }
-
-
-                    blockRenderer.renderSingleBlock(renderState, poseStack, bufferSource, packedLight, packedOverlay);
-                    poseStack.popPose();
+                if (yOffset >= plantHeight) {
+                    return;
                 }
+
+                // Two-part crops (e.g. rice): the base block fills every layer,
+                // the optional top block replaces it above the first layer.
+                boolean isTopLayer = yOffset == plantHeight - 1;
+                Block blockToRender = (yOffset > 0 && recipe.getTopRender() != null)
+                        ? recipe.getTopRender()
+                        : recipe.getBlockToRender();
+                BlockState renderState = blockToRender.defaultBlockState();
+
+                // Multi-section crops select their section model via a
+                // "location" integer property (e.g. Kaleidoscope Cookery rice:
+                // DOWN/MIDDLE/UP). Each tank layer must render the matching
+                // section, otherwise upper layers show floating bottom models.
+                for (var property : renderState.getProperties()) {
+                    if (property instanceof IntegerProperty i && "location".equals(i.getName())) {
+                        int min = i.getPossibleValues().stream().mapToInt(Integer::intValue).min().orElse(0);
+                        int max = i.getPossibleValues().stream().mapToInt(Integer::intValue).max().orElse(0);
+                        renderState = renderState.setValue(i, Mth.clamp(yOffset, min, max));
+                        break;
+                    }
+                }
+
+                poseStack.pushPose();
+
+                poseStack.translate(0.5, 0.0625, 0.5);
+                float scaleXZ = 12.0f / 16.0f;
+                poseStack.scale(scaleXZ, 1.0f, scaleXZ);
+                poseStack.translate(-0.5, (double) -1 /16, -0.5);
+
+
+                if (blockToRender instanceof ChorusPlantBlock) {
+                    boolean connectUp = yOffset < plantHeight - 1;
+                    boolean connectDown = yOffset > 0;
+                    renderState = renderState.setValue(ChorusPlantBlock.UP, connectUp)
+                            .setValue(ChorusPlantBlock.DOWN, connectDown);
+                } else if (recipe.isStageByProgress()) {
+                    // Animate the "age" property: completed layers render fully
+                    // grown; the topmost layer follows the progress toward the
+                    // next layer (or stays full once the crop is at its limit).
+                    IntegerProperty ageProperty = null;
+                    for (var property : renderState.getProperties()) {
+                        if (property instanceof IntegerProperty i && "age".equals(i.getName())) {
+                            ageProperty = i;
+                            break;
+                        }
+                    }
+                    if (ageProperty != null) {
+                        int maxAge = ageProperty.getPossibleValues().stream()
+                                .mapToInt(Integer::intValue).max().orElse(0);
+                        int currentAge;
+                        if (!isTopLayer) {
+                            currentAge = maxAge;
+                        } else if (plantHeight < Math.min(controller.getHeight(), recipe.getMaxHeight())) {
+                            float growthRatio = controller.getStageGrowthRatio();
+                            currentAge = Mth.clamp((int) (growthRatio * (maxAge + 1)), 0, maxAge);
+                        } else {
+                            currentAge = maxAge;
+                        }
+                        renderState = renderState.setValue(ageProperty, currentAge);
+                    }
+                }
+
+
+                blockRenderer.renderSingleBlock(renderState, poseStack, bufferSource, packedLight, packedOverlay);
+                poseStack.popPose();
             }
         });
     }

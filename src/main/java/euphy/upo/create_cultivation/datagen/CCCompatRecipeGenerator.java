@@ -29,7 +29,64 @@ public class CCCompatRecipeGenerator implements DataProvider {
             futures.add(DataProvider.saveStable(cache, json, recipePath));
         });
 
+        generateKaleidoscopeCookeryRecipes((id, json) -> {
+            Path recipePath = outputFolder.resolve("data/" + id.getNamespace() + "/recipe/compat/" + id.getPath() + ".json");
+            futures.add(DataProvider.saveStable(cache, json, recipePath));
+        });
+
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    private void generateKaleidoscopeCookeryRecipes(RecipeAcceptor acceptor) {
+        //万花筒烹饪：番茄（耕地成ren：1番茄+1种子，右键后回到成熟前的阶段）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/tomato"),
+                createCultivatingRecipe(
+                        "kaleidoscope_cookery",
+                        "kaleidoscope_cookery:tomato_seed",
+                        new String[]{"kaleidoscope_cookery:tomato,2", "kaleidoscope_cookery:tomato_seed,1", "kaleidoscope_cookery:tomato_seed,1,0.5"},
+                        12000,
+                        "kaleidoscope_cookery:tomato_crop"
+                )
+        );
+        //万花筒烹饪：辣椒（耕地成ren：1红辣椒+1种子+20%青椒；右键收获后回到第五阶段自补种）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/chili"),
+                createCultivatingRecipe(
+                        "kaleidoscope_cookery",
+                        "kaleidoscope_cookery:chili_seed",
+                        new String[]{"kaleidoscope_cookery:red_chili,1", "kaleidoscope_cookery:green_chili,1,0.2", "kaleidoscope_cookery:chili_seed,1"},
+                        12000,
+                        "kaleidoscope_cookery:chili_crop"
+                )
+        );
+        //万花筒烹饪：生菜（耕地成ren：1生菜+1种子+10%毛虫）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/lettuce"),
+                createCultivatingRecipe(
+                        "kaleidoscope_cookery",
+                        "kaleidoscope_cookery:lettuce_seed",
+                        new String[]{"kaleidoscope_cookery:lettuce,1", "kaleidoscope_cookery:lettuce_seed,1", "kaleidoscope_cookery:lettuce_seed,1,0.5", "kaleidoscope_cookery:caterpillar,1,0.1"},
+                        12000,
+                        "kaleidoscope_cookery:lettuce_crop"
+                )
+        );
+        //万花筒烹饪：水稻（堆叠作物，需要至少2格高的栽培罐；耕地成ren：2–4稻穗）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/rice"),
+                createStackingRecipe(
+                        "kaleidoscope_cookery",
+                        "kaleidoscope_cookery:rice",
+                        "kaleidoscope_cookery:rice_panicle",
+                        2,
+                        9000,
+                        "kaleidoscope_cookery:rice_crop",
+                        null,
+                        true,
+                        3,
+                        2
+                )
+        );
     }
 
     private void generateFarmersDelightRecipes(RecipeAcceptor acceptor) {
@@ -61,20 +118,25 @@ public class CCCompatRecipeGenerator implements DataProvider {
                 createCultivatingRecipe(
                         "farmersdelight",
                         "farmersdelight:onion",
-                        new String[]{"farmersdelight:onion,2", "farmersdelight:onion,1,0.5"},
+                        new String[]{"farmersdelight:onion,3", "farmersdelight:onion,1,0.5"},
                         18000,
                         "farmersdelight:onions"
                 )
         );
-        //农夫乐事：稻米
+        //农夫乐事：稻米（堆叠作物，需要至少 2 格高的栽培罐；底层稻株+顶层稻穗）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "farmersdelight/rice"),
-                createCultivatingRecipe(
+                createStackingRecipe(
                         "farmersdelight",
                         "farmersdelight:rice",
-                        new String[]{"farmersdelight:rice_panicle,2", "farmersdelight:rice_panicle,1,0.5","farmersdelight:rice,1"},
-                        18000,
-                        "farmersdelight:rice"
+                        "farmersdelight:rice_panicle",
+                        2,
+                        9000,
+                        "farmersdelight:rice",
+                        "farmersdelight:rice_panicles",
+                        true,
+                        2,
+                        2
                 )
         );
         /*
@@ -297,6 +359,49 @@ public class CCCompatRecipeGenerator implements DataProvider {
         json.addProperty("processingDuration", duration);
         json.addProperty("crop_block", cropBlockId);
 
+        return json;
+    }
+
+    /**
+     * Builds a stacking cultivation recipe with the mod-loaded condition.
+     * {@code minHeight} gates growth on the tank stack height (1 = no gate).
+     * Stacking recipes use a single {@code result} output that scales with
+     * the harvested layers.
+     */
+    private JsonObject createStackingRecipe(String modIdCondition, String ingredientId, String resultId, int resultCount,
+                                            int duration, String blockToRenderId, String topRenderId, boolean stageByProgress,
+                                            int maxHeight, int minHeight) {
+        JsonObject json = new JsonObject();
+        JsonArray conditions = new JsonArray();
+        JsonObject modLoaded = new JsonObject();
+        modLoaded.addProperty("type", "neoforge:mod_loaded");
+        modLoaded.addProperty("modid", modIdCondition);
+        conditions.add(modLoaded);
+        json.add("neoforge:conditions", conditions);
+
+        json.addProperty("type", CCRecipes.STACKING_CULTIVATING.getId().toString());
+
+        JsonObject ingredientJson = new JsonObject();
+        ingredientJson.addProperty("item", ingredientId);
+        json.add("ingredient", ingredientJson);
+
+        JsonObject resultJson = new JsonObject();
+        resultJson.addProperty("id", resultId);
+        resultJson.addProperty("count", resultCount);
+        json.add("result", resultJson);
+
+        json.addProperty("processingDuration", duration);
+        json.addProperty("block_to_render", blockToRenderId);
+        if (topRenderId != null && !topRenderId.isBlank()) {
+            json.addProperty("top_render", topRenderId);
+        }
+        if (stageByProgress) {
+            json.addProperty("stage_by_progress", true);
+        }
+        json.addProperty("maxHeight", maxHeight);
+        if (minHeight > 1) {
+            json.addProperty("min_height", minHeight);
+        }
         return json;
     }
 

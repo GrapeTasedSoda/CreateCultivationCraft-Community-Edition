@@ -31,6 +31,8 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
     private int catalystActiveValue = 0;
     /** Client-side mirror of the synced tank-watered data slot. */
     private int wateredValue = 0;
+    /** Client-side mirror of the synced output-full data slot. */
+    private int outputFullValue = 0;
 
     /**
      * Client-side constructor, invoked by the networked menu type. The block pos
@@ -110,6 +112,19 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
                 wateredValue = value;
             }
         });
+
+        // Synced flag: whether every output slot is full (red slot alarm).
+        addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                return blockEntity != null && blockEntity.isOutputFull() ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                outputFullValue = value;
+            }
+        });
     }
 
     /** Whether the catalyst boost animation should be shown (client side). */
@@ -120,6 +135,11 @@ public class CultivationBaseMenu extends AbstractContainerMenu {
     /** Whether the watering animation should be shown (client side). */
     public boolean isWatered() {
         return wateredValue != 0;
+    }
+
+    /** Whether the output slots are full and the red slot alarm should show. */
+    public boolean isOutputFull() {
+        return outputFullValue != 0;
     }
 
     private static IItemHandler handlerAt(Inventory playerInventory, BlockPos pos) {

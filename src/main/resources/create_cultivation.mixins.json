@@ -3,7 +3,8 @@
   "package": "euphy.upo.create_cultivation.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "SpoutBlockEntityMixin"
+    "SpoutBlockEntityMixin",
+    "SpoutRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
