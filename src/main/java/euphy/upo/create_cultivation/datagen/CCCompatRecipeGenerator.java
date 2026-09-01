@@ -471,7 +471,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
                 createCultivatingRecipe(
                         "pineapple_delight",
                         "pineapple_delight:pineapple_crop",
-                        new String[]{"pineapple_delight:pineapple,2", "pineapple_delight:pineapple,1,0.5"},
+                        new String[]{"pineapple_delight:pineapple,2", "pineapple_delight:pineapple,1,0.5", "pineapple_delight:pineapple_crop,1"},
                         12000,
                         "pineapple_delight:pineapple_crop"
                 )

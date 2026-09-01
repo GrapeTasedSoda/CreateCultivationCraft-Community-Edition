@@ -84,7 +84,8 @@ public final class CCConfig {
 			.defineListAllowEmpty("catalysts", List.of(
 			  "minecraft:bone_meal;600;2.0;1.5",
 			  "farmersdelight:organic_compost;1800;4.0;2.0",
-			  "mynethersdelight:letios_compost;1800;2.0;4.0"),
+			  "mynethersdelight:letios_compost;1800;2.0;4.0",
+			  "create_cultivation:efficient_fertilizer;900;3.0;2.0"),
 				o -> o instanceof String s && s.split(";").length == 4);
 
 		BUILDER.pop().push("synergy")

@@ -22,6 +22,10 @@
       "chance": 0.5,
       "count": 1,
       "id": "pineapple_delight:pineapple"
+    },
+    {
+      "count": 1,
+      "id": "pineapple_delight:pineapple_crop"
     }
   ]
 }
