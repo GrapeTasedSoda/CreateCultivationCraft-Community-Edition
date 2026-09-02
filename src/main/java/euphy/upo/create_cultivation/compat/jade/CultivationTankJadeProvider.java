@@ -28,10 +28,15 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
         }
 
         if (accessor.getBlockEntity() instanceof CultivationTankBlockEntity tankBE) {
-            tankBE.getControllerBE().getCurrentRecipe().ifPresent(recipeHolder -> {
-                ItemStack seedStack = recipeHolder.value().getIngredients().get(0).getItems()[0];
-                tooltip.add(Component.translatable("create_cultivation.jade.crop", seedStack.getDisplayName()));
-            });
+            CultivationTankBlockEntity controllerBE = tankBE.getControllerBE();
+            // The controller BE can be momentarily absent (chunk edge, unload
+            // in progress) - guard instead of letting Jade throw.
+            if (controllerBE != null) {
+                controllerBE.getCurrentRecipe().ifPresent(recipeHolder -> {
+                    ItemStack seedStack = recipeHolder.value().getIngredients().get(0).getItems()[0];
+                    tooltip.add(Component.translatable("create_cultivation.jade.crop", seedStack.getDisplayName()));
+                });
+            }
         }
 
         if (serverData.getBoolean("isMature")) {

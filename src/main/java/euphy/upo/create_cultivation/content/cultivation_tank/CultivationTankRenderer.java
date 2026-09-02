@@ -83,7 +83,10 @@ public class CultivationTankRenderer implements BlockEntityRenderer<CultivationT
                     if (ageProperty != null) {
                         float growthRatio = blockEntity.getStageGrowthRatio();
                         int maxAge = ageProperty.getPossibleValues().stream().max(Integer::compareTo).orElse(0);
-                        int currentAge = (int) (growthRatio * maxAge);
+                        // Clamp against the property's real range: saves with
+                        // uncapped growth progress produce a ratio above 1.0,
+                        // and an out-of-range age crashes the client renderer.
+                        int currentAge = Mth.clamp((int) (growthRatio * maxAge), 0, maxAge);
                         cropState = cropState.setValue(ageProperty, currentAge);
                     }
 
@@ -163,7 +166,13 @@ public class CultivationTankRenderer implements BlockEntityRenderer<CultivationT
                         int maxAge = ageProperty.getPossibleValues().stream()
                                 .mapToInt(Integer::intValue).max().orElse(0);
                         int currentAge;
-                        if (!isTopLayer) {
+                        if (controller.isHeightMismatch()) {
+                            // Tank too short for this crop: growth is blocked
+                            // entirely, so the layer must keep the freshly-
+                            // planted look instead of falling through to the
+                            // fully mature model below.
+                            currentAge = 0;
+                        } else if (!isTopLayer) {
                             currentAge = maxAge;
                         } else if (plantHeight < Math.min(controller.getHeight(), recipe.getMaxHeight())) {
                             float growthRatio = controller.getStageGrowthRatio();

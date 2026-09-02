@@ -5,6 +5,7 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import euphy.upo.create_cultivation.CreateCultivationCraft;
 import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlock;
 import euphy.upo.create_cultivation.content.cultivation_base.CultivationBaseBlockEntity;
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
@@ -148,14 +149,29 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         super.tick();
 
         if (this.recipeToLoad != null && this.level != null && this.isController()) {
-            this.level.getRecipeManager().byKey(this.recipeToLoad).ifPresent(recipe -> {
+            var loaded = this.level.getRecipeManager().byKey(this.recipeToLoad);
+            if (loaded.isPresent()) {
+                var recipe = loaded.get();
+                // Resolve on BOTH sides: the client renderer draws the crop
+                // from currentRecipe and the growth ratio uses
+                // processingDuration, so gating this to the server hides
+                // every planted crop model client-side.
                 this.currentRecipe = Optional.of(recipe);
                 if (recipe.value() instanceof CultivatingRecipe cr) {
                     this.processingDuration = cr.getProcessingDuration() > 0 ? cr.getProcessingDuration() / 10 : 10;
                 } else if (recipe.value() instanceof StackingCultivatingRecipe sr) {
                     this.processingDuration = sr.getProcessingDuration() > 0 ? sr.getProcessingDuration() / 10 : 20;
                 }
-            });
+            } else if (!this.level.isClientSide && this.recipeMode != RecipeMode.NONE) {
+                // Server-side only: the recipe behind a planted crop vanished
+                // (datapack reload, mod removal). The crop could never mature
+                // or be cleared by the normal paths, so remove it and free
+                // the tank; notifyUpdate() syncs the cleared state.
+                CreateCultivationCraft.LOGGER.warn(
+                        "Cultivation tank at {} references missing recipe {} - clearing the crop",
+                        this.worldPosition, this.recipeToLoad);
+                this.clearTank();
+            }
             this.recipeToLoad = null;
         }
 
@@ -345,7 +361,11 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
 
 
     private void handleStageGrowth(int points) {
-        progress += points;
+        // Cap at full maturity: uncapped progress would push the growth ratio
+        // past 1.0, overflow the tank's GROWTH_STAGE block property (0..3)
+        // through getCalculatedGrowthStage() and throw on both server
+        // (setBlock) and client (renderer) once speed multipliers stack up.
+        progress = Math.min(progress + points, processingDuration);
         setChanged();
         updateVisualGrowthStage();
     }
@@ -356,6 +376,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
 
         controllerBE.progress += points;
         int limit = Math.min(controllerBE.getHeight(), controllerBE.maxHeight);
+        boolean grew = false;
 
         while (controllerBE.progress >= controllerBE.processingDuration) {
             if (controllerBE.currentHeight >= limit) {
@@ -364,6 +385,13 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             }
             controllerBE.progress -= controllerBE.processingDuration;
             controllerBE.currentHeight++;
+            grew = true;
+        }
+
+        if (grew) {
+            // One batched sync per lazy tick instead of one packet per layer:
+            // with stacked speed multipliers a single tick can grow several
+            // layers, and each notifyUpdate() sent a full update packet.
             controllerBE.setChanged();
             controllerBE.notifyUpdate();
         }
@@ -379,6 +407,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         if (controllerBE == null) return;
 
         controllerBE.progress = 0;
+        controllerBE.growthAccumulator = 0f;
         controllerBE.harvestCooldown = 0;
 
         if (controllerBE.recipeMode == RecipeMode.STACK_BASED) {
@@ -468,12 +497,36 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         return false;
     }
 
+    /**
+     * Whether the currently planted crop requires a taller tank than built
+     * (stacking {@code minHeight} / stage {@code height} vs the stack height).
+     * Single source of truth for the base's orange alarm, the Jade tooltip and
+     * the display link readout.
+     */
+    public boolean isHeightMismatch() {
+        var recipeHolder = getCurrentRecipe();
+        if (recipeHolder.isEmpty()) {
+            return false;
+        }
+        if (recipeHolder.get().value() instanceof IStackingCultivatingRecipe recipe) {
+            return getHeight() < recipe.getMinHeight();
+        }
+        if (recipeHolder.get().value() instanceof CultivatingRecipe recipe) {
+            return recipe.getHeight() > 1 && getHeight() < recipe.getHeight();
+        }
+        return false;
+    }
+
     public boolean isReadyForHarvest() {
         return isMature() && harvestCooldown <= 0;
     }
 
     private int getCalculatedGrowthStage() {
-        return Mth.floor(getStageGrowthRatio() * (TOTAL_GROWTH_STAGES - 1));
+        // Hard clamps: protects against progress carried over from saves made
+        // before the growth cap existed (ratio could exceed 1.0 and the
+        // resulting stage would be out of the property's 0..3 range).
+        float ratio = Mth.clamp(getStageGrowthRatio(), 0.0f, 1.0f);
+        return Mth.clamp(Mth.floor(ratio * (TOTAL_GROWTH_STAGES - 1)), 0, TOTAL_GROWTH_STAGES - 1);
     }
 
     private void updateVisualGrowthStage() {

@@ -121,9 +121,9 @@ public class CultivationTankBlock extends Block implements IBE<CultivationTankBl
         }
 
 
-        if (pos.equals(fromPos.above())) {
-            return;
-        }
+        // Refresh the working state when the block below (the base) changes.
+        // The old code returned early on this exact condition, making the
+        // update unreachable - the 10-tick lazyTick self-heal masked it.
         if (fromPos.equals(pos.below())) {
             withBlockEntityDo(level, pos, CultivationTankBlockEntity::updateWorkingState);
         }

@@ -58,6 +58,8 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     private int catalystTicks = 0;
     /** Cached "all output slots full" flag, synced to clients when it flips. */
     private boolean outputFull = false;
+    private int outputFullRecheckCounter = 0;
+    private boolean wasCropReady = false;
     /** Cached "crop needs a taller tank" alarm (orange glow), synced to clients. */
     private boolean heightMismatch = false;
     public CultivationBaseBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -116,20 +118,7 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             return false;
         }
         CultivationTankBlockEntity controller = tankBE.getControllerBE();
-        if (controller == null) {
-            return false;
-        }
-        var recipeHolder = controller.getCurrentRecipe();
-        if (recipeHolder.isEmpty()) {
-            return false;
-        }
-        if (recipeHolder.get().value() instanceof StackingCultivatingRecipe recipe) {
-            return controller.getHeight() < recipe.getMinHeight();
-        }
-        if (recipeHolder.get().value() instanceof CultivatingRecipe recipe) {
-            return recipe.getHeight() > 1 && controller.getHeight() < recipe.getHeight();
-        }
-        return false;
+        return controller != null && controller.isHeightMismatch();
     }
 
     /**
@@ -167,6 +156,20 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
                 controller.setWatered(false);
             }
         }
+    }
+
+    /**
+     * Cheap per-tick readiness probe (tank lookup + mature check) used to
+     * detect the exact tick a crop becomes ready; the expensive full-harvest
+     * prediction then re-runs immediately instead of waiting for the 10-tick
+     * cadence.
+     */
+    private boolean isCropReady() {
+        if (level == null) {
+            return false;
+        }
+        BlockEntity be = level.getBlockEntity(worldPosition.above());
+        return be instanceof CultivationTankBlockEntity tankBE && tankBE.isReadyForHarvest();
     }
 
     private boolean isOutputSlotsFull(boolean worstCase) {
@@ -247,7 +250,15 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             pending.removeIf(ItemStack::isEmpty);
         } else if (tankBE.getRecipeMode() == CultivationTankBlockEntity.RecipeMode.STACK_BASED
                 && recipeHolder.get().value() instanceof StackingCultivatingRecipe stackRecipe) {
-            int layers = Math.max(1, tankBE.getCurrentHeight());
+            // Mirror the real harvest exactly: the bottom layer is reserved for
+            // the replant, so only currentHeight - 1 layers produce output and
+            // a height-1 stack harvests nothing at all (predictNextHarvest
+            // used max(1, height) and over-predicted by one layer, lighting
+            // the output-full alarm earlier than reality).
+            int layers = tankBE.getCurrentHeight() - 1;
+            if (layers <= 0) {
+                return pending;
+            }
             ItemStack base = stackRecipe.getResult().getStack().copy();
             int totalCount = (int) Math.floor(base.getCount() * layers * yieldMultiplier);
             if (totalCount > 0) {
@@ -359,6 +370,9 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         // Synced in update packets too, so the client renderer can show the
         // orange height alarm without recomputing recipe lookups client-side.
         compound.putBoolean("HeightMismatch", heightMismatch);
+        // Same for the red alarm: the client item handler is never synced, so
+        // the client cannot derive this - the in-world glow needs the flag.
+        compound.putBoolean("OutputFull", outputFull);
     }
 
     @Override
@@ -377,18 +391,29 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             catalystTicks = compound.getInt("CatalystTicks");
             if (compound.contains("ActiveCatalyst", CompoundTag.TAG_STRING)) {
                 ResourceLocation itemId = ResourceLocation.parse(compound.getString("ActiveCatalyst"));
+                lastConsumedCatalystId = itemId;
                 activeCatalystType = BuiltInRegistries.ITEM.getOptional(itemId)
                         .map(CCCatalysts::getType)
                         .orElse(null);
             } else {
+                lastConsumedCatalystId = null;
                 activeCatalystType = null;
             }
         }
-        // The flag is derived state: recompute on both sides instead of
-        // persisting it, so old saves and new code always agree. Plain
-        // evaluation (no hysteresis) is fine during load - the alarm will
-        // re-latch itself if the prediction overflows.
-        outputFull = isOutputSlotsFull(outputFull);
+        // The flag is derived state: recompute on save-load (server side) so
+        // old saves and new code agree. Client update packets must NOT run
+        // this - the client item handler is never synced (always empty), so
+        // the prediction is wasted work that always yields "not full"; the
+        // renderer reads the synced flag from the server update instead.
+        if (!clientPacket) {
+            outputFull = isOutputSlotsFull(outputFull);
+        } else {
+            // Client update packet: take the server-synced flag. The client
+            // item handler is always empty, so a local prediction is both
+            // wasted work and permanently wrong (this also finally feeds the
+            // in-world red glow, which silently never lit before).
+            outputFull = compound.getBoolean("OutputFull");
+        }
         // Height alarm arrives from the server via update packets (the recipe
         // lookup it depends on is not reliable on the client).
         heightMismatch = compound.getBoolean("HeightMismatch");
@@ -409,17 +434,29 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         }
 
         if (getBlockState().getValue(CultivationBaseBlock.WORKING)) {
-            // Refresh the alarm every tick while working so a full output or a
-            // height mismatch is detected the moment it arises, not up to 10
-            // seconds later on the next lazy tick.
+            // Refresh the height alarm every tick (cheap recipe lookup) so a
+            // mismatch is detected the moment it arises. The output-full
+            // prediction is expensive (harvest simulation), so it runs on a
+            // 10-tick cadence - plus immediately on the tick the crop becomes
+            // ready, closing the window where a just-matured harvest would
+            // overflow the output slots for up to 10 ticks.
             updateHeightMismatch();
-            updateOutputFull();
+            boolean cropReady = isCropReady();
+            if (cropReady && !wasCropReady) {
+                outputFullRecheckCounter = 0;
+            }
+            wasCropReady = cropReady;
+            if (outputFullRecheckCounter-- <= 0) {
+                outputFullRecheckCounter = 10;
+                updateOutputFull();
+            }
             tickCatalyst();
             tryHarvest();
         } else if (level != null && !level.isClientSide) {
             // Not working: make sure cached alarms clear immediately when the
             // machine stops (power lost / tank removed).
             updateHeightMismatch();
+            wasCropReady = false;
         }
     }
 
@@ -576,14 +613,59 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
     }
 
     private boolean canInsertAll(List<ItemStack> stacks) {
-        ItemStackHandler tempHandler = new ItemStackHandler(itemHandler.getSlots());
-        tempHandler.deserializeNBT(level.registryAccess(), itemHandler.serializeNBT(level.registryAccess()));
+        // Hot path: runs every tick via updateOutputFull while a crop is
+        // mature/latched. A full NBT round-trip of the handler per call was
+        // wasteful; a plain array snapshot + itemstack merge simulation is
+        // equivalent for this handler (no per-slot special rules on output
+        // slots) and allocation-cheap.
+        ItemStack[] snapshot = new ItemStack[itemHandler.getSlots()];
+        for (int i = 0; i < snapshot.length; i++) {
+            ItemStack existing = itemHandler.getStackInSlot(i);
+            snapshot[i] = existing.isEmpty() ? ItemStack.EMPTY : existing.copy();
+        }
         for (ItemStack stack : stacks) {
-            if (!ItemHandlerHelper.insertItemStacked(tempHandler, stack, true).isEmpty()) {
+            if (!simulateInsert(snapshot, stack)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Simulates inserting {@code stack} into a snapshot of the output slots,
+     * mirroring {@code ItemHandlerHelper.insertItemStacked}: merge into
+     * matching stacks first, then empty slots. Returns true when the whole
+     * stack fit (snapshot updated in place), false when leftovers remain.
+     */
+    private boolean simulateInsert(ItemStack[] snapshot, ItemStack stack) {
+        int toInsert = stack.getCount();
+        int slots = snapshot.length;
+        boolean catalystOk = isCatalyst(stack);
+        // Pass 1: top up matching, non-empty stacks.
+        for (int i = 0; i < slots && toInsert > 0; i++) {
+            if (i == CATALYST_SLOT && !catalystOk) {
+                continue;
+            }
+            ItemStack existing = snapshot[i];
+            if (!existing.isEmpty() && ItemStack.isSameItemSameComponents(existing, stack)) {
+                int space = existing.getMaxStackSize() - existing.getCount();
+                if (space > 0) {
+                    int moved = Math.min(space, toInsert);
+                    existing.grow(moved);
+                    toInsert -= moved;
+                }
+            }
+        }
+        // Pass 2: fill empty slots (the catalyst slot only accepts catalysts,
+        // mirroring the handler's insertItem rules).
+        for (int i = 0; i < slots && toInsert > 0; i++) {
+            if (snapshot[i].isEmpty() && (i != CATALYST_SLOT || catalystOk)) {
+                int moved = Math.min(stack.getMaxStackSize(), toInsert);
+                snapshot[i] = stack.copyWithCount(moved);
+                toInsert -= moved;
+            }
+        }
+        return toInsert <= 0;
     }
 
     private void insertAll(List<ItemStack> stacks) {

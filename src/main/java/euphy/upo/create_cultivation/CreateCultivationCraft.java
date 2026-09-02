@@ -18,6 +18,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 @Mod(CreateCultivationCraft.MODID)
 public class CreateCultivationCraft {
     public static final String MODID = "create_cultivation";
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MODID)
             .defaultCreativeTab(CCCreativeModeTabs.MAIN_TAB.getKey());
     public static ResourceLocation asResource(String path) {

@@ -112,6 +112,22 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         2
                 )
         );
+        //万花筒烹饪：野生稻（与水稻同方块同产物，堆叠作物，需要至少2格高的栽培罐）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/wild_rice"),
+                createStackingRecipe(
+                        "kaleidoscope_cookery",
+                        "kaleidoscope_cookery:wild_rice",
+                        "kaleidoscope_cookery:rice_panicle",
+                        2,
+                        9000,
+                        "kaleidoscope_cookery:rice_crop",
+                        null,
+                        true,
+                        3,
+                        2
+                )
+        );
     }
 
     private void generateFarmersDelightRecipes(RecipeAcceptor acceptor) {

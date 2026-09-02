@@ -64,6 +64,17 @@ public class BaseDisplaySource extends DisplaySource {
 
 			BlockEntity beAbove = baseBE.getLevel().getBlockEntity(baseBE.getBlockPos().above());
 			if (beAbove instanceof CultivationTankBlockEntity tankBE) {
+				CultivationTankBlockEntity controllerBE = tankBE.getControllerBE();
+				if (controllerBE != null && controllerBE.isHeightMismatch()) {
+					// Match the orange alarm and the display link time readout:
+					// nothing can grow while the tank is too short, so showing
+					// live multipliers would be misleading.
+					return List.of(
+						Component.translatable("create_cultivation.display_source.base_yield_multiplier",
+							String.format(Locale.ROOT, "%.2f", 0.0)),
+						Component.translatable("create_cultivation.display_source.base_growth_rate",
+							String.format(Locale.ROOT, "%.2f", 0.0)));
+				}
 				growthMultiplier = tankBE.getSpeedMultiplier() * CCConfig.GROWTH_RATE.get()
 					* baseBE.getCatalystGrowthMultiplier();
 				if (tankBE.isWatered()) {

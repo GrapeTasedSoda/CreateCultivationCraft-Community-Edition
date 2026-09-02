@@ -62,6 +62,12 @@ public class CultivationDisplaySource extends DisplaySource {
 			return List.of(cropName);
 		}
 
+		// Match the Jade tooltip and the base's orange alarm: when the tank is
+		// too short for this crop nothing can grow, so a countdown would lie.
+		if (controller.isHeightMismatch()) {
+			return List.of(Component.translatable("create_cultivation.jade.height_mismatch"));
+		}
+
 		// Same source of truth as the Jade tooltip: tick-accurate remaining
 		// growth points (batched + in-flight fraction, stacking-aware) divided
 		// by the true per-game-tick rate, so both displays agree.
