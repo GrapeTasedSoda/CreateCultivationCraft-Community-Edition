@@ -36,7 +36,7 @@ The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on c
 - Stack the **Cultivation Tank** on a **Cultivation Base**, right-click the tank with seeds to plant;
 - The machine grows, harvests into the base's storage, and **keeps one seed for replanting** — as long as storage isn't full it runs forever;
 - Supports staged crops (wheat, carrots…), flowers, and **stacking crops** that grow layer by layer (sugar cane, cactus, kelp, bamboo…);
-- Extract outputs with funnels/funnels — drops straight into existing logistics;
+- Extract outputs with funnels and chutes — drops straight into existing logistics;
 - Tanks stack upward: taller tank = taller stacking crops.
 
 #### 🌡️ Dual alarm lamps
@@ -48,7 +48,7 @@ The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on c
 - Defaults: bone_meal (30s, growth ×2 / yield ×1.5), Farmer's Delight organic compost (90s, ×4 / ×2), My Nether's Delight letios compost (90s, ×2 / ×4);
 - **New item: Efficient Fertilizer** (45s, growth ×3 / yield ×2), made in the Mechanical Mixer:
   - bone_meal + rotten flesh + 100mB water → 2;
-  - + Farmer's Delight bark or straw + 250mB water → 4.
+  - with Farmer's Delight installed: tree bark or straw + bone_meal + rotten flesh + 250mB water → 4.
 
 #### 💧 Watering bonus
 - Water the tank with a Spout: growth ×2, yield ×1.5;
@@ -73,7 +73,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 | Mod | Crops | Notes |
 |-----|-------|-------|
 | **Farmer's Delight** | cabbage, onion, rice, tomato | organic compost doubles as a top-tier fertilizer |
-| **Rustic Delight** | cotton, coffee, bell peppers (red/green/pale) | bell pepper colors roll by weight |
+| **Rustic Delight** | cotton, coffee, bell peppers (3 crops, 9 colors) | pepper color rolls by weight per crop |
 | **Kaleidoscope Cookery** | tomato, chili, lettuce, rice, wild rice | seeds returned on harvest; rice / wild rice need 2+ tank height |
 | **Kaleidoscope Tavern** | grape, ice grape, gold grape | hanging-crop rendering, vines kept for replant |
 | **Corn Delight** | corn | stacked growth, needs 2+ tank height |
@@ -112,7 +112,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 |---|---|---|
 | 运行环境 | 仅 Create 6.0.6（新版直接崩溃） | **Create 6.0.10 + NeoForge 21.1.x** |
 | 产物存储 | 无界面 | 基座 GUI：8 格产物仓 + 肥料槽 |
-| 肥料 | 无 | bone_meal / organic compost / letios compost（忘魂堆肥）/ **Efficient Fertilizer**（高效肥料），效果均可配置 |
+| 肥料 | 无 | bone_meal / organic compost / letios compost / **Efficient Fertilizer**，效果均可配置 |
 | 浇水加成 | 无 | Spout 浇水：生长 ×2、产量 ×1.5，与肥料还有协同加成 |
 | 机器状态提示 | 无 | 🔴 红灯 / 🟠 橙灯 双警示灯 + GUI 边框 + Jade 提示 |
 | 新物品 | 无 | Efficient Fertilizer（机械搅拌合成） |
@@ -125,7 +125,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 ### 玩家能体验到什么？
 
 #### 🌱 全自动种植机
-- **Cultivation Tank**（栽培罐）叠在 **Cultivation Base**（栽培基座）上，对罐子右键放入种子即完成种植；
+- **Cultivation Tank** 叠在 **Cultivation Base** 上，对罐子右键放入种子即完成种植；
 - 机器自动生长、成熟后自动收获进基座仓库，**并自动留种补种**——只要仓库不塞满，机器永远转下去；
 - 支持阶段式作物（wheat、carrot……）、花卉，以及 sugar cane / cactus / kelp / bamboo 这类**逐层长高**的堆叠作物；
 - 产物用漏斗 / 溜槽即可抽取，完美接入现有物流系统；
@@ -140,7 +140,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 - 默认肥料表：bone_meal（30 秒，生长 ×2 / 产量 ×1.5）、Farmer's Delight 的 organic compost（90 秒，×4 / ×2）、My Nether's Delight 的 letios compost（90 秒，×2 / ×4）；
 - **新物品：Efficient Fertilizer**（45 秒，生长 ×3 / 产量 ×2），用 Mechanical Mixer 生产：
   - bone_meal + rotten flesh + 100mB 水 → 2 个；
-  - 再加一份 Farmer's Delight 的 tree bark 或 straw + 250mB 水 → 4 个。
+  - 装了 Farmer's Delight 时另有配方：tree bark 或 straw + bone_meal + rotten flesh + 250mB 水 → 4 个。
 
 #### 💧 浇水加成
 - 用 Spout 给罐子浇水：生长 ×2、产量 ×1.5；
@@ -165,12 +165,12 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 | 模组 | 联动作物 | 备注 |
 |------|----------|------|
 | **Farmer's Delight** | cabbage、onion、rice、tomato | organic compost 可作高级肥料 |
-| **Rustic Delight** | cotton、coffee、bell peppers（红/绿/白三种） | bell pepper 按权重随机产出三种颜色 |
+| **Rustic Delight** | cotton、coffee、bell peppers（3 种植株 / 9 种颜色） | pepper 颜色按权重随机 |
 | **Kaleidoscope Cookery** | tomato、chili、lettuce、rice、wild rice | 收获自动返还种子；rice / wild rice 需 2 格以上罐高 |
-| **Kaleidoscope Tavern** | grape、ice grape（冰葡萄）、gold grape（金葡萄） | 悬挂式作物渲染，收获保留 grapevine 续种 |
+| **Kaleidoscope Tavern** | grape、ice grape、gold grape | 悬挂式作物渲染，收获保留 grapevine 续种 |
 | **Corn Delight** | corn | 堆叠式生长，需 2 格以上罐高 |
 | **Pineapple Delight** | pineapple | 收获自动留芽补种 |
-| **My Nether's Delight** | powdery cane（药烟竹）、bullet pepper（爆弹椒）、crimson colony（绯红菌菌落）、warped colony（诡异菌菌落） | letios compost（忘魂堆肥）可作高级肥料 |
+| **My Nether's Delight** | powdery cane、bullet pepper、crimson colony、warped colony | letios compost 可作高级肥料 |
 
 ### 稳定性修复（相对原版）
 
