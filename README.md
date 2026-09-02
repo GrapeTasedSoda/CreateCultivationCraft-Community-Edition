@@ -112,7 +112,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 |---|---|---|
 | 运行环境 | 仅 Create 6.0.6（新版直接崩溃） | **Create 6.0.10 + NeoForge 21.1.x** |
 | 产物存储 | 无界面 | 基座 GUI：8 格产物仓 + 肥料槽 |
-| 肥料 | 无 | bone_meal / organic compost / letios compost / **Efficient Fertilizer**，效果均可配置 |
+| 肥料 | 无 | bone_meal / organic compost / letios compost（忘魂堆肥）/ **Efficient Fertilizer**（高效肥料），效果均可配置 |
 | 浇水加成 | 无 | Spout 浇水：生长 ×2、产量 ×1.5，与肥料还有协同加成 |
 | 机器状态提示 | 无 | 🔴 红灯 / 🟠 橙灯 双警示灯 + GUI 边框 + Jade 提示 |
 | 新物品 | 无 | Efficient Fertilizer（机械搅拌合成） |
@@ -167,10 +167,10 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 | **Farmer's Delight** | cabbage、onion、rice、tomato | organic compost 可作高级肥料 |
 | **Rustic Delight** | cotton、coffee、bell peppers（红/绿/白三种） | bell pepper 按权重随机产出三种颜色 |
 | **Kaleidoscope Cookery** | tomato、chili、lettuce、rice、wild rice | 收获自动返还种子；rice / wild rice 需 2 格以上罐高 |
-| **Kaleidoscope Tavern** | grape、ice grape、gold grape | 悬挂式作物渲染，收获保留 grapevine 续种 |
+| **Kaleidoscope Tavern** | grape、ice grape（冰葡萄）、gold grape（金葡萄） | 悬挂式作物渲染，收获保留 grapevine 续种 |
 | **Corn Delight** | corn | 堆叠式生长，需 2 格以上罐高 |
 | **Pineapple Delight** | pineapple | 收获自动留芽补种 |
-| **My Nether's Delight** | powdery cane、bullet pepper、crimson colony、warped colony | letios compost 可作高级肥料 |
+| **My Nether's Delight** | powdery cane（药烟竹）、bullet pepper（爆弹椒）、crimson colony（绯红菌菌落）、warped colony（诡异菌菌落） | letios compost（忘魂堆肥）可作高级肥料 |
 
 ### 稳定性修复（相对原版）
 
