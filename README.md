@@ -1,266 +1,111 @@
 # Create: Cultivation Craft — Community Edition
 
+**机械动力：栽培工艺 · 社区版**
+
+一个为 Create（机械动力）打造的**全自动农业**附属模组：把种子丢进栽培罐，机器自己完成播种、生长、收获、补种、存储的全流程——你要做的只是接上动力、定期收菜（或者连收菜都交给漏斗）。
 
 ---
 
-## English
+## 这个移植版和原版有什么区别？
 
-**Create: Cultivation Craft — Community Edition**
+原模组（v0.1.3）停更于 Create 6.0.6 时代，在现行版本的 Create 下**加载即崩溃**。社区版做了完整的兼容移植，并在此之上加入了大量新功能与体验优化。
 
-A Create mod addon that provides a fully automatic crop cultivation system.
+一句话对比：
 
-### Original Features
+| | 原版 0.1.3 | 社区版 0.1.4 |
+|---|---|---|
+| 运行环境 | 仅 Create 6.0.6（新版直接崩溃） | **Create 6.0.10 + NeoForge 21.1.x** |
+| 产物存储 | 无界面 | 基座 GUI：8 格产物仓 + 肥料槽 |
+| 肥料 | 无 | 骨粉 / 有机堆肥 / 莱蒂俄堆肥 / **高效肥料**，效果均可配置 |
+| 浇水加成 | 无 | 注液器浇水：生长 ×2、产量 ×1.5，与肥料还有协同加成 |
+| 机器状态提示 | 无 | 🔴 红灯 / 🟠 橙灯 双警示灯 + GUI 边框 + Jade 提示 |
+| 新物品 | 无 | 高效肥料（机械搅拌合成） |
+| 模组联动 | 需自行写数据包 | **内置 6 个模组 20 种作物的栽培配方** |
+| 信息显示 | 无 | Jade 联动、显示连接器 5 种读数、JEI 配方查询 |
+| 稳定性 | 高倍率下进度溢出可崩溃 | 大量边界修复（详见下方"稳定性"） |
 
-This mod adds a new multi-block machine: the **Cultivation Tank**. It automates the planting, growing, and harvesting processes for a wide variety of plants, including:
+> 技术细节（崩溃根因分析、API 适配清单）见 [README_FIX.md](README_FIX.md)。
 
-- Vanilla staged crops (wheat, carrots, potatoes, etc.)
-- Flowers
-- Stacking plants (sugar cane, cactus, etc.)
-- Data-pack compatible crops from other mods (e.g., Farmer's Delight)
+## 玩家能体验到什么？
 
-### Community Edition Changes
+### 🌱 全自动种植机
 
-The original `create_cultivation-0.1.3` only supported Create 6.0.6 and would crash immediately under Create 6.0.10. This Community Edition ports the mod to **Create 6.0.10 + NeoForge 21.1.248** and adds several new features.
+- **栽培罐（Cultivation Tank）** 叠在**栽培基座（Cultivation Base）** 上，对罐子右键放入种子即完成种植；
+- 机器自动生长、成熟后自动收获进基座仓库，**并自动留种补种**——只要仓库不塞满，机器永远转下去；
+- 支持阶段式作物（小麦、胡萝卜……）、花卉、以及甘蔗/仙人掌/海带/竹子这类**逐层长高**的堆叠作物；
+- 产物用漏斗 / 溜槽即可抽取，完美接入现有物流系统；
+- 罐体本身可以向上堆叠：更高的罐子 = 更高的堆叠作物上限。
 
-#### Crash Fixes
+### 🌡️ 一眼读懂机器状态：双警示灯
 
-The original mod crashed on startup under Create 6.0.10 with:
+栽培基座顶部有两盏呼吸灯，搭配 GUI 槽位边框同色警示：
 
-```
-java.lang.NoClassDefFoundError: com/simibubi/create/foundation/fluid/FluidIngredient
-```
+- 🔴 **红灯——仓库快满了**：机器会预测"下一次收获能不能装下"，装不下就提前暂停（连同肥料倒计时、浇水一起），绝不浪费物料；腾出空间后自动复工；
+- 🟠 **橙灯——罐子太矮**：某些作物有最低罐高要求（比如水稻要 2 格），不满足时机器亮橙灯说明原因，**此时不生长、不消耗肥料、浇水也会被礼貌拒绝**——不会白烧你的资源。
 
-Create 6.0.7+ removed the `FluidIngredient` class in favor of NeoForge's `SizedFluidIngredient`. The following files were adapted:
+### 🌿 肥料系统
 
-| File | Change |
-|------|--------|
-| `CultivatingRecipeParams.java` | `FluidIngredient` → `SizedFluidIngredient`, `FluidIngredient.CODEC` → `CreateCodecs.SIZED_FLUID_INGREDIENT` |
-| `CultivationBaseBlockEntity.java` | `output.rollOutput()` → `output.rollOutput(level.getRandom())` (new Create 6.0.10 signature) |
-| `CCRecipeProvider.java` | `buildRecipes` access modifier `protected` → `public` |
-| `neoforge.mods.toml` | Create dependency range `[6.0.6,6.1.0)` → `[6.0.10,6.1.0)` |
+- 基座 GUI 里有专属肥料槽，肥料生效期间生长与产量获得倍率加成，一份消耗完自动续上下一份；
+- 默认肥料表：骨粉（30 秒，生长 ×2 / 产量 ×1.5）、Farmer's Delight 有机堆肥（90 秒，×4 / ×2）、My Nether's Delight 莱蒂俄堆肥（90 秒，×2 / ×4）；
+- **新物品：高效肥料**（45 秒，生长 ×3 / 产量 ×2），用机械搅拌器生产：
+  - 骨粉 + 腐肉 + 100mB 水 → 2 个；
+  - 再加一份 Farmer's Delight 树皮或草秆 + 250mB 水 → 4 个。
 
-#### Build System
+### 💧 浇水加成
 
-- Create / Ponder / Flywheel / Registrate are loaded from local `libs/` directory jars instead of Maven coordinates, ensuring exact version parity with the runtime environment.
-- Version bumped to `mod_version = 0.1.4`
+- 用注液器（Spout）给罐子浇水：生长 ×2、产量 ×1.5；
+- 浇水 + 肥料同时生效触发**协同加成**（再 ×1.5）；
+- 配方可以自定义灌溉流体——比如下界疣要用岩浆浇才给加成。
 
-#### New Features
+### 📊 信息联动
 
-**Cultivation Base Storage GUI**
+- **Jade**：看向机器即可显示当前作物、是否成熟、精确到秒的剩余生长时间；罐高不足时直接告诉你"高度不满足栽培需求"，而不是误导性的"已成熟"；
+- **显示连接器**（Create）：作物名称、剩余生长时间、基座产物清单、肥料余量、实时倍率五种读数可选，接上显示屏就能给农场装一块状态板；
+- **JEI**：新增"栽培 / 堆叠栽培"两个配方分类，点击任意作物即可查询种法（含浇灌流体与所需肥料）。
 
-Right-click the Cultivation Base (with any item, no need for an empty hand) to open its GUI:
+### 📖 内置教学
 
-- 8 output slots for harvested items plus a dedicated catalyst slot.
-- Holding a Cultivation Tank and right-clicking the base places the tank on top directly instead of opening the GUI.
+对着基座或罐子使用 Create 的 Ponder，有覆盖完整流程的图文教学：组装、动力、种植、收获、取物、肥料、浇水、显示连接器与罐体堆叠。
 
-**Catalyst System**
+### ⚙️ 游戏内配置
 
-- Insert fertilizer items (bone meal by default) into the base GUI; each fertilizer's duration and multipliers are configurable.
-- One catalyst is consumed every 30 seconds; recipes can override the item type and per-item duration via `catalyst` / `catalyst_use`.
-- The catalyst bar timer is renewed on each insertion, so topping up never loses progress.
-- GUI animations (catalyst arrows / water lines) run on a wall-clock timer and stay immune to server lag and time sync.
+`Mods 界面 → Create: Cultivation Craft → Config`，可调生长速率、产量倍率、浇水加成、协同加成、浇水时长，以及整张肥料表（每条肥料的物品 / 时长 / 双倍率）。
 
-**JEI Recipe Integration**
+## 模组联动目录
 
-Automatically enabled when JEI 19.44.0+ (NeoForge) is installed:
+以下配方**内置在本模组中**，安装对应模组后自动启用（未安装则不加载，无需任何配置）。模组名保持英文。
 
-- Adds **Cultivating** and **Stacking Cultivation** recipe categories.
-- Click a seed/crop to view its cultivation recipe (input seed → output crop).
-- Displays: irrigant fluid, growth time, and the recipe catalyst above the arrow.
-- Cultivation Base and Cultivation Tank are registered as JEI recipe catalysts.
-- No JEI dependency — the mod works fine without it.
+| 模组 | 联动作物 | 备注 |
+|------|----------|------|
+| **Farmer's Delight** | 卷心菜、洋葱、水稻、番茄 | 有机堆肥可作高级肥料 |
+| **Rustic Delight** | 棉花、咖啡、灯笼椒（红/绿/黄） | 灯笼椒按权重随机产出三种颜色 |
+| **Kaleidoscope Cookery** | 番茄、辣椒、生菜、水稻、野生稻 | 收获自动返还种子；水稻 / 野生稻需 2 格以上罐高 |
+| **Kaleidoscope Tavern** | 葡萄、冰晶葡萄、黄金葡萄 | 悬挂式作物渲染，收获保留藤蔓续种 |
+| **Corn Delight** | 玉米 | 堆叠式生长，需 2 格以上罐高 |
+| **Pineapple Delight** | 菠萝 | 收获自动留芽补种 |
+| **My Nether's Delight** | 粉末甘蔗、子弹椒、绯红菌索、诡异菌索 | 莱蒂俄堆肥可作高级肥料 |
 
-**Display Link Integration**
+## 稳定性修复（相对原版）
 
-Both blocks register multiple Create display sources, selectable in the display link UI:
+这些是实际游玩中会遇到的问题，社区版已全部处理：
 
-| Block | Source | Content |
-|-------|--------|---------|
-| Cultivation Tank | Crop Type | Current crop name (e.g., Wheat / Sugar Cane) |
-| Cultivation Tank | Time Remaining | Remaining growth time |
-| Cultivation Base | Base Output | Lists stored output items and counts |
-| Cultivation Base | Base Catalyst Amount | e.g., "Remaining Bone Meal: 7" |
-| Cultivation Base | Base Multipliers | Current yield multiplier and growth rate, live values |
+- 阶段作物在超高速运行下进度溢出，导致**渲染崩溃或服务端崩溃**；
+- 数据包重载后配方丢失，罐中作物**永久卡死**（现在会自动清除并记录日志）；
+- 罐高不足时 Jade 误报"已成熟"、作物模型错误显示成熟形态；
+- 肥料被无声消耗、警示解除后 GUI 动画永不停止；
+- 拆除基座后罐子的工作状态延迟刷新等十余项边界问题。
 
-Multiplier values update live with machine state (watering, catalyst, RPM).
+## 安装需求
 
-**Fluid Irrigation System**
+- Minecraft **1.21.1**
+- NeoForge **≥ 21.1.248**
+- Create **≥ 6.0.10, < 6.1.0**
+- 可选：JEI（配方查询）、Jade（状态提示）及上方联动目录中的任意模组
 
-Cultivation recipes support an optional `irrigant` field:
+## 版本
 
-```json
-{
-  "type": "create_cultivation:cultivating",
-  "crop_block": "minecraft:nether_wart",
-  "irrigant": "minecraft:lava"
-}
-```
+**0.1.4**（Community Edition）
 
-- Defaults to water when omitted.
-- Only matching fluid from a Spout triggers the watering bonus.
-- Example: Nether Wart is configured to use lava.
-
-**In-Game Config**
-
-Access via `Mods screen → create_cultivation → Config` or edit `config/create_cultivation-common.toml`:
-
-| Key | Default | Range | Description |
-|-----|---------|-------|-------------|
-| `growthRateMultiplier` | 1.0 | 0.05–20 | Crop growth rate multiplier |
-| `cropYieldMultiplier` | 1.0 | 0.1–64 | Crop yield multiplier |
-| `wateringYieldBonus` | 1.5 | 1.0–10 | Extra yield bonus when watered |
-| `wateringGrowthBonus` | 2.0 | 1.0–10 | Extra growth speed multiplier when watered |
-| `wateredDuration` | 2 | 1–600 | Watered status duration in ticks |
-| `catalysts` | see below | list | Fertilizer table: `item;durationTicks;growthMultiplier;yieldMultiplier` per entry; defaults: bone meal `600;2.0;1.5`, Farmer's Delight organic compost `1800;4.0;2.0` |
-| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | Extra multiplier for growth and yield while watered AND fertilized |
-
-#### Ponder
-
-The machine ships with an in-game Ponder walkthrough covering the full loop: assembly, rotational power, planting, automatic harvesting, output extraction (funnel/chute), the catalyst system, spout watering bonuses, display link usage and tank stacking. Open it with the Create ponder on the base or tank.
-
-#### Requirements
-
-- **Minecraft** 1.21.1
-- **NeoForge** ≥ 21.1.248
-- **Create** ≥ 6.0.10, < 6.1.0 (includes Ponder 1.0.82 / Flywheel 1.0.6 / Registrate +67)
-- Optional: **JEI** ≥ 19.44.0 (NeoForge)
-
-#### Version
-
-**0.1.4** (Community Edition)
-
-#### License
-
-Same as the original. See [LICENSE.txt](LICENSE.txt).
-
----
-
-## 中文
-
-**机械动力：栽培 — 社区版**
-
-一个为机械动力（Create）模组添加的全自动作物栽培附属模组。
-
-### 原版介绍
-
-本模组添加了一个新的多方块机器：**栽培罐（Cultivation Tank）**。它为各类植物提供了从播种、生长到收获的全自动化解决方案，支持：
-
-- 原版阶段式作物（小麦、胡萝卜、马铃薯等）
-- 花卉
-- 堆叠式植物（甘蔗、仙人掌等）
-- 通过数据包兼容其他模组的作物（如农夫乐事）
-
-### 社区版改动
-
-原版 `create_cultivation-0.1.3` 仅兼容 Create 6.0.6，在 Create 6.0.10 下会直接崩溃。本社区版将模组移植到 **Create 6.0.10 + NeoForge 21.1.248**，并新增了多项功能。
-
-#### 崩溃修复
-
-原版在 Create 6.0.10 下启动时报错：
-
-```
-java.lang.NoClassDefFoundError: com/simibubi/create/foundation/fluid/FluidIngredient
-```
-
-Create 自 6.0.7 起移除了 `FluidIngredient` 类，改用 NeoForge 的 `SizedFluidIngredient`。本社区版已完成以下适配：
-
-| 文件 | 修改内容 |
-|------|----------|
-| `CultivatingRecipeParams.java` | `FluidIngredient` → `SizedFluidIngredient`，`FluidIngredient.CODEC` → `CreateCodecs.SIZED_FLUID_INGREDIENT` |
-| `CultivationBaseBlockEntity.java` | `output.rollOutput()` → `output.rollOutput(level.getRandom())`（适配 Create 6.0.10 新签名） |
-| `CCRecipeProvider.java` | `buildRecipes` 访问修饰符 `protected` → `public` |
-| `neoforge.mods.toml` | Create 依赖范围 `[6.0.6,6.1.0)` → `[6.0.10,6.1.0)` |
-
-#### 构建系统
-
-- Create / Ponder / Flywheel / Registrate 改为从项目内 `libs/` 目录加载本地 jar，确保与运行环境版本完全一致。
-- 版本号更新：`mod_version = 0.1.4`
-
-#### 新增功能
-
-**栽培基座存储界面**
-
-右键栽培基座（任意物品，无需空手）即可打开界面：
-
-- 8 个产物槽用于存放收获物，另有 1 个专属肥料槽。
-- 手持栽培罐右键基座会直接把罐子放到基座上方，而不是打开界面。
-
-**肥料系统**
-
-- 在基座界面放入肥料物品（默认骨粉），各肥料的时长与倍率可在配置文件中自定义。
-- 每隔 30 秒消耗一份肥料；配方可通过 `catalyst` / `catalyst_use` 字段自定义肥料种类与单份时长。
-- 肥料计时器在每次放入时重新续期，中途补货不会损失剩余时间。
-- 基座界面动画（肥料箭头/水线）基于真实时钟驱动，不受服务器卡顿与时间同步影响。
-
-**JEI 配方显示**
-
-安装 JEI 19.44.0+（NeoForge 版）时自动启用：
-
-- 新增 **栽培（Cultivating）** 与 **堆叠栽培（Stacking Cultivation）** 两个配方分类。
-- 点击种子/作物可查看栽培配方（输入种子 → 输出作物）。
-- 界面显示：浇灌流体、生长时间，以及箭头上方的配方肥料。
-- 栽培基座与栽培罐注册为 JEI 配方肥料，点击即可查看相关配方。
-- 不安装 JEI 时不影响模组运行。
-
-**显示连接器联动**
-
-两种方块都注册了多个 Create 显示源，可在显示连接器界面中切换：
-
-| 方块 | 显示源 | 内容 |
-|-------|--------|---------|
-| 栽培罐 | 作物种类 | 当前作物名称（如 小麦 / 甘蔗） |
-| 栽培罐 | 剩余生长时间 | 生长剩余时间 |
-| 栽培基座 | 基座产物 | 列出已存储的产物种类与数量 |
-| 栽培基座 | 基座肥料数量 | 如「剩余骨粉：7个」 |
-| 栽培基座 | 基座倍率 | 当前产物倍率与生产速率，实时数值 |
-
-倍率显示会随机器状态实时更新（浇水、肥料、转速）。
-
-**流体灌溉系统**
-
-栽培配方支持可选字段 `irrigant`，用于指定浇灌流体：
-
-```json
-{
-  "type": "create_cultivation:cultivating",
-  "crop_block": "minecraft:nether_wart",
-  "irrigant": "minecraft:lava"
-}
-```
-
-- 未填写时默认为水。
-- 注液器（Spout）倒入的流体只有与配方匹配时才会触发浇水加成。
-- 原版示例：下界疣已设置为用岩浆灌溉。
-
-**游戏内配置**
-
-通过 `游戏内 Mods 界面 → create_cultivation → Config` 或直接编辑 `config/create_cultivation-common.toml`：
-
-| 配置项 | 默认值 | 范围 | 说明 |
-|--------|--------|------|------|
-| `growthRateMultiplier` | 1.0 | 0.05–20 | 作物生长速率倍率 |
-| `cropYieldMultiplier` | 1.0 | 0.1–64 | 作物产出数量倍率 |
-| `wateringYieldBonus` | 1.5 | 1.0–10 | 浇水时额外产出加成 |
-| `wateringGrowthBonus` | 2.0 | 1.0–10 | 浇水时额外生长速度倍率 |
-| `wateredDuration` | 2 | 1–600 | 浇水状态持续刻数 |
-| `catalysts` | 见下 | 列表 | 肥料表：每条格式 `物品;持续刻;生长倍率;产量倍率`，默认含骨粉 `600;2.0;1.5`、农夫乐事有机堆肥 `1800;4.0;2.0` |
-| `waterCatalystSynergyBonus` | 1.5 | 1.0–10 | 浇水与肥料同时生效时的额外加成倍率 |
-
-#### Ponder 教学场景
-
-模组内置了覆盖完整玩法的 Ponder 教学场景：组装、动力供应、种植、自动收获、漏斗/溜槽取物、肥料系统、注液器浇水加成、显示连接器用法与堆叠罐体。对着基座或栽培罐使用 Create 的 ponder 指引即可打开。
-
-#### 环境要求
-
-- **Minecraft** 1.21.1
-- **NeoForge** ≥ 21.1.248
-- **Create** ≥ 6.0.10, < 6.1.0（含 Ponder 1.0.82 / Flywheel 1.0.6 / Registrate +67）
-- 可选：**JEI** ≥ 19.44.0（NeoForge 版）
-
-#### 版本
-
-**0.1.4** (Community Edition)
-
-#### 许可
+## 许可
 
 与原版保持一致，详见 [LICENSE.txt](LICENSE.txt)。
