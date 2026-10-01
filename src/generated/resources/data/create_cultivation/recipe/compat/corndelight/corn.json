@@ -6,16 +6,16 @@
     }
   ],
   "type": "create_cultivation:stacking_cultivating",
+  "block_to_render": "corn_delight:corn_crop",
   "ingredient": {
     "item": "corn_delight:corn_seeds"
   },
-  "result": {
-    "id": "corn_delight:corn",
-    "count": 1
-  },
-  "processingDuration": 12000,
-  "block_to_render": "corn_delight:corn_crop",
-  "stage_by_progress": true,
   "maxHeight": 2,
-  "min_height": 2
+  "min_height": 2,
+  "processingDuration": 12000,
+  "result": {
+    "count": 1,
+    "id": "corn_delight:corn,1"
+  },
+  "stage_by_progress": true
 }

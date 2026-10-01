@@ -16,14 +16,15 @@ A Create mod addon that provides a **fully automatic crop cultivation system**: 
 
 The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on current Create versions. This Community Edition ports it to **Create 6.0.10 + NeoForge 21.1.x** and adds a lot on top.
 
-| | Original 0.1.3 | Community Edition 0.1.4 |
+| | Original 0.1.3 | Community Edition 0.1.5 |
 |---|---|---|
 | Runtime | Create 6.0.6 only (crashes on newer) | **Create 6.0.10 + NeoForge 21.1.x** |
 | Output storage | No interface | Base GUI: 8-slot output + fertilizer slot |
-| Fertilizers | None | bone_meal / organic compost / letios compost / **Efficient Fertilizer**, all configurable |
+| Fertilizers | None | bone_meal / organic compost / letios compost / **Efficient Fertilizer** (also usable as a right-click fertilizer), all configurable |
 | Watering bonus | None | Spout watering: growth ×2, yield ×1.5, plus synergy bonus with fertilizers |
+| Greenhouse climate | None | **Full climate system**: controller, 4 devices, auto setpoint solver, season mod support |
 | Machine status | None | 🔴 red / 🟠 orange dual alarm lamps + GUI border + Jade hints |
-| New items | None | Efficient Fertilizer (Mechanical Mixer recipes) |
+| New items | None | Efficient Fertilizer (Mechanical Mixer recipes + right-click use) |
 | Mod integration | DIY datapacks required | **Built-in recipes for 23 crops across 7 mods** |
 | Info displays | None | Jade, 5 Display Link readouts, JEI recipe categories |
 | Stability | Progress overflow crashes at high speed | Many edge-case fixes (see below) |
@@ -54,6 +55,16 @@ The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on c
 - Water the tank with a Spout: growth ×2, yield ×1.5;
 - Watering + fertilizer together trigger a **synergy bonus** (another ×1.5);
 - Recipes can define a custom irrigant fluid — e.g. nether wart wants lava.
+
+#### 🏡 Greenhouse climate system
+- Build a sealed **greenhouse** out of Greenhouse Glass (connected-texture glass that still counts as a wall) and place the **Greenhouse Controller** inside: it scans the interior (up to 2048 cells) and tracks the live **temperature (°C) and humidity (%RH)**;
+- The controller GUI shows every scanned crop as a row with its optimal/survival climate bars, a flip-board readout on top, and two **setpoint sliders** with gear-detent dragging — an orange warning appears when the connected devices cannot reach the setpoint;
+- Steer the climate with **powered devices**: Humidifier (+humidity), Dehumidifier (−humidity), Air Conditioner (temperature) — all driven toward the setpoints automatically, or hit the hook button and the **auto solver** picks the setpoints from the crops you grow;
+- Greenhouse crops grow up to **×9 faster** in their optimal climate, and are **stalled** (no growth, no fertilizer consumed, watering and fertilizing refused) outside their survival ranges;
+- The **Sprinkler** sprays water over the crops below it and keeps a 7×7 farmland area permanently hydrated; supply water through its bottom port;
+- Climate data is data-pack driven: per-crop temperature/humidity ranges live in the `crop_climate` data map, and multi-structure crops (rice, grapes, trellises…) get proper icons in the controller GUI through the `display_icon` data map — mod packs can add their own entries to both;
+- **Season mods**: Serene Seasons and Ecliptic Seasons are supported — the season adjusts the greenhouse's baseline climate, and Greenhouse Glass counts as Serene Seasons' greenhouse glass so seasonal crops keep growing indoors;
+- Optional **ambient crops** mode (config) extends the same climate rules to outdoor crops based on their biome.
 
 #### 📊 Info integration
 - **Jade**: crop name, maturity and a second-accurate growth countdown on sight; short tanks get an honest "height mismatch" instead of a misleading "mature";
@@ -93,7 +104,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 - Minecraft **1.21.1**
 - NeoForge **≥ 21.1.248**
 - Create **≥ 6.0.10, < 6.1.0**
-- Optional: JEI, Jade, and any mod from the compatibility table
+- Optional: JEI, Jade, Serene Seasons / Ecliptic Seasons, and any mod from the compatibility table
 
 ### Credits
 
@@ -108,14 +119,15 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 
 原模组（v0.1.3）停更于 Create 6.0.6 时代，在现行版本的 Create 下**加载即崩溃**。社区版做了完整的兼容移植，并在此之上加入了大量新功能与体验优化。
 
-| | 原版 0.1.3 | 社区版 0.1.4 |
+| | 原版 0.1.3 | 社区版 0.1.5 |
 |---|---|---|
 | 运行环境 | 仅 Create 6.0.6（新版直接崩溃） | **Create 6.0.10 + NeoForge 21.1.x** |
 | 产物存储 | 无界面 | 基座 GUI：8 格产物仓 + 肥料槽 |
-| 肥料 | 无 | bone_meal / organic compost / letios compost / **Efficient Fertilizer**，效果均可配置 |
+| 肥料 | 无 | bone_meal / organic compost / letios compost / **Efficient Fertilizer**（也可右键直接施肥），效果均可配置 |
 | 浇水加成 | 无 | Spout 浇水：生长 ×2、产量 ×1.5，与肥料还有协同加成 |
+| 温室气候 | 无 | **完整气候系统**：控制器 + 4 种设备 + 自动求解器 + 季节模组联动 |
 | 机器状态提示 | 无 | 🔴 红灯 / 🟠 橙灯 双警示灯 + GUI 边框 + Jade 提示 |
-| 新物品 | 无 | Efficient Fertilizer（机械搅拌合成） |
+| 新物品 | 无 | Efficient Fertilizer（机械搅拌合成 + 右键直接施肥） |
 | 模组联动 | 需自行写数据包 | **内置 7 个模组 23 种作物的栽培配方** |
 | 信息显示 | 无 | Jade 联动、Display Link 5 种读数、JEI 配方查询 |
 | 稳定性 | 高倍率下进度溢出可崩溃 | 大量边界修复（详见下方"稳定性修复"） |
@@ -146,6 +158,16 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 - 用 Spout 给罐子浇水：生长 ×2、产量 ×1.5；
 - 浇水 + 肥料同时生效触发**协同加成**（再 ×1.5）；
 - 配方可以自定义灌溉流体——比如 nether wart 要用岩浆浇才给加成。
+
+#### 🏡 温室气候系统
+- 用**温室玻璃**（连接纹理玻璃，同样算作封闭墙体）搭出密封温室，在里面放上**温室控制器**：它会扫描温室内部（最多 2048 格）并实时追踪**温度（°C）与湿度（%RH）**；
+- 控制器 GUI 顶部是翻牌式数据显示，扫描到的每种作物列成一行、带各自的适宜/生存气候条；两个**设定值滑条**支持齿轮棘轮式拖动，设备够不到设定值时会出现橙色警告；
+- 用通电设备调节气候：**加湿器**（升湿度）、**抽湿器**（降湿度）、**空气调节器**（调温度）——设备会自动朝设定值工作；也可以点一下挂钩按钮，**自动求解器**会根据你种的作物直接选好设定值；
+- 温室内的作物在最适宜气候下最高 **9 倍生长速度**，跌出生存区间则**停滞**（不生长、不消耗肥料、拒绝浇水施肥）；
+- **洒水器**给下方作物均匀喷洒水雾，并让 7×7 范围的耕地永久保持湿润；从底部接口供水即可工作；
+- 气候数据全部由数据包驱动：每种作物的温湿度区间在 `crop_climate` 数据图里，稻米/葡萄/藤架这类多结构作物的图标通过 `display_icon` 数据图映射——整合包可以自由添加条目；
+- **节气/季节模组**：支持 Serene Seasons 与 Ecliptic Seasons——季节修正温室的环境基准气候，温室玻璃同时计入 Serene Seasons 的温室玻璃判定，季节性作物在温室内照常生长；
+- 可选的**室外作物**模式（配置项）把同一套气候规则按群系扩展到户外的作物上。
 
 #### 📊 信息联动
 - **Jade**：看向机器即可显示当前作物、是否成熟、精确到秒的剩余生长时间；罐高不足时直接告诉你"高度不满足栽培需求"，而不是误导性的"已成熟"；
@@ -187,7 +209,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 - Minecraft **1.21.1**
 - NeoForge **≥ 21.1.248**
 - Create **≥ 6.0.10, < 6.1.0**
-- 可选：JEI（配方查询）、Jade（状态提示）及上方联动目录中的任意模组
+- 可选：JEI（配方查询）、Jade（状态提示）、Serene Seasons / Ecliptic Seasons（季节联动）及上方联动目录中的任意模组
 
 ### 致谢
 
@@ -198,4 +220,4 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 
 ## 版本 / Version
 
-**0.1.4** (Community Edition)
+**0.1.5** (Community Edition)

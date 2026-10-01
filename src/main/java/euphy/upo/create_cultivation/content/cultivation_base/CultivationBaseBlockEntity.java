@@ -252,9 +252,7 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
                 && recipeHolder.get().value() instanceof StackingCultivatingRecipe stackRecipe) {
             // Mirror the real harvest exactly: the bottom layer is reserved for
             // the replant, so only currentHeight - 1 layers produce output and
-            // a height-1 stack harvests nothing at all (predictNextHarvest
-            // used max(1, height) and over-predicted by one layer, lighting
-            // the output-full alarm earlier than reality).
+            // a height-1 stack harvests nothing at all.
             int layers = tankBE.getCurrentHeight() - 1;
             if (layers <= 0) {
                 return pending;
@@ -408,16 +406,20 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         if (!clientPacket) {
             outputFull = isOutputSlotsFull(outputFull);
         } else {
-            // Client update packet: take the server-synced flag. The client
-            // item handler is always empty, so a local prediction is both
-            // wasted work and permanently wrong (this also finally feeds the
-            // in-world red glow, which silently never lit before).
+            // Client update packet: take the server-synced flag - a local
+            // prediction is permanently wrong (the client item handler is
+            // always empty).
             outputFull = compound.getBoolean("OutputFull");
         }
         // Height alarm arrives from the server via update packets (the recipe
         // lookup it depends on is not reliable on the client).
         heightMismatch = compound.getBoolean("HeightMismatch");
     }
+
+    /** Own 20-tick cadence for updateWorkingState: super.tick() drives the shared
+     *  lazyTickCounter at Create's own rate, so reusing it made this refresh drift
+     *  between 10 and 30 ticks. */
+    private int workingStateCounter;
 
     @Override
     public void tick() {
@@ -428,8 +430,8 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         }
 
 
-        if (lazyTickCounter-- < 0) {
-            lazyTickCounter = 20;
+        if (workingStateCounter-- <= 0) {
+            workingStateCounter = 20;
             updateWorkingState();
         }
 

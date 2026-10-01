@@ -1,0 +1,430 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_up": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lu_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_up": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ru_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ld_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/rd_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_up": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ud_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_up": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/u_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/d_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "true",
+        "frozen_south": "true",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lr_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/l_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_up": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/r_x"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "true",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lu_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ru_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "true",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ld_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/rd_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "true",
+        "frozen_south": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ud_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "false",
+        "frozen_south": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/u_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "true",
+        "frozen_south": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/d_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "true",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lr_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "true",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/l_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_east": "false",
+        "frozen_north": "false",
+        "frozen_south": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/r_y"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "true",
+        "frozen_up": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lu_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "false",
+        "frozen_up": "true",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ru_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_east": "true",
+        "frozen_up": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ld_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_east": "false",
+        "frozen_up": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/rd_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_east": "false",
+        "frozen_up": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/ud_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "false",
+        "frozen_up": "true",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/u_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "true",
+        "frozen_east": "false",
+        "frozen_up": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/d_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "true",
+        "frozen_up": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/lr_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "true",
+        "frozen_up": "false",
+        "frozen_west": "false"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/l_z"
+      }
+    },
+    {
+      "when": {
+        "frozen_down": "false",
+        "frozen_east": "false",
+        "frozen_up": "false",
+        "frozen_west": "true"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/r_z"
+      }
+    },
+    {
+      "when": {
+        "north": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_north"
+      }
+    },
+    {
+      "when": {
+        "north": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_north"
+      }
+    },
+    {
+      "when": {
+        "south": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_south"
+      }
+    },
+    {
+      "when": {
+        "south": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_south"
+      }
+    },
+    {
+      "when": {
+        "west": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_west"
+      }
+    },
+    {
+      "when": {
+        "west": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_west"
+      }
+    },
+    {
+      "when": {
+        "east": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_east"
+      }
+    },
+    {
+      "when": {
+        "east": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_east"
+      }
+    },
+    {
+      "when": {
+        "down": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_down"
+      }
+    },
+    {
+      "when": {
+        "down": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_down"
+      }
+    },
+    {
+      "when": {
+        "up": true
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_open_up"
+      }
+    },
+    {
+      "when": {
+        "up": false
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_up"
+      }
+    }
+  ]
+}

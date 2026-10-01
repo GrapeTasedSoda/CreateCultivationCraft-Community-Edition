@@ -12,12 +12,20 @@ import net.neoforged.neoforge.common.ModConfigSpec;
  * from the NeoForge config screen ("Mods &gt; create_cultivation &gt; Config") that
  * {@code CreateCultivationCraftClient} already wires up via
  * {@code IConfigScreenFactory/ConfigurationScreen}.</p>
+ *
+ * <p>Values are grouped into two top-level sections: {@code cultivation_tank}
+ * (the base/tank machine: growth, yield, watering, catalysts) and
+ * {@code greenhouse} (climate control devices and crop climate bonuses).</p>
  */
 public final class CCConfig {
 
 	private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
 	public static final ModConfigSpec SPEC;
+
+	// ------------------------------------------------------------------
+	// Cultivation tank section
+	// ------------------------------------------------------------------
 
 	/** Scales how fast crops mature. 1.0 = vanilla speed of this addon. */
 	public static final ModConfigSpec.DoubleValue GROWTH_RATE;
@@ -40,7 +48,92 @@ public final class CCConfig {
 	/** Extra multiplier applied to both growth speed and yield while the tank is watered AND the catalyst is active. */
 	public static final ModConfigSpec.DoubleValue WATER_CATALYST_SYNERGY_BONUS;
 
+	// ------------------------------------------------------------------
+	// Greenhouse section
+	// ------------------------------------------------------------------
+
+	/** Climate work of one air conditioner (degC * blocks). */
+	public static final ModConfigSpec.DoubleValue AIRCONDITIONER_CAPACITY;
+
+	/** Climate work of one humidifier (%RH * blocks, raises humidity). */
+	public static final ModConfigSpec.DoubleValue HUMIDIFIER_CAPACITY;
+
+	/** Climate work of one dehumidifier (%RH * blocks, lowers humidity). */
+	public static final ModConfigSpec.DoubleValue DEHUMIDIFIER_CAPACITY;
+
+	/** Climate change speed factor (dimensionless multiplier). */
+	public static final ModConfigSpec.DoubleValue CLIMATE_RATE;
+
+	/** Yield multiplier while temperature AND humidity are inside the optimal ranges. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_OPTIMAL_YIELD;
+
+	/** Growth speed multiplier while temperature AND humidity are inside the optimal ranges. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_OPTIMAL_GROWTH;
+
+	/** Yield multiplier while exactly one dimension is optimal, the other inside survival. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_SURVIVAL_YIELD;
+
+	/** Growth speed multiplier while exactly one dimension is optimal, the other inside survival. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_SURVIVAL_GROWTH;
+
+	/** Yield multiplier while both dimensions are inside survival but neither is optimal. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_SURVIVAL_ONLY_YIELD;
+
+	/** Growth speed multiplier while both dimensions are inside survival but neither is optimal. */
+	public static final ModConfigSpec.DoubleValue CLIMATE_SURVIVAL_ONLY_GROWTH;
+
+	// ------------------------------------------------------------------
+	// Ambient (outdoor) climate section
+	// ------------------------------------------------------------------
+
+	/** Master switch for the ambient climate crop effects (default off). */
+	public static final ModConfigSpec.BooleanValue AMBIENT_CROPS_ENABLED;
+
+	/** Ambient yield bonus while temperature AND humidity are both optimal. */
+	public static final ModConfigSpec.DoubleValue AMBIENT_OPTIMAL_YIELD;
+
+	/** Ambient growth bonus while temperature AND humidity are both optimal. */
+	public static final ModConfigSpec.DoubleValue AMBIENT_OPTIMAL_GROWTH;
+
+	/** Ambient yield while exactly one dimension is optimal, the other in survival. */
+	public static final ModConfigSpec.DoubleValue AMBIENT_PARTIAL_YIELD;
+
+	/** Ambient growth while exactly one dimension is optimal, the other in survival. */
+	public static final ModConfigSpec.DoubleValue AMBIENT_PARTIAL_GROWTH;
+
+	/** Ambient yield while both dimensions are merely surviving (no bonus by default). */
+	public static final ModConfigSpec.DoubleValue AMBIENT_SURVIVAL_ONLY_YIELD;
+
+	/** Ambient growth while both dimensions are merely surviving (no bonus by default). */
+	public static final ModConfigSpec.DoubleValue AMBIENT_SURVIVAL_ONLY_GROWTH;
+
+	/** Master switch: reject fertilizer use on stalled crops. */
+	public static final ModConfigSpec.BooleanValue STALL_BLOCK_ENABLED;
+
+	/** Item ids rejected on stalled crops (one registry id per entry). */
+	public static final ModConfigSpec.ConfigValue<List<? extends String>> STALL_BLOCKED_FERTILIZERS;
+
+	// ------------------------------------------------------------------
+	// Serene Seasons section
+	// ------------------------------------------------------------------
+
+	/** Humidity offset (%RH) applied to the resolved biome humidity during Spring. */
+	public static final ModConfigSpec.DoubleValue SS_SPRING_HUMIDITY_OFFSET;
+
+	/** Humidity offset (%RH) applied to the resolved biome humidity during Summer. */
+	public static final ModConfigSpec.DoubleValue SS_SUMMER_HUMIDITY_OFFSET;
+
+	/** Humidity offset (%RH) applied to the resolved biome humidity during Autumn. */
+	public static final ModConfigSpec.DoubleValue SS_AUTUMN_HUMIDITY_OFFSET;
+
+	/** Humidity offset (%RH) applied to the resolved biome humidity during Winter. */
+	public static final ModConfigSpec.DoubleValue SS_WINTER_HUMIDITY_OFFSET;
+
 	static {
+		BUILDER.push("cultivation_tank")
+			.comment("Cultivation tank machine settings: growth speed, harvest yield,")
+			.comment("watering bonuses and the catalyst table.");
+
 		BUILDER.push("general")
 			.comment("General gameplay settings for the cultivation machine.");
 
@@ -95,6 +188,169 @@ public final class CCConfig {
 			.comment("Extra multiplier applied to BOTH growth speed and harvest yield while the tank is watered AND the catalyst is active. 1.5 means 50% extra on top of the existing multipliers; 1.0 disables the synergy.")
 			.translation("create_cultivation.config.waterCatalystSynergyBonus")
 			.defineInRange("waterCatalystSynergyBonus", 1.5, 1.0, 10.0);
+
+		BUILDER.pop();
+
+		BUILDER.pop();
+
+		BUILDER.push("greenhouse")
+			.comment("Greenhouse settings: climate control devices and the crop")
+			.comment("bonuses granted by the controlled climate.");
+
+		BUILDER.push("climate_control")
+			.comment("Climate control: device capacity decides both how far")
+			.comment("the climate can be pushed (|setpoint - ambient| * volume must fit")
+			.comment("into the summed capacity) and how fast it moves there.");
+
+		AIRCONDITIONER_CAPACITY = BUILDER
+			.comment("Climate work one air conditioner provides, in degC*blocks. 4000 means")
+			.comment("one unit shifts a 1000-block greenhouse by 4 degC or a 100-block one by 40 degC.")
+			.translation("create_cultivation.config.airconditionerCapacity")
+			.defineInRange("airconditionerCapacity", 4000.0, 1.0, 1000000.0);
+
+		HUMIDIFIER_CAPACITY = BUILDER
+			.comment("Climate work one humidifier provides, in %RH*blocks (raises humidity).")
+			.translation("create_cultivation.config.humidifierCapacity")
+			.defineInRange("humidifierCapacity", 4000.0, 1.0, 1000000.0);
+
+		DEHUMIDIFIER_CAPACITY = BUILDER
+			.comment("Climate work one dehumidifier provides, in %RH*blocks (lowers humidity).")
+			.translation("create_cultivation.config.dehumidifierCapacity")
+			.defineInRange("dehumidifierCapacity", 4000.0, 1.0, 1000000.0);
+
+		CLIMATE_RATE = BUILDER
+			.comment("Climate change speed factor. The live value moves at capacity/volume")
+			.comment("units per tick multiplied by this; 1.0 = a full-capacity 1000-block")
+			.comment("greenhouse shifts 4 degC per second.")
+			.translation("create_cultivation.config.climateRate")
+			.defineInRange("climateRate", 1.0, 0.05, 20.0);
+
+		BUILDER.pop().push("crop_boost")
+			.comment("Multipliers for crops growing inside a powered greenhouse, decided")
+			.comment("by the live climate vs the crop's configured ranges: both dimensions")
+			.comment("optimal, exactly one optimal (other within survival), both merely")
+			.comment("surviving (no bonus), or stalled (outside survival: no growth, no yield).");
+
+		CLIMATE_OPTIMAL_YIELD = BUILDER
+			.comment("Harvest yield multiplier while temperature AND humidity are both inside the crop's optimal range.")
+			.translation("create_cultivation.config.climateOptimalYieldBonus")
+			.defineInRange("climateOptimalYieldBonus", 3.0, 0.0, 64.0);
+
+		CLIMATE_OPTIMAL_GROWTH = BUILDER
+			.comment("Growth speed multiplier while temperature AND humidity are both inside the crop's optimal range.")
+			.translation("create_cultivation.config.climateOptimalGrowthBonus")
+			.defineInRange("climateOptimalGrowthBonus", 9.0, 0.0, 64.0);
+
+		CLIMATE_SURVIVAL_YIELD = BUILDER
+			.comment("Harvest yield multiplier while exactly one dimension is optimal and the other is inside the survival range.")
+			.translation("create_cultivation.config.climateSurvivalYieldBonus")
+			.defineInRange("climateSurvivalYieldBonus", 1.5, 0.0, 64.0);
+
+		CLIMATE_SURVIVAL_GROWTH = BUILDER
+			.comment("Growth speed multiplier while exactly one dimension is optimal and the other is inside the survival range.")
+			.translation("create_cultivation.config.climateSurvivalGrowthBonus")
+			.defineInRange("climateSurvivalGrowthBonus", 3.0, 0.0, 64.0);
+
+		CLIMATE_SURVIVAL_ONLY_YIELD = BUILDER
+			.comment("Harvest yield multiplier while both dimensions are inside the survival ranges but neither is optimal.")
+			.translation("create_cultivation.config.climateSurvivalOnlyYieldBonus")
+			.defineInRange("climateSurvivalOnlyYieldBonus", 1.0, 0.0, 64.0);
+
+		CLIMATE_SURVIVAL_ONLY_GROWTH = BUILDER
+			.comment("Growth speed multiplier while both dimensions are inside the survival ranges but neither is optimal.")
+			.translation("create_cultivation.config.climateSurvivalOnlyGrowthBonus")
+			.defineInRange("climateSurvivalOnlyGrowthBonus", 1.0, 0.0, 64.0);
+
+		BUILDER.pop();
+
+		BUILDER.push("ambient_crops")
+			.comment("Optional climate effects on crops growing OUTSIDE greenhouses,")
+			.comment("from the ambient biome temperature and humidity. The ladder is")
+			.comment("the same as the greenhouse one; a greenhouse registration always")
+			.comment("takes priority and shields its interior from these effects.");
+
+		AMBIENT_CROPS_ENABLED = BUILDER
+			.comment("Enable ambient climate effects on outdoor soil crops. Default: false (vanilla behaviour).")
+			.translation("create_cultivation.config.ambientCropsEnabled")
+			.define("ambientCropsEnabled", false);
+
+		AMBIENT_OPTIMAL_YIELD = BUILDER
+			.comment("Outdoor harvest yield multiplier while temperature AND humidity are both inside the crop's optimal range.")
+			.translation("create_cultivation.config.ambientOptimalYieldBonus")
+			.defineInRange("ambientOptimalYieldBonus", 1.5, 0.0, 64.0);
+
+		AMBIENT_OPTIMAL_GROWTH = BUILDER
+			.comment("Outdoor growth speed multiplier while temperature AND humidity are both inside the crop's optimal range.")
+			.translation("create_cultivation.config.ambientOptimalGrowthBonus")
+			.defineInRange("ambientOptimalGrowthBonus", 2.0, 0.0, 64.0);
+
+		AMBIENT_PARTIAL_YIELD = BUILDER
+			.comment("Outdoor harvest yield multiplier while exactly one dimension is optimal and the other is inside the survival range.")
+			.translation("create_cultivation.config.ambientPartialYieldBonus")
+			.defineInRange("ambientPartialYieldBonus", 1.0, 0.0, 64.0);
+
+		AMBIENT_PARTIAL_GROWTH = BUILDER
+			.comment("Outdoor growth speed multiplier while exactly one dimension is optimal and the other is inside the survival range.")
+			.translation("create_cultivation.config.ambientPartialGrowthBonus")
+			.defineInRange("ambientPartialGrowthBonus", 1.5, 0.0, 64.0);
+
+		AMBIENT_SURVIVAL_ONLY_YIELD = BUILDER
+			.comment("Outdoor harvest yield multiplier while both dimensions are merely surviving. 1.0 = no bonus.")
+			.translation("create_cultivation.config.ambientSurvivalOnlyYieldBonus")
+			.defineInRange("ambientSurvivalOnlyYieldBonus", 1.0, 0.0, 64.0);
+
+		AMBIENT_SURVIVAL_ONLY_GROWTH = BUILDER
+			.comment("Outdoor growth speed multiplier while both dimensions are merely surviving. 1.0 = no bonus.")
+			.translation("create_cultivation.config.ambientSurvivalOnlyGrowthBonus")
+			.defineInRange("ambientSurvivalOnlyGrowthBonus", 1.0, 0.0, 64.0);
+
+		BUILDER.pop();
+
+		BUILDER.pop();
+
+		BUILDER.push("stall_fertilizer_block")
+			.comment("While a crop is stalled (outside both of its survival ranges) fertilizing")
+			.comment("it has no effect anyway; this optionally rejects the item outright so")
+			.comment("the stall becomes visible to the player instead of silently wasting");
+
+		STALL_BLOCK_ENABLED = BUILDER
+			.comment("Block fertilizer items on crops the climate system currently holds in the stalled state. Default: true.")
+			.translation("create_cultivation.config.stallBlockEnabled")
+			.define("stallBlockEnabled", true);
+
+		STALL_BLOCKED_FERTILIZERS = BUILDER
+			.comment("Item ids rejected on stalled crops while the feature is enabled (default: bone meal and efficient fertilizer). Unknown ids are ignored.")
+			.translation("create_cultivation.config.stallBlockedFertilizers")
+			.defineListAllowEmpty("blockedFertilizers", List.of("minecraft:bone_meal", "create_cultivation:efficient_fertilizer"),
+				o -> o instanceof String s && !s.isBlank());
+
+		BUILDER.pop();
+
+		BUILDER.push("sereneseasons")
+			.comment("Serene Seasons integration: while a season is active, the resolved")
+			.comment("biome humidity is shifted by the season's offset (in %RH). Temperature")
+			.comment("follows Serene Seasons' own biome_temp_adjustment. Non-whitelisted")
+			.comment("dimensions and blacklisted biomes are never offset.");
+
+		SS_SPRING_HUMIDITY_OFFSET = BUILDER
+			.comment("Humidity offset during Spring.")
+			.translation("create_cultivation.config.springHumidityOffset")
+			.defineInRange("springHumidityOffset", 5.0, -100.0, 100.0);
+
+		SS_SUMMER_HUMIDITY_OFFSET = BUILDER
+			.comment("Humidity offset during Summer.")
+			.translation("create_cultivation.config.summerHumidityOffset")
+			.defineInRange("summerHumidityOffset", 10.0, -100.0, 100.0);
+
+		SS_AUTUMN_HUMIDITY_OFFSET = BUILDER
+			.comment("Humidity offset during Autumn.")
+			.translation("create_cultivation.config.autumnHumidityOffset")
+			.defineInRange("autumnHumidityOffset", 0.0, -100.0, 100.0);
+
+		SS_WINTER_HUMIDITY_OFFSET = BUILDER
+			.comment("Humidity offset during Winter.")
+			.translation("create_cultivation.config.winterHumidityOffset")
+			.defineInRange("winterHumidityOffset", -15.0, -100.0, 100.0);
 
 		BUILDER.pop();
 

@@ -24,3 +24,9 @@ runs
 run-data
 
 repo
+# local workspace only (not part of the mod source)
+models_workshop/
+MEMORY.md
+publish_release.ps1
+curseforge_changelog.md
+curseforge_description.md

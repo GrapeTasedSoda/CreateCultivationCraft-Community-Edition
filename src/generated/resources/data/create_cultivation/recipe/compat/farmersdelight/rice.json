@@ -6,17 +6,17 @@
     }
   ],
   "type": "create_cultivation:stacking_cultivating",
+  "block_to_render": "farmersdelight:rice",
   "ingredient": {
     "item": "farmersdelight:rice"
   },
-  "result": {
-    "id": "farmersdelight:rice_panicle",
-    "count": 2
-  },
-  "processingDuration": 9000,
-  "block_to_render": "farmersdelight:rice",
-  "top_render": "farmersdelight:rice_panicles",
-  "stage_by_progress": true,
   "maxHeight": 2,
-  "min_height": 2
+  "min_height": 2,
+  "processingDuration": 9000,
+  "result": {
+    "count": 2,
+    "id": "farmersdelight:rice_panicle"
+  },
+  "stage_by_progress": true,
+  "top_render": "farmersdelight:rice_panicles"
 }

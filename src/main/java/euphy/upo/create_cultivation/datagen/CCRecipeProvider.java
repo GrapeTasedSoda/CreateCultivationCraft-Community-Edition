@@ -17,10 +17,12 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.Tags;
@@ -67,6 +69,80 @@ public class CCRecipeProvider extends ProcessingRecipeGen<CultivatingRecipeParam
                 .define('G', Tags.Items.GLASS_BLOCKS)
                 .define('A', AllItems.ANDESITE_ALLOY.get())
                 .unlockedBy("has_andesite_alloy", has(AllItems.ANDESITE_ALLOY.get()))
+                .save(consumer);
+
+
+        //温室控制器：左右上角电子管，上格发信线圈，中心小齿轮，下格黄铜机壳，其余黄铜板
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.GREENHOUSE_CONTROLLER.get())
+                .pattern("ETE")
+                .pattern("PGP")
+                .pattern("PCP")
+                .define('E', AllItems.ELECTRON_TUBE.get())
+                .define('T', AllItems.TRANSMITTER.get())
+                .define('P', AllItems.BRASS_SHEET.get())
+                .define('G', AllBlocks.COGWHEEL.get())
+                .define('C', AllBlocks.BRASS_CASING.get())
+                .unlockedBy("has_transmitter", has(AllItems.TRANSMITTER.get()))
+                .save(consumer);
+
+        //温室玻璃：铁板十字 + 中心玻璃 + 安山合金 X 形，一次 8 块
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.GREENHOUSE_GLASS.get(), 8)
+                .pattern("APA")
+                .pattern("PGP")
+                .pattern("APA")
+                .define('P', AllItems.IRON_SHEET.get())
+                .define('G', Items.GLASS)
+                .define('A', AllItems.ANDESITE_ALLOY.get())
+                .unlockedBy("has_andesite_alloy", has(AllItems.ANDESITE_ALLOY.get()))
+                .save(consumer);
+
+        //温室玻璃门：任意木门 + 温室玻璃
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, CCBlocks.GREENHOUSE_GLASS_DOOR.get())
+                .requires(Ingredient.of(ItemTags.WOODEN_DOORS))
+                .requires(CCBlocks.GREENHOUSE_GLASS.get())
+                .unlockedBy("has_greenhouse_glass", has(CCBlocks.GREENHOUSE_GLASS.get()))
+                .save(consumer);
+
+        //加湿器
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.HUMIDIFIER.get())
+                .pattern("P")
+                .pattern("T")
+                .pattern("I")
+                .define('P', AllBlocks.FLUID_PIPE.get())
+                .define('T', AllItems.TRANSMITTER.get())
+                .define('I', AllItems.IRON_SHEET.get())
+                .unlockedBy("has_transmitter", has(AllItems.TRANSMITTER.get()))
+                .save(consumer);
+
+        //抽湿器
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.DEHUMIDIFIER.get())
+                .pattern("P")
+                .pattern("T")
+                .pattern("S")
+                .define('P', AllBlocks.FLUID_PIPE.get())
+                .define('T', AllBlocks.FLUID_TANK.get())
+                .define('S', AllItems.TRANSMITTER.get())
+                .unlockedBy("has_transmitter", has(AllItems.TRANSMITTER.get()))
+                .save(consumer);
+
+        //空气调节器
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.AIR_CONDITIONER.get())
+                .pattern("B")
+                .pattern("T")
+                .define('B', AllBlocks.INDUSTRIAL_IRON_BLOCK.get())
+                .define('T', AllItems.TRANSMITTER.get())
+                .unlockedBy("has_industrial_iron_block", has(AllBlocks.INDUSTRIAL_IRON_BLOCK.get()))
+                .save(consumer);
+
+        //洒水器
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, CCBlocks.SPRINKLER.get())
+                .pattern("A")
+                .pattern("P")
+                .pattern("I")
+                .define('P', AllBlocks.FLUID_PIPE.get())
+                .define('A', AllItems.ANDESITE_ALLOY.get())
+                .define('I', AllItems.IRON_SHEET.get())
+                .unlockedBy("has_fluid_pipe", has(AllBlocks.FLUID_PIPE.get()))
                 .save(consumer);
 
 

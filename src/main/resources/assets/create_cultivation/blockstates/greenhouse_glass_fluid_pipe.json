@@ -1,0 +1,127 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "frozen_axis": "y"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/window"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "y"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_north"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "y"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_south"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "y"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_east"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "y"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_west"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "x"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/window",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "x"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_up"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "x"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_down"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "x"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_north"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "x"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_south"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "z"
+      },
+      "apply": {
+        "model": "create:block/fluid_pipe/window",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "z"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_up"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "z"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_down"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "z"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_east"
+      }
+    },
+    {
+      "when": {
+        "frozen_axis": "z"
+      },
+      "apply": {
+        "model": "create_cultivation:block/greenhouse_fluid_pipe/block_flat_west"
+      }
+    }
+  ]
+}

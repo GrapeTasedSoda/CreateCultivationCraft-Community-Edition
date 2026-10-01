@@ -10,5 +10,9 @@ public class CCStress {
         Block cultivationBaseInstance = CCBlocks.CULTIVATION_BASE.get();
         double stressImpact = 4.0;
         BlockStressValues.IMPACTS.register(cultivationBaseInstance, () -> stressImpact);
+
+        Block greenhouseController = CCBlocks.GREENHOUSE_CONTROLLER.get();
+        double greenhouseStressImpact = 2.0;
+        BlockStressValues.IMPACTS.register(greenhouseController, () -> greenhouseStressImpact);
     }
 }

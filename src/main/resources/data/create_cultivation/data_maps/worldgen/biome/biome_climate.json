@@ -1,0 +1,14 @@
+{
+  "#minecraft:is_nether": {
+    "temperature": 110.0,
+    "humidity": 0.0
+  },
+  "#minecraft:is_end": {
+    "temperature": 8.0,
+    "humidity": 0.0
+  },
+  "minecraft:the_void": {
+    "temperature": 15.0,
+    "humidity": 0.0
+  }
+}

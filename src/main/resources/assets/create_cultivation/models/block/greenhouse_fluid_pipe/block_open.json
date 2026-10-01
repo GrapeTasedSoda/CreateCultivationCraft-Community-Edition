@@ -1,0 +1,32 @@
+{
+  "textures": {
+    "0": "create_cultivation:block/greenhouse_fluid_pipe_open",
+    "particle": "create_cultivation:block/greenhouse_fluid_pipe_open"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        15.05
+      ],
+      "to": [
+        16,
+        16,
+        15.95
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout_mipped"
+}

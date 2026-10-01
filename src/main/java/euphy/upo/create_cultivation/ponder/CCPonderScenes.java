@@ -5,6 +5,7 @@ import euphy.upo.create_cultivation.registry.CCBlocks;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 import euphy.upo.create_cultivation.ponder.scenes.CultivationScenes;
+import euphy.upo.create_cultivation.ponder.scenes.GreenhouseScenes;
 
 import static com.simibubi.create.infrastructure.ponder.AllCreatePonderTags.KINETIC_APPLIANCES;
 
@@ -18,5 +19,20 @@ public class CCPonderScenes {
 
         ENTRY_HELPER.forComponents(CCBlocks.CULTIVATION_BASE)
                 .addStoryBoard("cul", CultivationScenes::cultivating,KINETIC_APPLIANCES);
+
+        ENTRY_HELPER.forComponents(CCBlocks.GREENHOUSE_CONTROLLER)
+                .addStoryBoard("greenhouse", GreenhouseScenes::greenhouse, CCPonderTags.GREENHOUSE_TAG);
+
+        ENTRY_HELPER.forComponents(CCBlocks.GREENHOUSE_GLASS)
+                .addStoryBoard("greenhouse", GreenhouseScenes::greenhouse, CCPonderTags.GREENHOUSE_TAG);
+
+        ENTRY_HELPER.forComponents(CCBlocks.AIR_CONDITIONER)
+                .addStoryBoard("greenhouse", GreenhouseScenes::greenhouse, CCPonderTags.GREENHOUSE_TAG);
+
+        ENTRY_HELPER.forComponents(CCBlocks.HUMIDIFIER)
+                .addStoryBoard("greenhouse", GreenhouseScenes::greenhouse, CCPonderTags.GREENHOUSE_TAG);
+
+        ENTRY_HELPER.forComponents(CCBlocks.DEHUMIDIFIER)
+                .addStoryBoard("greenhouse", GreenhouseScenes::greenhouse, CCPonderTags.GREENHOUSE_TAG);
     }
 }

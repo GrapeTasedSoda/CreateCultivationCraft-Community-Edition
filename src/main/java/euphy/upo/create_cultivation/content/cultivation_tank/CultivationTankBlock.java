@@ -59,7 +59,11 @@ public class CultivationTankBlock extends Block implements IBE<CultivationTankBl
         if (!level.isClientSide && state.getValue(PLANTED)) {
             withBlockEntityDo(level, pos, tankBE -> {
                 tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
-                    ItemStack seedStack = recipeHolder.value().getIngredients().get(0).getItems()[0].copy();
+                    ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
+                    if (seedOptions.length != 1) {
+                        return; // tag ingredient: no single "the seed" to hand back
+                    }
+                    ItemStack seedStack = seedOptions[0].copy();
                     seedStack.setCount(1);
 
 
@@ -122,8 +126,6 @@ public class CultivationTankBlock extends Block implements IBE<CultivationTankBl
 
 
         // Refresh the working state when the block below (the base) changes.
-        // The old code returned early on this exact condition, making the
-        // update unreachable - the 10-tick lazyTick self-heal masked it.
         if (fromPos.equals(pos.below())) {
             withBlockEntityDo(level, pos, CultivationTankBlockEntity::updateWorkingState);
         }

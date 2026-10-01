@@ -63,7 +63,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
     }
 
     private void generateKaleidoscopeCookeryRecipes(RecipeAcceptor acceptor) {
-        //万花筒烹饪：番茄（耕地成ren：1番茄+1种子，右键后回到成熟前的阶段）
+        //万花筒烹饪：番茄（耕地成熟：1番茄+1种子，右键后回到成熟前的阶段）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/tomato"),
                 createCultivatingRecipe(
@@ -74,7 +74,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         "kaleidoscope_cookery:tomato_crop"
                 )
         );
-        //万花筒烹饪：辣椒（耕地成ren：1红辣椒+1种子+20%青椒；右键收获后回到第五阶段自补种）
+        //万花筒烹饪：辣椒（耕地成熟：1红辣椒+1种子+20%青椒；右键收获后回到第五阶段自补种）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/chili"),
                 createCultivatingRecipe(
@@ -85,7 +85,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         "kaleidoscope_cookery:chili_crop"
                 )
         );
-        //万花筒烹饪：生菜（耕地成ren：1生菜+1种子+10%毛虫）
+        //万花筒烹饪：生菜（耕地成熟：1生菜+1种子+10%毛虫）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/lettuce"),
                 createCultivatingRecipe(
@@ -96,7 +96,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         "kaleidoscope_cookery:lettuce_crop"
                 )
         );
-        //万花筒烹饪：水稻（堆叠作物，需要至少2格高的栽培罐；耕地成ren：2–4稻穗）
+        //万花筒烹饪：水稻（堆叠作物，需要至少2格高的栽培罐；耕地成熟：2–4稻穗）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "kaleidoscopecookery/rice"),
                 createStackingRecipe(
@@ -180,187 +180,6 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         2
                 )
         );
-        /*
-        //自然环境：车轮花
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/cartwheel"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:cartwheel",
-                        new String[]{"environmental:cartwheel,2", "environmental:cartwheel,1,0.5"},
-                        140,
-                        "environmental:cartwheel"
-                )
-        );
-        //自然环境：蓝铃花
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/bluebell"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:bluebell",
-                        new String[]{"environmental:bluebell,2", "environmental:bluebell,1,0.5"},
-                        140,
-                        "environmental:bluebell"
-                )
-        );
-        //自然环境：紫罗兰
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/violet"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:violet",
-                        new String[]{"environmental:violet,2", "environmental:violet,1,0.5"},
-                        140,
-                        "environmental:violet"
-                )
-        );
-        //自然环境：石竹
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/dianthus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:dianthus",
-                        new String[]{"environmental:dianthus,2", "environmental:dianthus,1,0.5"},
-                        140,
-                        "environmental:dianthus"
-                )
-        );
-        //自然环境：莲花
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/red_lotus_flower"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:red_lotus_flower",
-                        new String[]{"environmental:red_lotus_flower,2", "environmental:red_lotus_flower,1,0.5"},
-                        140,
-                        "environmental:red_lotus_flower"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/white_lotus_flower"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:white_lotus_flower",
-                        new String[]{"environmental:white_lotus_flower,2", "environmental:white_lotus_flower,1,0.5"},
-                        140,
-                        "environmental:white_lotus_flower"
-                )
-        );
-        //自然环境：木槿花
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/yellow_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:yellow_hibiscus",
-                        new String[]{"environmental:yellow_hibiscus,2", "environmental:yellow_hibiscus,1,0.5"},
-                        140,
-                        "environmental:yellow_hibiscus"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/orange_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:orange_hibiscus",
-                        new String[]{"environmental:orange_hibiscus,2", "environmental:orange_hibiscus,1,0.5"},
-                        140,
-                        "environmental:orange_hibiscus"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/red_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:red_hibiscus",
-                        new String[]{"environmental:red_hibiscus,2", "environmental:red_hibiscus,1,0.5"},
-                        140,
-                        "environmental:red_hibiscus"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/pink_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:pink_hibiscus",
-                        new String[]{"environmental:pink_hibiscus,2", "environmental:pink_hibiscus,1,0.5"},
-                        140,
-                        "environmental:pink_hibiscus"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/purple_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:purple_hibiscus",
-                        new String[]{"environmental:purple_hibiscus,2", "environmental:purple_hibiscus,1,0.5"},
-                        140,
-                        "environmental:purple_hibiscus"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/purple_hibiscus"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:purple_hibiscus",
-                        new String[]{"environmental:purple_hibiscus,2", "environmental:purple_hibiscus,1,0.5"},
-                        140,
-                        "environmental:purple_hibiscus"
-                )
-        );
-        //自然环境：鹤望兰
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/bird_of_paradise"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:bird_of_paradise",
-                        new String[]{"environmental:bird_of_paradise,2", "environmental:bird_of_paradise,1,0.5"},
-                        140,
-                        "environmental:bird_of_paradise"
-                )
-        );
-        //自然环境：翠雀花
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/pink_delphinium"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:pink_delphinium",
-                        new String[]{"environmental:pink_delphinium,2", "environmental:pink_delphinium,1,0.5"},
-                        140,
-                        "environmental:pink_delphinium"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/blue_delphinium"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:blue_delphinium",
-                        new String[]{"environmental:blue_delphinium,2", "environmental:blue_delphinium,1,0.5"},
-                        140,
-                        "environmental:blue_delphinium"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/purple_delphinium"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:purple_delphinium",
-                        new String[]{"environmental:purple_delphinium,2", "environmental:purple_delphinium,1,0.5"},
-                        140,
-                        "environmental:purple_delphinium"
-                )
-        );
-        acceptor.accept(
-                ResourceLocation.fromNamespaceAndPath("create_cultivation", "environmental/white_delphinium"),
-                createCultivatingRecipe(
-                        "environmental",
-                        "environmental:white_delphinium",
-                        new String[]{"environmental:white_delphinium,2", "environmental:white_delphinium,1,0.5"},
-                        140,
-                        "environmental:white_delphinium"
-                )
-        );
-         */
-
 
 
 
@@ -481,7 +300,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
     }
 
     private void generatePineappleDelightRecipes(RecipeAcceptor acceptor) {
-        //菠萝乐事：菠萝（耕地成塾：1菠萝，收成后不掉种子；种子是菠萝芽 pineapple_crop）
+        //菠萝乐事：菠萝（耕地成熟：1菠萝，收成后不掉种子；种子是菠萝芽 pineapple_crop）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "pineappledelight/pineapple"),
                 createCultivatingRecipe(
@@ -495,7 +314,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
     }
 
     private void generateMyNethersDelightRecipes(RecipeAcceptor acceptor) {
-        //我的下界乐事：粉蔗（powder cannon 为种苗；耕地成塾：成年时掉1个powder_cannon苗+点嬉后2-3子弹椒）
+        //我的下界乐事：粉蔗（powder cannon 为种苗；耕地成熟：成年时掉1个powder_cannon苗+点嬉后2-3子弹椒）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "mynethersdelight/powdery_cane"),
                 createCultivatingRecipe(
@@ -517,7 +336,7 @@ public class CCCompatRecipeGenerator implements DataProvider {
                         "mynethersdelight:bullet_pepper"
                 )
         );
-        //我的下界乐事：绯红菌（colony = 种苗+作物；耕地成塾：2-5菌，均值3）
+        //我的下界乐事：绯红菌（colony = 种苗+作物；耕地成熟：2-5菌，均值3）
         acceptor.accept(
                 ResourceLocation.fromNamespaceAndPath("create_cultivation", "mynethersdelight/crimson_colony"),
                 createCultivatingRecipe(

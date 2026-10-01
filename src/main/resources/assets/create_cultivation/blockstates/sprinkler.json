@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "active=false,facing=up": {
+      "model": "create_cultivation:block/sprinkler"
+    },
+    "active=true,facing=up": {
+      "model": "create_cultivation:block/sprinkler_active"
+    },
+    "active=false,facing=down": {
+      "model": "create_cultivation:block/sprinkler",
+      "x": 180
+    },
+    "active=true,facing=down": {
+      "model": "create_cultivation:block/sprinkler_active",
+      "x": 180
+    }
+  }
+}

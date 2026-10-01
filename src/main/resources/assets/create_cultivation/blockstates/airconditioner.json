@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "create_cultivation:block/airconditioner"
+    },
+    "active=false,facing=east": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 270
+    },
+    "active=true,facing=north": {
+      "model": "create_cultivation:block/airconditioner"
+    },
+    "active=true,facing=east": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 90
+    },
+    "active=true,facing=south": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 180
+    },
+    "active=true,facing=west": {
+      "model": "create_cultivation:block/airconditioner",
+      "y": 270
+    }
+  }
+}

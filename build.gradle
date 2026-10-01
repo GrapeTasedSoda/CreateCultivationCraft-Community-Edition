@@ -97,6 +97,13 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+// datagen regenerates Registrate defaults (blockstates, item models, loot
+// tables, auto lang) that also exist as hand-written files in main resources;
+// the hand-written main copies must win
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
@@ -106,11 +113,27 @@ dependencies {
     // Compile against the exact Create 6.0.10 + bundled Ponder/Flywheel/Registrate jars
     // that are installed in the running environment. These are NOT bundled into this mod.
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+// datagen (runData) actually loads the mod classes, so the dependency check
+// fires there too - Create & friends must be on the datagen runtime as mods
+localRuntime fileTree(dir: 'libs', include: ['*.jar'])
 
     // JEI API for the optional recipe display integration. JEI itself is provided by the user.
     compileOnly("mezz.jei:jei-1.21.1-neoforge-api:${jei_version}")
 
     compileOnly "maven.modrinth:jade:${project.jade_version}"
+
+    // Serene Seasons compat (optional at runtime): season-aware biome
+    // temperature/humidity for the climate resolver. glitchcore is SS's
+    // config library - its types leak through SeasonsConfig's superclass.
+    compileOnly "maven.modrinth:serene-seasons:${project.sereneseasons_version}"
+    compileOnly "maven.modrinth:glitchcore:${project.glitchcore_version}"
+    // SS declares a hard dependency on glitchcore: the data/run classpaths
+    // include compile-only jars, so glitchcore must exist at run time too
+    localRuntime "maven.modrinth:glitchcore:${project.glitchcore_version}"
+
+    // Ecliptic Seasons compat (optional at runtime): the 24-solar-term season
+    // mod with its own humidity system. Same compile-only pattern.
+    compileOnly "maven.modrinth:ecliptic-seasons:${project.eclipticseasons_version}"
 }
 
 

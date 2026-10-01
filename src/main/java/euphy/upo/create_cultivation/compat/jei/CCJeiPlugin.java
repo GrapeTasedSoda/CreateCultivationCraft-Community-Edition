@@ -6,17 +6,21 @@ import java.util.List;
 import com.simibubi.create.compat.jei.category.CreateRecipeCategory;
 
 import euphy.upo.create_cultivation.CreateCultivationCraft;
+import euphy.upo.create_cultivation.content.greenhouse.GreenhouseControllerScreen;
 import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
 import euphy.upo.create_cultivation.registry.CCBlocks;
 import euphy.upo.create_cultivation.registry.CCRecipes;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.handlers.IGuiProperties;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -32,6 +36,52 @@ public class CCJeiPlugin implements IModPlugin {
 	@Override
 	public ResourceLocation getPluginUid() {
 		return UID;
+	}
+
+	@Override
+	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+		// the greenhouse controller panel fills the whole window on purpose:
+		// reporting full-screen GUI properties leaves JEI no side room, so
+		// its item list panels do not render over this screen at all
+		registration.addGuiScreenHandler(GreenhouseControllerScreen.class, screen -> {
+			Minecraft mc = Minecraft.getInstance();
+			return new IGuiProperties() {
+				@Override
+				public Class<? extends Screen> screenClass() {
+					return GreenhouseControllerScreen.class;
+				}
+
+				@Override
+				public int guiLeft() {
+					return 0;
+				}
+
+				@Override
+				public int guiTop() {
+					return 0;
+				}
+
+				@Override
+				public int guiXSize() {
+					return mc.getWindow().getGuiScaledWidth();
+				}
+
+				@Override
+				public int guiYSize() {
+					return mc.getWindow().getGuiScaledHeight();
+				}
+
+				@Override
+				public int screenWidth() {
+					return mc.getWindow().getGuiScaledWidth();
+				}
+
+				@Override
+				public int screenHeight() {
+					return mc.getWindow().getGuiScaledHeight();
+				}
+			};
+		});
 	}
 
 	@Override

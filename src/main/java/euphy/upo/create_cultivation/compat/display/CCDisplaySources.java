@@ -43,6 +43,24 @@ public class CCDisplaySources {
 				DisplaySource.BY_BLOCK_ENTITY.add(CCBlockEntities.CULTIVATION_BASE.get(), source))
 			.register();
 
+	public static final RegistryEntry<DisplaySource, GreenhouseDisplaySource> GREENHOUSE_CLIMATE =
+		REGISTRATE.displaySource("greenhouse_climate", () -> new GreenhouseDisplaySource(GreenhouseDisplaySource.MODE_CLIMATE))
+			.onRegisterAfter(Registries.BLOCK_ENTITY_TYPE, source ->
+				DisplaySource.BY_BLOCK_ENTITY.add(CCBlockEntities.GREENHOUSE_CONTROLLER.get(), source))
+			.register();
+
+	public static final RegistryEntry<DisplaySource, GreenhouseDisplaySource> GREENHOUSE_DEVICES =
+		REGISTRATE.displaySource("greenhouse_devices", () -> new GreenhouseDisplaySource(GreenhouseDisplaySource.MODE_DEVICES))
+			.onRegisterAfter(Registries.BLOCK_ENTITY_TYPE, source ->
+				DisplaySource.BY_BLOCK_ENTITY.add(CCBlockEntities.GREENHOUSE_CONTROLLER.get(), source))
+			.register();
+
+	public static final RegistryEntry<DisplaySource, GreenhouseDisplaySource> GREENHOUSE_CROPS =
+		REGISTRATE.displaySource("greenhouse_crops", () -> new GreenhouseDisplaySource(GreenhouseDisplaySource.MODE_CROPS))
+			.onRegisterAfter(Registries.BLOCK_ENTITY_TYPE, source ->
+				DisplaySource.BY_BLOCK_ENTITY.add(CCBlockEntities.GREENHOUSE_CONTROLLER.get(), source))
+			.register();
+
 	public static void register() {
 	}
 }

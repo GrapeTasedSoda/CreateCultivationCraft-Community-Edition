@@ -172,7 +172,11 @@ public class CultivationBaseBlock extends HorizontalKineticBlock implements IBE<
                 BlockPos posAbove = pos.above();
                 if (level.getBlockEntity(posAbove) instanceof CultivationTankBlockEntity tankBE) {
                     tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
-                        ItemStack seedStack = recipeHolder.value().getIngredients().get(0).getItems()[0].copy();
+                        ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
+                        if (seedOptions.length != 1) {
+                            return; // tag ingredient: no single "the seed" to drop
+                        }
+                        ItemStack seedStack = seedOptions[0].copy();
                         seedStack.setCount(1);
                         Containers.dropItemStack(level, posAbove.getX(), posAbove.getY(), posAbove.getZ(), seedStack);
                     });

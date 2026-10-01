@@ -36,8 +36,7 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
     private ResourceLocation recipeToLoad = null;
     private RecipeMode recipeMode = RecipeMode.NONE;
 
-    private boolean isWatered;
-    private int wateredTickCounter;
+    private boolean isWatered;    private int wateredTickCounter;
 
     private int progress = 0;
     private int processingDuration = 10;
@@ -107,7 +106,8 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         if (controllerBE == null) return;
         controllerBE.currentRecipe = Optional.of(recipe);
         controllerBE.recipeMode = RecipeMode.STAGE_BASED;
-        controllerBE.processingDuration = recipe.value().getProcessingDuration() > 0 ? recipe.value().getProcessingDuration() / 10 : 10;
+        controllerBE.processingDuration = recipe.value().getProcessingDuration() > 0
+                ? Math.max(1, recipe.value().getProcessingDuration() / 10) : 10;
         controllerBE.progress = 0;
         controllerBE.growthAccumulator = 0;
 
@@ -128,7 +128,8 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         if (controllerBE == null) return;
         controllerBE.currentRecipe = Optional.of(recipe);
         controllerBE.recipeMode = RecipeMode.STACK_BASED;
-        controllerBE.processingDuration = recipe.value().getProcessingDuration() > 0 ? recipe.value().getProcessingDuration() / 10 : 20;
+        controllerBE.processingDuration = recipe.value().getProcessingDuration() > 0
+                ? Math.max(1, recipe.value().getProcessingDuration() / 10) : 20;
         controllerBE.maxHeight = recipe.value().getMaxHeight();
         controllerBE.progress = 0;
         controllerBE.growthAccumulator = 0;
@@ -158,9 +159,9 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
                 // every planted crop model client-side.
                 this.currentRecipe = Optional.of(recipe);
                 if (recipe.value() instanceof CultivatingRecipe cr) {
-                    this.processingDuration = cr.getProcessingDuration() > 0 ? cr.getProcessingDuration() / 10 : 10;
+                    this.processingDuration = cr.getProcessingDuration() > 0 ? Math.max(1, cr.getProcessingDuration() / 10) : 10;
                 } else if (recipe.value() instanceof StackingCultivatingRecipe sr) {
-                    this.processingDuration = sr.getProcessingDuration() > 0 ? sr.getProcessingDuration() / 10 : 20;
+                    this.processingDuration = sr.getProcessingDuration() > 0 ? Math.max(1, sr.getProcessingDuration() / 10) : 20;
                 }
             } else if (!this.level.isClientSide && this.recipeMode != RecipeMode.NONE) {
                 // Server-side only: the recipe behind a planted crop vanished
@@ -484,10 +485,9 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
             if (recipeHolder.isPresent() && recipeHolder.get().value() instanceof IStackingCultivatingRecipe recipe) {
                 minHeight = recipe.getMinHeight();
             }
-            // A tank shorter than the crop's minimum can never mature - the
-            // plain min(height, maxHeight) cap previously made a 1-block tank
-            // report a 2+ block crop as instantly "mature". A taller-than-min
-            // but shorter-than-max tank still harvests what actually grew.
+            // A tank shorter than the crop's minimum can never mature. A
+            // taller-than-min but shorter-than-max tank still harvests what
+            // actually grew.
             if (controllerBE.getHeight() < minHeight) {
                 return false;
             }
@@ -584,7 +584,9 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
         if (isController()) {
-            recipeMode = RecipeMode.values()[compound.getInt("RecipeMode")];
+            int modeIndex = compound.getInt("RecipeMode");
+            RecipeMode[] recipeModes = RecipeMode.values();
+            recipeMode = modeIndex >= 0 && modeIndex < recipeModes.length ? recipeModes[modeIndex] : RecipeMode.NONE;
 
             recipeToLoad = null;
             currentRecipe = Optional.empty();

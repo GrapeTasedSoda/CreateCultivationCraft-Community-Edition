@@ -1,0 +1,7 @@
+{
+  "ui.setpoint_click": {
+    "sounds": [
+      "create_cultivation:ui/setpoint_click"
+    ]
+  }
+}

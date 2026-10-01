@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "facing=north,active=false": {
+      "model": "create_cultivation:block/humidifier"
+    },
+    "facing=north,active=true": {
+      "model": "create_cultivation:block/humidifier_active"
+    },
+    "facing=east,active=false": {
+      "model": "create_cultivation:block/humidifier",
+      "y": 90
+    },
+    "facing=east,active=true": {
+      "model": "create_cultivation:block/humidifier_active",
+      "y": 90
+    },
+    "facing=south,active=false": {
+      "model": "create_cultivation:block/humidifier",
+      "y": 180
+    },
+    "facing=south,active=true": {
+      "model": "create_cultivation:block/humidifier_active",
+      "y": 180
+    },
+    "facing=west,active=false": {
+      "model": "create_cultivation:block/humidifier",
+      "y": 270
+    },
+    "facing=west,active=true": {
+      "model": "create_cultivation:block/humidifier_active",
+      "y": 270
+    },
+    "facing=up,active=false": {
+      "model": "create_cultivation:block/humidifier",
+      "x": 270
+    },
+    "facing=up,active=true": {
+      "model": "create_cultivation:block/humidifier_active",
+      "x": 270
+    },
+    "facing=down,active=false": {
+      "model": "create_cultivation:block/humidifier",
+      "x": 90
+    },
+    "facing=down,active=true": {
+      "model": "create_cultivation:block/humidifier_active",
+      "x": 90
+    }
+  }
+}

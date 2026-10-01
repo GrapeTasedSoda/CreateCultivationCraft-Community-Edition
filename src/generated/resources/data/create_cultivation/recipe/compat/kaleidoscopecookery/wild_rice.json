@@ -6,16 +6,16 @@
     }
   ],
   "type": "create_cultivation:stacking_cultivating",
+  "block_to_render": "kaleidoscope_cookery:rice_crop",
   "ingredient": {
     "item": "kaleidoscope_cookery:wild_rice"
   },
-  "result": {
-    "id": "kaleidoscope_cookery:rice_panicle",
-    "count": 2
-  },
-  "processingDuration": 9000,
-  "block_to_render": "kaleidoscope_cookery:rice_crop",
-  "stage_by_progress": true,
   "maxHeight": 3,
-  "min_height": 2
+  "min_height": 2,
+  "processingDuration": 9000,
+  "result": {
+    "count": 2,
+    "id": "kaleidoscope_cookery:rice_panicle"
+  },
+  "stage_by_progress": true
 }

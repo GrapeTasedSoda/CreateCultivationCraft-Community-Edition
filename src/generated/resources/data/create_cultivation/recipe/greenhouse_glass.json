@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "create:iron_sheet"
+    }
+  },
+  "pattern": [
+    "APA",
+    "PGP",
+    "APA"
+  ],
+  "result": {
+    "count": 8,
+    "id": "create_cultivation:greenhouse_glass"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "values": [
+    "create_cultivation:humidifier",
+    "create_cultivation:dehumidifier",
+    "create_cultivation:airconditioner",
+    "create_cultivation:sprinkler"
+  ]
+}

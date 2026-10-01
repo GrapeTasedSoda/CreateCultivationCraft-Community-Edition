@@ -1,0 +1,379 @@
+{
+  "replace": false,
+  "values": {
+    "minecraft:wheat": {
+      "temp_optimal": { "min": 12, "max": 26 },
+      "temp_survival": { "min": -5, "max": 38 },
+      "humidity_optimal": { "min": 40, "max": 70 },
+      "humidity_survival": { "min": 15, "max": 90 }
+    },
+    "minecraft:carrots": {
+      "temp_optimal": { "min": 8, "max": 22 },
+      "temp_survival": { "min": -8, "max": 35 },
+      "humidity_optimal": { "min": 45, "max": 75 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "minecraft:potatoes": {
+      "temp_optimal": { "min": 8, "max": 20 },
+      "temp_survival": { "min": -8, "max": 34 },
+      "humidity_optimal": { "min": 50, "max": 80 },
+      "humidity_survival": { "min": 25, "max": 95 }
+    },
+    "minecraft:beetroots": {
+      "temp_optimal": { "min": 8, "max": 22 },
+      "temp_survival": { "min": -8, "max": 36 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "minecraft:melon_stem": {
+      "temp_optimal": { "min": 24, "max": 38 },
+      "temp_survival": { "min": 12, "max": 45 },
+      "humidity_optimal": { "min": 55, "max": 85 },
+      "humidity_survival": { "min": 25, "max": 95 }
+    },
+    "minecraft:pumpkin_stem": {
+      "temp_optimal": { "min": 20, "max": 34 },
+      "temp_survival": { "min": 8, "max": 42 },
+      "humidity_optimal": { "min": 50, "max": 85 },
+      "humidity_survival": { "min": 25, "max": 95 }
+    },
+    "minecraft:cocoa": {
+      "temp_optimal": { "min": 25, "max": 42 },
+      "temp_survival": { "min": 18, "max": 46 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 40, "max": 100 }
+    },
+    "minecraft:sweet_berry_bush": {
+      "temp_optimal": { "min": 0, "max": 15 },
+      "temp_survival": { "min": -20, "max": 22 },
+      "humidity_optimal": { "min": 50, "max": 90 },
+      "humidity_survival": { "min": 15, "max": 95 }
+    },
+    "minecraft:nether_wart": {
+      "temp_optimal": { "min": 95, "max": 118 },
+      "temp_survival": { "min": -25, "max": 120 },
+      "humidity_optimal": { "min": 0, "max": 25 },
+      "humidity_survival": { "min": 0, "max": 100 }
+    },
+    "minecraft:sugar_cane": {
+      "temp_optimal": { "min": 25, "max": 45 },
+      "temp_survival": { "min": 15, "max": 50 },
+      "humidity_optimal": { "min": 65, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+    "minecraft:cactus": {
+      "temp_optimal": { "min": 28, "max": 50 },
+      "temp_survival": { "min": 5, "max": 50 },
+      "humidity_optimal": { "min": 0, "max": 20 },
+      "humidity_survival": { "min": 0, "max": 45 }
+    },
+    "minecraft:bamboo": {
+      "temp_optimal": { "min": 22, "max": 40 },
+      "temp_survival": { "min": 10, "max": 46 },
+      "humidity_optimal": { "min": 60, "max": 100 },
+      "humidity_survival": { "min": 30, "max": 100 }
+    },
+    "minecraft:torchflower_crop": {
+      "temp_optimal": { "min": 18, "max": 32 },
+      "temp_survival": { "min": 8, "max": 40 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 92 }
+    },
+    "minecraft:pitcher_crop": {
+      "temp_optimal": { "min": 16, "max": 30 },
+      "temp_survival": { "min": 5, "max": 36 },
+      "humidity_optimal": { "min": 65, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+    "minecraft:brown_mushroom": {
+      "temp_optimal": { "min": 5, "max": 20 },
+      "temp_survival": { "min": -10, "max": 30 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+    "minecraft:red_mushroom": {
+      "temp_optimal": { "min": 5, "max": 20 },
+      "temp_survival": { "min": -10, "max": 30 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+
+    "farmersdelight:cabbages": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 6, "max": 18 },
+      "temp_survival": { "min": -6, "max": 28 },
+      "humidity_optimal": { "min": 45, "max": 75 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "farmersdelight:onions": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 8, "max": 20 },
+      "temp_survival": { "min": -6, "max": 30 },
+      "humidity_optimal": { "min": 40, "max": 70 },
+      "humidity_survival": { "min": 15, "max": 90 }
+    },
+    "farmersdelight:tomatoes": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 16, "max": 28 },
+      "temp_survival": { "min": 8, "max": 36 },
+      "humidity_optimal": { "min": 45, "max": 75 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "farmersdelight:tomatoes_on_rope": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 16, "max": 28 },
+      "temp_survival": { "min": 8, "max": 36 },
+      "humidity_optimal": { "min": 45, "max": 75 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "farmersdelight:rice": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 20, "max": 35 },
+      "temp_survival": { "min": 12, "max": 42 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 40, "max": 100 }
+    },
+    "farmersdelight:rice_panicles": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 20, "max": 35 },
+      "temp_survival": { "min": 12, "max": 42 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 40, "max": 100 }
+    },
+    "farmersdelight:brown_mushroom_colony": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 5, "max": 20 },
+      "temp_survival": { "min": -10, "max": 30 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+    "farmersdelight:red_mushroom_colony": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }
+      ],
+      "temp_optimal": { "min": 5, "max": 20 },
+      "temp_survival": { "min": -10, "max": 30 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+
+    "corn_delight:corn_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "corn_delight" }
+      ],
+      "temp_optimal": { "min": 20, "max": 34 },
+      "temp_survival": { "min": 10, "max": 40 },
+      "humidity_optimal": { "min": 50, "max": 85 },
+      "humidity_survival": { "min": 25, "max": 95 }
+    },
+
+    "kaleidoscope_cookery:tomato_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" }
+      ],
+      "temp_optimal": { "min": 16, "max": 28 },
+      "temp_survival": { "min": 8, "max": 36 },
+      "humidity_optimal": { "min": 45, "max": 75 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "kaleidoscope_cookery:chili_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" }
+      ],
+      "temp_optimal": { "min": 20, "max": 34 },
+      "temp_survival": { "min": 10, "max": 40 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "kaleidoscope_cookery:lettuce_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" }
+      ],
+      "temp_optimal": { "min": 6, "max": 18 },
+      "temp_survival": { "min": -4, "max": 26 },
+      "humidity_optimal": { "min": 50, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "kaleidoscope_cookery:rice_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" }
+      ],
+      "temp_optimal": { "min": 20, "max": 35 },
+      "temp_survival": { "min": 12, "max": 42 },
+      "humidity_optimal": { "min": 70, "max": 100 },
+      "humidity_survival": { "min": 40, "max": 100 }
+    },
+
+    "rusticdelight:cotton": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "rusticdelight" }
+      ],
+      "temp_optimal": { "min": 22, "max": 36 },
+      "temp_survival": { "min": 10, "max": 42 },
+      "humidity_optimal": { "min": 40, "max": 75 },
+      "humidity_survival": { "min": 15, "max": 95 }
+    },
+    "rusticdelight:bell_peppers": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "rusticdelight" }
+      ],
+      "temp_optimal": { "min": 16, "max": 28 },
+      "temp_survival": { "min": 8, "max": 36 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "rusticdelight:pale_bell_peppers": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "rusticdelight" }
+      ],
+      "temp_optimal": { "min": 15, "max": 26 },
+      "temp_survival": { "min": 6, "max": 34 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "rusticdelight:dark_bell_peppers": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "rusticdelight" }
+      ],
+      "temp_optimal": { "min": 12, "max": 24 },
+      "temp_survival": { "min": 2, "max": 32 },
+      "humidity_optimal": { "min": 45, "max": 80 },
+      "humidity_survival": { "min": 20, "max": 95 }
+    },
+    "rusticdelight:coffee": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "rusticdelight" }
+      ],
+      "temp_optimal": { "min": 18, "max": 28 },
+      "temp_survival": { "min": 10, "max": 36 },
+      "humidity_optimal": { "min": 65, "max": 95 },
+      "humidity_survival": { "min": 35, "max": 100 }
+    },
+
+    "kaleidoscope_tavern:grape_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": 12, "max": 26 },
+      "temp_survival": { "min": 2, "max": 34 },
+      "humidity_optimal": { "min": 35, "max": 65 },
+      "humidity_survival": { "min": 10, "max": 90 }
+    },
+    "kaleidoscope_tavern:ice_grape_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": -8, "max": 8 },
+      "temp_survival": { "min": -20, "max": 16 },
+      "humidity_optimal": { "min": 40, "max": 80 },
+      "humidity_survival": { "min": 15, "max": 95 }
+    },
+    "kaleidoscope_tavern:gold_grape_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": 22, "max": 38 },
+      "temp_survival": { "min": 12, "max": 45 },
+      "humidity_optimal": { "min": 30, "max": 65 },
+      "humidity_survival": { "min": 10, "max": 90 }
+    },
+
+    "kaleidoscope_tavern:grapevine_trellis": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": 12, "max": 26 },
+      "temp_survival": { "min": 2, "max": 34 },
+      "humidity_optimal": { "min": 35, "max": 65 },
+      "humidity_survival": { "min": 10, "max": 90 }
+    },
+    "kaleidoscope_tavern:ice_grapevine_trellis": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": -8, "max": 8 },
+      "temp_survival": { "min": -20, "max": 16 },
+      "humidity_optimal": { "min": 40, "max": 80 },
+      "humidity_survival": { "min": 15, "max": 95 }
+    },
+    "kaleidoscope_tavern:gold_grapevine_trellis": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": 22, "max": 38 },
+      "temp_survival": { "min": 12, "max": 45 },
+      "humidity_optimal": { "min": 30, "max": 65 },
+      "humidity_survival": { "min": 10, "max": 90 }
+    },
+    "kaleidoscope_tavern:wild_grapevine": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_tavern" }
+      ],
+      "temp_optimal": { "min": 12, "max": 26 },
+      "temp_survival": { "min": 2, "max": 34 },
+      "humidity_optimal": { "min": 35, "max": 65 },
+      "humidity_survival": { "min": 10, "max": 90 }
+    },
+
+    "pineapple_delight:pineapple_crop": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "pineapple_delight" }
+      ],
+      "temp_optimal": { "min": 22, "max": 38 },
+      "temp_survival": { "min": 14, "max": 45 },
+      "humidity_optimal": { "min": 60, "max": 95 },
+      "humidity_survival": { "min": 30, "max": 100 }
+    },
+
+    "mynethersdelight:bullet_pepper": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "mynethersdelight" }
+      ],
+      "temp_optimal": { "min": 95, "max": 118 },
+      "temp_survival": { "min": 70, "max": 120 },
+      "humidity_optimal": { "min": 0, "max": 25 },
+      "humidity_survival": { "min": 0, "max": 60 }
+    },
+    "mynethersdelight:crimson_fungus_colony": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "mynethersdelight" }
+      ],
+      "temp_optimal": { "min": 95, "max": 118 },
+      "temp_survival": { "min": 70, "max": 120 },
+      "humidity_optimal": { "min": 0, "max": 20 },
+      "humidity_survival": { "min": 0, "max": 50 }
+    },
+    "mynethersdelight:warped_fungus_colony": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "mynethersdelight" }
+      ],
+      "temp_optimal": { "min": 90, "max": 115 },
+      "temp_survival": { "min": 60, "max": 118 },
+      "humidity_optimal": { "min": 0, "max": 25 },
+      "humidity_survival": { "min": 0, "max": 55 }
+    },
+    "mynethersdelight:powdery_cane": {
+      "neoforge:conditions": [
+        { "type": "neoforge:mod_loaded", "modid": "mynethersdelight" }
+      ],
+      "temp_optimal": { "min": 95, "max": 118 },
+      "temp_survival": { "min": 65, "max": 120 },
+      "humidity_optimal": { "min": 0, "max": 15 },
+      "humidity_survival": { "min": 0, "max": 50 }
+    }
+  }
+}

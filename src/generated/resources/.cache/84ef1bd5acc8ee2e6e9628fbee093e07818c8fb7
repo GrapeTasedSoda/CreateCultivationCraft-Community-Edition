@@ -1,4 +1,8 @@
-// 1.21.1	2025-07-16T00:07:31.939552	Tags for minecraft:block mod id create_cultivation
-ad313e90777769975d49a81734353d907ad9d349 data/create/tags/block/wrench_pickup.json
+// 1.21.1	2026-10-01T15:18:35.8934145	Tags for minecraft:block mod id create_cultivation
+3a287d863914075b464976cbbd95c5cab4f7afa3 data/create/tags/block/wrench_pickup.json
+a236d19c6fd6298951630c73b72fe01e0fd6c1b6 data/create_cultivation/tags/block/greenhouse_device.json
+987f2cef7df7fd1fc33586003df4f945ef764699 data/minecraft/tags/block/doors.json
 ad313e90777769975d49a81734353d907ad9d349 data/minecraft/tags/block/mineable/axe.json
-ad313e90777769975d49a81734353d907ad9d349 data/minecraft/tags/block/mineable/pickaxe.json
+4717358527546a5bdf675920ddd3a0847e149f5c data/minecraft/tags/block/mineable/pickaxe.json
+987f2cef7df7fd1fc33586003df4f945ef764699 data/minecraft/tags/block/wooden_doors.json
+987f2cef7df7fd1fc33586003df4f945ef764699 data/quark/tags/block/non_double_door.json

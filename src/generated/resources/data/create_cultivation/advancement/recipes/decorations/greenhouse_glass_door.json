@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_greenhouse_glass": {
+      "conditions": {
+        "items": [
+          {
+            "items": "create_cultivation:greenhouse_glass"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "create_cultivation:greenhouse_glass_door"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_greenhouse_glass"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "create_cultivation:greenhouse_glass_door"
+    ]
+  }
+}

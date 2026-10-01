@@ -3,6 +3,12 @@
   "package": "euphy.upo.create_cultivation.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BoneMealItemMixin",
+    "ClimateGrowthAmplifierMixin",
+    "CogWheelBlockMixin",
+    "CropBlockGrowthMixin",
+    "FarmBlockMixin",
+    "RotationPropagatorMixin",
     "SpoutBlockEntityMixin",
     "SpoutRendererMixin"
   ],

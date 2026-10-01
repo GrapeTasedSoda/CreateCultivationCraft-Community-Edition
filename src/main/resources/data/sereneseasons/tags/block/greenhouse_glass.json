@@ -1,0 +1,8 @@
+{
+  "values": [
+    "create_cultivation:greenhouse_glass",
+    "create_cultivation:greenhouse_glass_door",
+    "create_cultivation:greenhouse_fluid_pipe",
+    "create_cultivation:greenhouse_glass_fluid_pipe"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "create:fluid_pipe"
+    },
+    "S": {
+      "item": "create:transmitter"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    }
+  },
+  "pattern": [
+    "P",
+    "T",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_cultivation:dehumidifier"
+  }
+}

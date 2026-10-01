@@ -1,0 +1,122 @@
+{
+  "replace": false,
+  "values": {
+    "farmersdelight:rice_panicles": {
+      "item": "farmersdelight:rice_panicle",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "farmersdelight"
+        }
+      ]
+    },
+    "farmersdelight:tomatoes_on_rope": {
+      "item": "farmersdelight:tomato",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "farmersdelight"
+        }
+      ]
+    },
+    "kaleidoscope_cookery:tomato_crop": {
+      "item": "kaleidoscope_cookery:tomato_seed",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_cookery"
+        }
+      ]
+    },
+    "kaleidoscope_cookery:chili_crop": {
+      "item": "kaleidoscope_cookery:chili_seed",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_cookery"
+        }
+      ]
+    },
+    "kaleidoscope_cookery:lettuce_crop": {
+      "item": "kaleidoscope_cookery:lettuce_seed",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_cookery"
+        }
+      ]
+    },
+    "kaleidoscope_cookery:rice_crop": {
+      "item": "kaleidoscope_cookery:rice",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_cookery"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:grape_crop": {
+      "item": "kaleidoscope_tavern:grape",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:ice_grape_crop": {
+      "item": "kaleidoscope_tavern:ice_grape",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:gold_grape_crop": {
+      "item": "kaleidoscope_tavern:gold_grape",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:grapevine_trellis": {
+      "item": "kaleidoscope_tavern:grapevine",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:ice_grapevine_trellis": {
+      "item": "kaleidoscope_tavern:grapevine",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "kaleidoscope_tavern:gold_grapevine_trellis": {
+      "item": "kaleidoscope_tavern:grapevine",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "kaleidoscope_tavern"
+        }
+      ]
+    },
+    "corn_delight:corn_crop": {
+      "item": "corn_delight:corn_seeds",
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "corn_delight"
+        }
+      ]
+    }
+  }
+}

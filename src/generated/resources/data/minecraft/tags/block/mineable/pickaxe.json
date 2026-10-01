@@ -1,6 +1,8 @@
 {
   "values": [
     "create_cultivation:cultivation_base",
-    "create_cultivation:cultivation_tank"
+    "create_cultivation:cultivation_tank",
+    "create_cultivation:greenhouse_glass_door",
+    "create_cultivation:sprinkler"
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "create_cultivation:blocks/greenhouse_controller",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "create_cultivation:greenhouse_controller"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}
