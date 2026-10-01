@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import euphy.upo.create_cultivation.config.CCConfig;
 import euphy.upo.create_cultivation.content.climate.CCDataMaps;
 import euphy.upo.create_cultivation.registry.CCBlockTags;
 import net.minecraft.core.BlockPos;
@@ -41,16 +42,14 @@ import net.minecraft.world.level.block.state.BlockState;
  * tilled soil or a crop) never spread sideways - the flood only continues
  * downwards through them - so a tilled floor cannot leak around the wall
  * bases.</li>
- * <li>Leaking out of the world height or exceeding {@link #MAX_VOLUME} also
+ * <li>Leaking out of the world height or exceeding the configured max volume
+ * ({@code greenhouse.scan.maxGreenhouseVolume}, default 2048) also
  * fails the scan. Fill cells inside unloaded chunks read as air, which makes
  * an over-large fill run into the volume cap - greenhouses spanning unloaded
  * chunks are therefore invalid until everything is loaded.</li>
  * </ul>
  */
 public final class GreenhouseScanner {
-
-    /** Hard cap on the measured volume (interior + boundary + floor). */
-    public static final int MAX_VOLUME = 2048;
 
     /** Result of one scan. Immutable. */
     public record ScanResult(boolean valid, int volume, List<BlockPos> devices, List<BlockPos> crops,
@@ -100,7 +99,7 @@ public final class GreenhouseScanner {
 
                 if (state.is(CCBlockTags.GREENHOUSE_BOUNDARY)) {
                     volume++;
-                    if (volume > MAX_VOLUME)
+                    if (volume > CCConfig.MAX_GREENHOUSE_VOLUME.get())
                         return ScanResult.INVALID;
                     continue;
                 }
@@ -113,7 +112,7 @@ public final class GreenhouseScanner {
                     // Floor (reached from above) is exempt from the shell check;
                     // side/ceiling candidates are probed after the fill.
                     volume++;
-                    if (volume > MAX_VOLUME)
+                    if (volume > CCConfig.MAX_GREENHOUSE_VOLUME.get())
                         return ScanResult.INVALID;
                     if (device)
                         devices.add(next.immutable());
@@ -141,7 +140,7 @@ public final class GreenhouseScanner {
                 // Fully passable (air, liquids) or floor material entered from
                 // above (farmland, planted crops, ...).
                 volume++;
-                if (volume > MAX_VOLUME)
+                if (volume > CCConfig.MAX_GREENHOUSE_VOLUME.get())
                     return ScanResult.INVALID;
                 if (device)
                     devices.add(next.immutable());
@@ -150,7 +149,7 @@ public final class GreenhouseScanner {
                 queue.add(new Cell(next.immutable(), !airLike));
             }
 
-            if (volume > MAX_VOLUME)
+            if (volume > CCConfig.MAX_GREENHOUSE_VOLUME.get())
                 return ScanResult.INVALID;
         }
 

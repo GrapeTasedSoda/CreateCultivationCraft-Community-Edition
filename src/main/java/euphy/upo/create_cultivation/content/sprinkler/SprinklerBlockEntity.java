@@ -19,6 +19,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
+import euphy.upo.create_cultivation.config.CCConfig;
 import euphy.upo.create_cultivation.registry.CCParticles;
 
 import java.util.List;
@@ -41,8 +42,7 @@ public class SprinklerBlockEntity extends SmartBlockEntity {
     /** Farmland hydration refresh cadence: 20 ticks = 1 second. */
     public static final int MOISTEN_INTERVAL = 20;
     /** Hydrated area: 7x7 centred on the sprinkler. */
-    public static final int AREA_RADIUS = 3;
-    /** How deep each column scan follows below the sprinkler. */
+        /** How deep each column scan follows below the sprinkler. */
     public static final int MAX_SCAN_DEPTH = 6;
     /** Vanilla "fully hydrated" moisture value. */
     private static final int MAX_MOISTURE = 7;
@@ -127,8 +127,8 @@ public class SprinklerBlockEntity extends SmartBlockEntity {
      * {@link #MAX_SCAN_DEPTH}.
      */
     private void moistenFarmlandBelow() {
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -CCConfig.SPRINKLER_AREA_RADIUS.get(); dx <= CCConfig.SPRINKLER_AREA_RADIUS.get(); dx++) {
+            for (int dz = -CCConfig.SPRINKLER_AREA_RADIUS.get(); dz <= CCConfig.SPRINKLER_AREA_RADIUS.get(); dz++) {
                 BlockPos cursor = worldPosition.offset(dx, -1, dz);
                 for (int depth = 0; depth < MAX_SCAN_DEPTH; depth++) {
                     BlockState state = level.getBlockState(cursor);
@@ -159,8 +159,8 @@ public class SprinklerBlockEntity extends SmartBlockEntity {
      * sprinkler owns their moisture.
      */
     public static boolean isFarmlandCoveredBySprinkler(ServerLevel level, BlockPos farmlandPos) {
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -CCConfig.SPRINKLER_AREA_RADIUS.get(); dx <= CCConfig.SPRINKLER_AREA_RADIUS.get(); dx++) {
+            for (int dz = -CCConfig.SPRINKLER_AREA_RADIUS.get(); dz <= CCConfig.SPRINKLER_AREA_RADIUS.get(); dz++) {
                 BlockPos cursor = farmlandPos.offset(dx, 1, dz);
                 for (int depth = 0; depth < MAX_SCAN_DEPTH; depth++) {
                     BlockState state = level.getBlockState(cursor);

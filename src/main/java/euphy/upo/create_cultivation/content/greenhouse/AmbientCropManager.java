@@ -40,8 +40,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 public final class AmbientCropManager {
 
     /** Ticks between ambient rescans (biome climate can drift, e.g. seasons). */
-    private static final int RECHECK_INTERVAL_TICKS = 200;
-
+    
     /** dimension -> packed positions of the watched outdoor crops. */
     private static final Map<ResourceKey<Level>, Set<Long>> WATCHED = new ConcurrentHashMap<>();
 
@@ -69,7 +68,7 @@ public final class AmbientCropManager {
             }
             return;
         }
-        if (++tickCounter % RECHECK_INTERVAL_TICKS != 0) {
+        if (++tickCounter % CCConfig.AMBIENT_RECHECK_INTERVAL_TICKS.get() != 0) {
             return;
         }
         refreshDimension(level);

@@ -58,8 +58,7 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
     public static final int GREEN_BLINK_ON = 8;
 
     /** Server ticks between automatic enclosure scans while powered. */
-    public static final int SCAN_INTERVAL = 100;
-
+    
     /** Default target temperature when no player setting exists (deg C). */
     public static final float DEFAULT_SET_TEMP = 20.0f;
     /** Default target humidity when no player setting exists (%RH). */
@@ -114,7 +113,7 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         if (powered) {
             if (!wasPowered || scanCooldown <= 0) {
                 runScan();
-                scanCooldown = SCAN_INTERVAL;
+                scanCooldown = CCConfig.SCAN_INTERVAL_TICKS.get();
             } else {
                 scanCooldown--;
             }

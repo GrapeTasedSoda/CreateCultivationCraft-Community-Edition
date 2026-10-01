@@ -12,6 +12,7 @@ import euphy.upo.create_cultivation.compat.display.CCDisplaySources;
 import euphy.upo.create_cultivation.compat.eclipticseasons.EclipticSeasonsCompat;
 import euphy.upo.create_cultivation.compat.sereneseasons.SereneSeasonsCompat;
 import euphy.upo.create_cultivation.config.CCConfig;
+import euphy.upo.create_cultivation.config.CCConfigMigrations;
 import euphy.upo.create_cultivation.datagen.DataGenerators;
 import euphy.upo.create_cultivation.registry.*;
 import net.minecraft.resources.ResourceLocation;
@@ -45,6 +46,9 @@ public class CreateCultivationCraft {
     public CreateCultivationCraft(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
         modContainer.registerConfig(ModConfig.Type.COMMON, CCConfig.SPEC);
+        // config migration: upgrade old config files in place (version stamp +
+        // key moves) while preserving the user's modified values
+        modEventBus.addListener(CCConfigMigrations::onConfigLoad);
         CCBlocks.register();
         CCItems.register();
         CCBlockEntities.register();

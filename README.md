@@ -57,7 +57,7 @@ The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on c
 - Recipes can define a custom irrigant fluid — e.g. nether wart wants lava.
 
 #### 🏡 Greenhouse climate system
-- Build a sealed **greenhouse** out of Greenhouse Glass (connected-texture glass that still counts as a wall) and place the **Greenhouse Controller** inside: it scans the interior (up to 2048 cells) and tracks the live **temperature (°C) and humidity (%RH)**;
+- Build a sealed **greenhouse** out of Greenhouse Glass (connected-texture glass that still counts as a wall) and place the **Greenhouse Controller** inside: it scans the interior and tracks the live **temperature (°C) and humidity (%RH)** — the scan volume cap (default 2048 cells, ~12x12x14) and re-scan interval are configurable;
 - The controller GUI shows every scanned crop as a row with its optimal/survival climate bars, a flip-board readout on top, and two **setpoint sliders** with gear-detent dragging — an orange warning appears when the connected devices cannot reach the setpoint;
 - Steer the climate with **powered devices**: Humidifier (+humidity), Dehumidifier (−humidity), Air Conditioner (temperature) — all driven toward the setpoints automatically, or hit the hook button and the **auto solver** picks the setpoints from the crops you grow;
 - Greenhouse crops grow up to **×9 faster** in their optimal climate, and are **stalled** (no growth, no fertilizer consumed, watering and fertilizing refused) outside their survival ranges;
@@ -75,7 +75,7 @@ The original mod (v0.1.3) stopped at Create 6.0.6 and **crashes instantly** on c
 Use Create's Ponder on the base or tank: full illustrated tutorials covering assembly, rotation, planting, harvesting, item retrieval, fertilizers, watering, display links and tank stacking.
 
 #### ⚙️ In-game config
-`Mods → Create: Cultivation Craft → Config`: growth rate, yield multiplier, watering bonuses, synergy, watering duration, and the whole fertilizer table (item / duration / both multipliers per entry).
+`Mods → Create: Cultivation Craft → Config`: growth rate, yield multiplier, watering bonuses, synergy, watering duration, the whole fertilizer table (item / duration / both multipliers per entry), the Efficient Fertilizer's direct-use bonus chance, the greenhouse scan (max volume, re-scan interval), the sprinkler's hydration radius, the outdoor-crop re-check cadence and the season humidity offsets. Config files from older versions are migrated automatically on load (moved keys carry user values over).
 
 ### Mod compatibility
 
@@ -160,7 +160,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 - 配方可以自定义灌溉流体——比如 nether wart 要用岩浆浇才给加成。
 
 #### 🏡 温室气候系统
-- 用**温室玻璃**（连接纹理玻璃，同样算作封闭墙体）搭出密封温室，在里面放上**温室控制器**：它会扫描温室内部（最多 2048 格）并实时追踪**温度（°C）与湿度（%RH）**；
+- 用**温室玻璃**（连接纹理玻璃，同样算作封闭墙体）搭出密封温室，在里面放上**温室控制器**：它会扫描温室内部并实时追踪**温度（°C）与湿度（%RH）**——扫描体积上限（默认 2048 格，约 12×12×14）与重扫间隔均可在配置中调整；
 - 控制器 GUI 顶部是翻牌式数据显示，扫描到的每种作物列成一行、带各自的适宜/生存气候条；两个**设定值滑条**支持齿轮棘轮式拖动，设备够不到设定值时会出现橙色警告；
 - 用通电设备调节气候：**加湿器**（升湿度）、**抽湿器**（降湿度）、**空气调节器**（调温度）——设备会自动朝设定值工作；也可以点一下挂钩按钮，**自动求解器**会根据你种的作物直接选好设定值；
 - 温室内的作物在最适宜气候下最高 **9 倍生长速度**，跌出生存区间则**停滞**（不生长、不消耗肥料、拒绝浇水施肥）；
@@ -178,7 +178,7 @@ All recipes are **built in** and auto-enable when the target mod is installed (n
 对着基座或罐子使用 Create 的 Ponder，有覆盖完整流程的图文教学：组装、动力、种植、收获、取物、肥料、浇水、Display Link 与罐体堆叠。
 
 #### ⚙️ 游戏内配置
-`Mods 界面 → Create: Cultivation Craft → Config`，可调生长速率、产量倍率、浇水加成、协同加成、浇水时长，以及整张肥料表（每条肥料的物品 / 时长 / 双倍率）。
+`Mods 界面 → Create: Cultivation Craft → Config`，可调生长速率、产量倍率、浇水加成、协同加成、浇水时长、整张肥料表（每条肥料的物品 / 时长 / 双倍率）、高效肥料的直用加成概率、温室扫描（最大体积、重扫间隔）、洒水器浇灌半径、室外作物重检间隔与四季湿度偏移。旧版本的配置文件会在加载时自动迁移（搬迁键会保留用户修改值）。
 
 ### 模组联动目录
 

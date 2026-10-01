@@ -1,5 +1,6 @@
 package euphy.upo.create_cultivation.content.fertilizer;
 
+import euphy.upo.create_cultivation.config.CCConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -22,9 +23,6 @@ import net.minecraft.world.level.Level;
  */
 public class EfficientFertilizerItem extends Item {
 
-    /** Chance of the second (bonus) application, on top of the base one. */
-    private static final float DOUBLE_CHANCE = 0.5f;
-
     public EfficientFertilizerItem(Properties properties) {
         super(properties);
     }
@@ -43,7 +41,7 @@ public class EfficientFertilizerItem extends Item {
             if (player != null) {
                 player.swing(context.getHand());
             }
-            if (level.random.nextFloat() < DOUBLE_CHANCE) {
+            if (level.random.nextFloat() < CCConfig.FERTILIZER_BONUS_CHANCE.get().floatValue()) {
                 // bonus application on a copy: doubles the effect without an
                 // extra fertilizer being consumed
                 BoneMealItem.growCrop(stack.copy(), level, pos);

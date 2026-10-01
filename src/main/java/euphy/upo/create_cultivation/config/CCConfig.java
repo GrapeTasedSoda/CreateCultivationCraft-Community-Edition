@@ -48,6 +48,9 @@ public final class CCConfig {
 	/** Extra multiplier applied to both growth speed and yield while the tank is watered AND the catalyst is active. */
 	public static final ModConfigSpec.DoubleValue WATER_CATALYST_SYNERGY_BONUS;
 
+	/** Chance (0-1) of the Efficient Fertilizer's bonus second application on direct use. */
+	public static final ModConfigSpec.DoubleValue FERTILIZER_BONUS_CHANCE;
+
 	// ------------------------------------------------------------------
 	// Greenhouse section
 	// ------------------------------------------------------------------
@@ -63,6 +66,18 @@ public final class CCConfig {
 
 	/** Climate change speed factor (dimensionless multiplier). */
 	public static final ModConfigSpec.DoubleValue CLIMATE_RATE;
+
+	/** Hard cap on the scanned greenhouse volume (blocks). */
+	public static final ModConfigSpec.IntValue MAX_GREENHOUSE_VOLUME;
+
+	/** Ticks between enclosure re-scans while powered. */
+	public static final ModConfigSpec.IntValue SCAN_INTERVAL_TICKS;
+
+	/** Horizontal radius of the sprinkler's hydrated farmland area. */
+	public static final ModConfigSpec.IntValue SPRINKLER_AREA_RADIUS;
+
+	/** Ticks between outdoor crop climate re-checks. */
+	public static final ModConfigSpec.IntValue AMBIENT_RECHECK_INTERVAL_TICKS;
 
 	/** Yield multiplier while temperature AND humidity are inside the optimal ranges. */
 	public static final ModConfigSpec.DoubleValue CLIMATE_OPTIMAL_YIELD;
@@ -191,6 +206,17 @@ public final class CCConfig {
 
 		BUILDER.pop();
 
+		BUILDER.push("fertilizer")
+			.comment("The standalone Efficient Fertilizer item's direct-use mode:")
+			.comment("right-clicking a crop behaves like bone meal with a bonus application.");
+
+		FERTILIZER_BONUS_CHANCE = BUILDER
+			.comment("Chance (0.0-1.0) of a second full bone-meal application per use, on a copy of the stack (no extra item consumed). 0.5 = 1.5x bone meal effect on average; 0.0 = plain bone meal strength.")
+			.translation("create_cultivation.config.fertilizerBonusChance")
+			.defineInRange("bonusApplicationChance", 0.5, 0.0, 1.0);
+
+		BUILDER.pop();
+
 		BUILDER.pop();
 
 		BUILDER.push("greenhouse")
@@ -225,7 +251,31 @@ public final class CCConfig {
 			.translation("create_cultivation.config.climateRate")
 			.defineInRange("climateRate", 1.0, 0.05, 20.0);
 
-		BUILDER.pop().push("crop_boost")
+		BUILDER.pop()
+			.push("scan")
+			.comment("Greenhouse enclosure scanning.");
+
+		MAX_GREENHOUSE_VOLUME = BUILDER
+			.comment("Hard cap on the scanned greenhouse volume (interior + boundary + floor, in blocks). Scans exceeding it are invalid; the flood fill itself is unbounded, so this is purely a performance/memory guard. 2048 fits a ~12x12x14 enclosure.")
+			.translation("create_cultivation.config.maxGreenhouseVolume")
+			.defineInRange("maxGreenhouseVolume", 2048, 8, 32768);
+
+		SCAN_INTERVAL_TICKS = BUILDER
+			.comment("Ticks between enclosure re-scans while powered (20 = 1 second). Faster scans pick up greenhouse edits sooner at a small scan cost.")
+			.translation("create_cultivation.config.scanIntervalTicks")
+			.defineInRange("scanIntervalTicks", 100, 20, 1200);
+
+		BUILDER.pop()
+			.push("sprinkler")
+			.comment("The sprinkler's farmland hydration coverage.");
+
+		SPRINKLER_AREA_RADIUS = BUILDER
+			.comment("Horizontal radius (in blocks) of the farmland area the sprinkler keeps hydrated. 3 = a 7x7 area.")
+			.translation("create_cultivation.config.sprinklerAreaRadius")
+			.defineInRange("areaRadius", 3, 1, 8);
+
+		BUILDER.pop()
+			.push("crop_boost")
 			.comment("Multipliers for crops growing inside a powered greenhouse, decided")
 			.comment("by the live climate vs the crop's configured ranges: both dimensions")
 			.comment("optimal, exactly one optimal (other within survival), both merely")
@@ -273,6 +323,11 @@ public final class CCConfig {
 			.comment("Enable ambient climate effects on outdoor soil crops. Default: false (vanilla behaviour).")
 			.translation("create_cultivation.config.ambientCropsEnabled")
 			.define("ambientCropsEnabled", false);
+
+		AMBIENT_RECHECK_INTERVAL_TICKS = BUILDER
+			.comment("Ticks between outdoor crop climate re-checks (20 = 1 second). Each pass only visits already-tracked crops; lower values follow biome/season changes sooner.")
+			.translation("create_cultivation.config.ambientRecheckIntervalTicks")
+			.defineInRange("recheckIntervalTicks", 200, 20, 2400);
 
 		AMBIENT_OPTIMAL_YIELD = BUILDER
 			.comment("Outdoor harvest yield multiplier while temperature AND humidity are both inside the crop's optimal range.")
