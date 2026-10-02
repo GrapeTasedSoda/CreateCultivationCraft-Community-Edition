@@ -53,6 +53,7 @@ public class CreateCultivationCraft {
         CCItems.register();
         CCBlockEntities.register();
         CCMenuTypes.register();
+        CCAdvancementTriggers.register();
         CCParticles.register(modEventBus);
         CCSounds.register(modEventBus);
         CCCreativeModeTabs.register(modEventBus);

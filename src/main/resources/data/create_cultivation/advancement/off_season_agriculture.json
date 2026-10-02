@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "id": "create_cultivation:greenhouse_controller"
+    },
+    "title": {
+      "translate": "advancements.create_cultivation.off_season_agriculture.title"
+    },
+    "description": {
+      "translate": "advancements.create_cultivation.off_season_agriculture.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "activated": {
+      "trigger": "create_cultivation:activate_greenhouse_controller"
+    }
+  },
+  "requirements": [
+    [
+      "activated"
+    ]
+  ]
+}

@@ -9,6 +9,7 @@ import euphy.upo.create_cultivation.content.recipes.CultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.ICultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.IStackingCultivatingRecipe;
 import euphy.upo.create_cultivation.content.recipes.StackingCultivatingRecipe;
+import euphy.upo.create_cultivation.registry.CCAdvancementTriggers;
 import euphy.upo.create_cultivation.registry.CCBlocks;
 import euphy.upo.create_cultivation.registry.CCMenuTypes;
 import net.minecraft.core.BlockPos;
@@ -23,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -421,6 +423,9 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
      *  between 10 and 30 ticks. */
     private int workingStateCounter;
 
+    /** Previous working state, for the activation advancement edge. */
+    private boolean wasWorking;
+
     @Override
     public void tick() {
         super.tick();
@@ -434,6 +439,14 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             workingStateCounter = 20;
             updateWorkingState();
         }
+
+        // advancement: the first tick this machine is seen running grants
+        // "Automatic Agriculture" to the players present
+        boolean workingNow = getBlockState().getValue(CultivationBaseBlock.WORKING);
+        if (workingNow && !wasWorking) {
+            CCAdvancementTriggers.ACTIVATE_CULTIVATION_TANK.awardNearby((ServerLevel) level, getBlockPos());
+        }
+        wasWorking = workingNow;
 
         if (getBlockState().getValue(CultivationBaseBlock.WORKING)) {
             // Refresh the height alarm every tick (cheap recipe lookup) so a

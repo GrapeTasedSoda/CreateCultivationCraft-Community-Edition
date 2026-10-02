@@ -126,5 +126,9 @@
   "create_cultivation.ponder.greenhouse.text_12": "用显示链接器读取控制器：实时气候、设备统计，以及带适宜区间的作物清单。",
   "create_cultivation.ponder.greenhouse.text_13": "温室外的作物则受生物群系环境气候影响，默认关闭，可在配置中开启。",
   "create_cultivation.ponder.greenhouse.header": "温室",
-  "block.create_cultivation.sprinkler.tooltip.summary": "向下方 _7×7 范围_ 均匀洒水，持续保持耕地湿润。水雾会穿过作物与玻璃洒落。_每秒消耗 10mB 水_，从 _底部接口_ 供水。"
+  "block.create_cultivation.sprinkler.tooltip.summary": "向下方 _7×7 范围_ 均匀洒水，持续保持耕地湿润。水雾会穿过作物与玻璃洒落。_每秒消耗 10mB 水_，从 _底部接口_ 供水。",
+  "advancements.create_cultivation.automatic_agriculture.title": "自动农业",
+  "advancements.create_cultivation.automatic_agriculture.description": "让一台栽培罐运转起来",
+  "advancements.create_cultivation.off_season_agriculture.title": "反季农业",
+  "advancements.create_cultivation.off_season_agriculture.description": "让温室控制器识别出一座温室"
 }

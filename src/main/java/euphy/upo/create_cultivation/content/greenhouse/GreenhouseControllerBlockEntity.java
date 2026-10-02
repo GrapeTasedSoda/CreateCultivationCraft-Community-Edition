@@ -15,6 +15,7 @@ import euphy.upo.create_cultivation.content.climate.CropState;
 import euphy.upo.create_cultivation.content.dehumidifier.DehumidifierBlock;
 import euphy.upo.create_cultivation.content.humidifier.HumidifierBlock;
 import euphy.upo.create_cultivation.config.CCConfig;
+import euphy.upo.create_cultivation.registry.CCAdvancementTriggers;
 import euphy.upo.create_cultivation.infrastructure.network.GreenhouseSnapshotPayload;
 
 import net.createmod.catnip.animation.LerpedFloat;
@@ -68,6 +69,9 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
     private boolean lampWorking;
     /** Whether connected devices cannot reach the setpoints (yellow steady). */
     private boolean lampShort;
+
+    /** Previous working state, for the activation advancement edge. */
+    private boolean wasWorking;
 
     @Nullable
     private GreenhouseScanner.ScanResult lastScan;
@@ -153,6 +157,14 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
             lampShort = newShort;
             sendData();
         }
+
+        // advancement: the first tick this controller is seen running with a
+        // recognised greenhouse grants "Off-Season Agriculture" to the players
+        // present
+        if (newWorking && !wasWorking) {
+            CCAdvancementTriggers.ACTIVATE_GREENHOUSE_CONTROLLER.awardNearby((net.minecraft.server.level.ServerLevel) level, getBlockPos());
+        }
+        wasWorking = newWorking;
 
         // push the live climate to open GUIs once per second - also while
         // not controlling, so an open GUI keeps showing live (idle) data

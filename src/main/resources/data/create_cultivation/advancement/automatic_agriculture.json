@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "id": "create_cultivation:cultivation_base"
+    },
+    "title": {
+      "translate": "advancements.create_cultivation.automatic_agriculture.title"
+    },
+    "description": {
+      "translate": "advancements.create_cultivation.automatic_agriculture.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "activated": {
+      "trigger": "create_cultivation:activate_cultivation_tank"
+    }
+  },
+  "requirements": [
+    [
+      "activated"
+    ]
+  ]
+}

@@ -126,5 +126,9 @@
   "create_cultivation.ponder.greenhouse.text_12": "Attach Display Links to read the controller: live climate, device stats and the crop list with its ranges.",
   "create_cultivation.ponder.greenhouse.text_13": "Crops outside greenhouses follow the biome's ambient climate instead - off by default, enable it in the config.",
   "create_cultivation.ponder.greenhouse.header": "Greenhouse",
-  "block.create_cultivation.sprinkler.tooltip.summary": "Sprays water evenly over the _7x7 area_ below it, keeping farmland hydrated. Spray falls straight through crops and glass. _Consumes 10mB of water per second_; supply water through the _bottom port_."
+  "block.create_cultivation.sprinkler.tooltip.summary": "Sprays water evenly over the _7x7 area_ below it, keeping farmland hydrated. Spray falls straight through crops and glass. _Consumes 10mB of water per second_; supply water through the _bottom port_.",
+  "advancements.create_cultivation.automatic_agriculture.title": "Automatic Agriculture",
+  "advancements.create_cultivation.automatic_agriculture.description": "Get a Cultivation Tank running.",
+  "advancements.create_cultivation.off_season_agriculture.title": "Off-Season Agriculture",
+  "advancements.create_cultivation.off_season_agriculture.description": "Have a Greenhouse Controller recognise a greenhouse."
 }
