@@ -62,6 +62,8 @@
   "block.create_cultivation.greenhouse_fluid_pipe": "温室玻璃流体管道",
   "block.create_cultivation.greenhouse_glass_fluid_pipe": "温室玻璃窗式流体管道",
   "create_cultivation.jade.greenhouse.no_power": "未接入动力",
+  "create_cultivation.meter.thermometer": "环境温度：%s °C",
+  "create_cultivation.meter.hygrometer": "环境湿度：%s %RH",
   "create_cultivation.jade.greenhouse.not_scanned": "尚未完成扫描",
   "create_cultivation.jade.greenhouse.valid": "温室完整 · 体积: %s · 已接入设备: %s",
   "create_cultivation.jade.greenhouse.invalid": "温室不完整/泄漏 · 已扫描: %s 格",

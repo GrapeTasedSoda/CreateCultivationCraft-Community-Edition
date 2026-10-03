@@ -62,6 +62,8 @@
   "block.create_cultivation.greenhouse_fluid_pipe": "Greenhouse Fluid Pipe",
   "block.create_cultivation.greenhouse_glass_fluid_pipe": "Greenhouse Window Fluid Pipe",
   "create_cultivation.jade.greenhouse.no_power": "No rotational power",
+  "create_cultivation.meter.thermometer": "Ambient temperature: %s °C",
+  "create_cultivation.meter.hygrometer": "Ambient humidity: %s %RH",
   "create_cultivation.jade.greenhouse.not_scanned": "Not scanned yet",
   "create_cultivation.jade.greenhouse.valid": "Greenhouse intact · Volume: %s · Connected: %s",
   "create_cultivation.jade.greenhouse.invalid": "Greenhouse incomplete / leaking · Scanned: %s blocks",

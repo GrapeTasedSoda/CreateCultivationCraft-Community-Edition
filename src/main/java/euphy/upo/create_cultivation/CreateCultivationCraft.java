@@ -10,6 +10,7 @@ import euphy.upo.create_cultivation.content.greenhouse.GreenhouseCropTracker;
 import euphy.upo.create_cultivation.content.greenhouse.GreenhouseGlassEncasingHandler;
 import euphy.upo.create_cultivation.compat.display.CCDisplaySources;
 import euphy.upo.create_cultivation.compat.eclipticseasons.EclipticSeasonsCompat;
+import euphy.upo.create_cultivation.compat.eclipticseasons.EclipticSeasonsMeterHandler;
 import euphy.upo.create_cultivation.compat.sereneseasons.SereneSeasonsCompat;
 import euphy.upo.create_cultivation.config.CCConfig;
 import euphy.upo.create_cultivation.config.CCConfigMigrations;
@@ -67,6 +68,7 @@ public class CreateCultivationCraft {
         NeoForge.EVENT_BUS.addListener(GreenhouseCropBoostEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(GreenhouseCropBoostEvents::onRightClickBlock);
         NeoForge.EVENT_BUS.addListener(AmbientCropManager::onServerTick);
+        NeoForge.EVENT_BUS.addListener(EclipticSeasonsMeterHandler::onRightClickItem);
         NeoForge.EVENT_BUS.addListener(this::onServerStopped);
         modEventBus.addListener(DataGenerators::gatherData);
         modEventBus.addListener(CCBlockEntities::registerCapabilities);
