@@ -167,6 +167,9 @@ public class SprinklerBlockEntity extends SmartBlockEntity {
                     if (state.getBlock() instanceof SprinklerBlock && state.getValue(SprinklerBlock.ACTIVE)) {
                         return true;
                     }
+                    if (state.is(Blocks.FARMLAND)) {
+                        break;
+                    }
                     if (state.isSolidRender(level, cursor)) {
                         break;
                     }

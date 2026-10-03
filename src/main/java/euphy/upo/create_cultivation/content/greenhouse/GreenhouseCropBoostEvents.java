@@ -1,6 +1,5 @@
 package euphy.upo.create_cultivation.content.greenhouse;
 
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -70,14 +69,14 @@ public final class GreenhouseCropBoostEvents {
         if (boost == null || boost.yieldMultiplier() == 1.0) {
             return;
         }
-        if (boost.yieldMultiplier() <= 0.0) {
-            event.getDrops().clear();
-            return;
-        }
-        for (ItemEntity item : event.getDrops()) {
-            int count = item.getItem().getCount();
-            int scaled = Math.max(1, (int) Math.round(count * boost.yieldMultiplier()));
+        final double yieldMultiplier = boost.yieldMultiplier();
+        event.getDrops().removeIf(item -> {
+            int scaled = (int) Math.floor(item.getItem().getCount() * yieldMultiplier);
+            if (scaled <= 0) {
+                return true;
+            }
             item.getItem().setCount(scaled);
-        }
+            return false;
+        });
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -42,7 +43,10 @@ public class EfficientFertilizerItem extends Item {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide) {
-            context.getPlayer().gameEvent(GameEvent.ITEM_INTERACT_FINISH);
+            Player player = context.getPlayer();
+            if (player != null) {
+                player.gameEvent(GameEvent.ITEM_INTERACT_FINISH);
+            }
             level.levelEvent(1505, pos, 15);
             if (level.random.nextFloat() < CCConfig.FERTILIZER_BONUS_CHANCE.get().floatValue()) {
                 // bonus application on a copy: doubles the effect without an

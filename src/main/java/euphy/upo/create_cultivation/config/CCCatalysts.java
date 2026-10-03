@@ -69,8 +69,8 @@ public final class CCCatalysts {
                 continue;
             }
             try {
-                ResourceLocation id = ResourceLocation.parse(parts[0].trim().toLowerCase(Locale.ROOT));
-                Item item = BuiltInRegistries.ITEM.getOptional(id).orElse(null);
+                ResourceLocation id = ResourceLocation.tryParse(parts[0].trim().toLowerCase(Locale.ROOT));
+                Item item = id == null ? null : BuiltInRegistries.ITEM.getOptional(id).orElse(null);
                 if (item == null || item == Items.AIR) {
                     LOGGER.info("Catalyst entry references unknown item (mod not installed?): {}", parts[0]);
                     continue;
@@ -80,8 +80,8 @@ public final class CCCatalysts {
                 double yield = Double.parseDouble(parts[3].trim());
                 yield = Math.max(0.0, Math.min(MAX_MULTIPLIER, yield));
                 map.put(item, new CatalystType(duration, growth, yield));
-            } catch (NumberFormatException e) {
-                LOGGER.warn("Skipping catalyst entry with invalid numbers: {}", entry);
+            } catch (Exception e) {
+                LOGGER.warn("Skipping invalid catalyst entry: {}", entry);
             }
         }
         return Map.copyOf(map);

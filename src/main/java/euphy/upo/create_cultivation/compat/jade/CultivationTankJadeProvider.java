@@ -9,6 +9,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.Locale;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -33,8 +35,13 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
             // in progress) - guard instead of letting Jade throw.
             if (controllerBE != null) {
                 controllerBE.getCurrentRecipe().ifPresent(recipeHolder -> {
-                    ItemStack seedStack = recipeHolder.value().getIngredients().get(0).getItems()[0];
-                    tooltip.add(Component.translatable("create_cultivation.jade.crop", seedStack.getDisplayName()));
+                    if (recipeHolder.value().getIngredients().isEmpty()) {
+                        return;
+                    }
+                    ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
+                    if (seedOptions.length > 0) {
+                        tooltip.add(Component.translatable("create_cultivation.jade.crop", seedOptions[0].getDisplayName()));
+                    }
                 });
             }
         }
@@ -58,7 +65,7 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
                     // only refines downward as Jade re-syncs snapshots.
                     float remainingPoints = serverData.getFloat("remainingPoints");
                     float remainingSeconds = Math.max(0, remainingPoints / (pointsPerGameTick * 20.0f));
-                    String formattedTime = String.format("%.1f", remainingSeconds);
+                    String formattedTime = String.format(Locale.ROOT, "%.1f", remainingSeconds);
                     tooltip.add(Component.translatable("create_cultivation.jade.time_remaining", formattedTime));
                 }
             } else if ("STACK_BASED".equals(recipeMode)) {
@@ -72,7 +79,7 @@ public enum CultivationTankJadeProvider implements IBlockComponentProvider, ISer
                     // points (all unfinished layers) ÷ per-tick rate.
                     float remainingPoints = serverData.getFloat("remainingPoints");
                     float remainingSeconds = Math.max(0, remainingPoints / (pointsPerGameTick * 20.0f));
-                    String formattedTime = String.format("%.1f", remainingSeconds);
+                    String formattedTime = String.format(Locale.ROOT, "%.1f", remainingSeconds);
                     tooltip.add(Component.translatable("create_cultivation.jade.time_remaining", formattedTime));
                 }
             }

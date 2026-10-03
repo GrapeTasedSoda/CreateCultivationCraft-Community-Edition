@@ -786,7 +786,9 @@ public class CultivationTankBlockEntity extends SmartBlockEntity implements IMul
         CultivationTankBlockEntity controller = getControllerBE();
         if (controller == null) return;
 
-        controller.wateredTickCounter = CCConfig.WATERED_DURATION.get();
+        if (watered) {
+            controller.wateredTickCounter = CCConfig.WATERED_DURATION.get();
+        }
         if (controller.isWatered != watered) {
             controller.isWatered = watered;
             controller.setChanged();

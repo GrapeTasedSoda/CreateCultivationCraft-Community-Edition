@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Locale;
+
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -102,8 +104,8 @@ public enum CropClimateJadeProvider implements IBlockComponentProvider {
             return;
         }
         tooltip.add(Component.translatable("create_cultivation.jade.crop.growth_rate",
-                String.format("%.1f", boost.growthMultiplier())));
+                String.format(Locale.ROOT, "%.1f", boost.growthMultiplier())));
         tooltip.add(Component.translatable("create_cultivation.jade.crop.yield_rate",
-                String.format("%.1f", boost.yieldMultiplier())));
+                String.format(Locale.ROOT, "%.1f", boost.yieldMultiplier())));
     }
 }

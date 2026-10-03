@@ -576,7 +576,11 @@ public class GreenhouseControllerScreen extends AbstractContainerScreen<Greenhou
             // item + bottom-right count. Blocks without an item form of their
             // own (rice, grapes, trellises - the planting item is separate)
             // fall back to the display_icon data map so the row is not blank
-            Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(row.blockId()));
+            ResourceLocation blockId = ResourceLocation.tryParse(row.blockId());
+            Block block = blockId == null ? null : BuiltInRegistries.BLOCK.get(blockId);
+            if (block == null) {
+                continue;
+            }
             Item item = block.asItem();
             if (item == Items.AIR) {
                 CCDataMaps.CropDisplay display = block.builtInRegistryHolder().getData(CCDataMaps.CROP_DISPLAY_ICON);
@@ -608,8 +612,7 @@ public class GreenhouseControllerScreen extends AbstractContainerScreen<Greenhou
                 RowTooltip tip = miniBarTooltip(row, mouseX, mouseY, rowY);
                 if (tip == null) {
                     // crop name, border hue matching the row's frame colour
-                    tip = new RowTooltip(BuiltInRegistries.BLOCK.get(
-                            ResourceLocation.parse(row.blockId())).getName(),
+                    tip = new RowTooltip(block.getName(),
                             frame == FRAME_STALL ? BORDER_STALL[0]
                                     : frame == FRAME_SURV ? BORDER_SURVIVAL[0] : BORDER_OPTIMAL[0],
                             frame == FRAME_STALL ? BORDER_STALL[1]

@@ -56,36 +56,43 @@ public class CultivationTankBlock extends Block implements IBE<CultivationTankBl
             return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide && state.getValue(PLANTED)) {
-            withBlockEntityDo(level, pos, tankBE -> {
-                tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
-                    ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
-                    if (seedOptions.length != 1) {
-                        return; // tag ingredient: no single "the seed" to hand back
-                    }
-                    ItemStack seedStack = seedOptions[0].copy();
-                    seedStack.setCount(1);
+        if (!state.getValue(PLANTED)) {
+            return InteractionResult.PASS;
+        }
 
-
-                    BlockPos dropPos = pos;
-                    Direction clickedFace = hitResult.getDirection();
-
-                    if (clickedFace.getAxis() != Direction.Axis.Y) {
-                        dropPos = pos.relative(clickedFace);
-                    }
-                    else if (clickedFace == Direction.UP) {
-                        dropPos = pos.relative(player.getDirection().getOpposite());
-                    }
-
-                    popResource(level, dropPos, seedStack);
-                });
-
-                tankBE.clearTank();
-            });
+        if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.PASS;
+        withBlockEntityDo(level, pos, tankBE -> {
+            tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
+                if (recipeHolder.value().getIngredients().isEmpty()) {
+                    return;
+                }
+                ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
+                if (seedOptions.length != 1) {
+                    return;
+                }
+                ItemStack seedStack = seedOptions[0].copy();
+                seedStack.setCount(1);
+
+
+                BlockPos dropPos = pos;
+                Direction clickedFace = hitResult.getDirection();
+
+                if (clickedFace.getAxis() != Direction.Axis.Y) {
+                    dropPos = pos.relative(clickedFace);
+                }
+                else if (clickedFace == Direction.UP) {
+                    dropPos = pos.relative(player.getDirection().getOpposite());
+                }
+
+                popResource(level, dropPos, seedStack);
+            });
+
+            tankBE.clearTank();
+        });
+        return InteractionResult.SUCCESS;
     }
 
     @Override

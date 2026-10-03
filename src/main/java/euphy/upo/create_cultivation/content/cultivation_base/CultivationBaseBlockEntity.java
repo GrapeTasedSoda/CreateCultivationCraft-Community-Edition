@@ -233,6 +233,9 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             if (recipe.getHeight() > 1 && tankBE.getHeight() < recipe.getHeight()) {
                 return pending;
             }
+            if (recipe.getIngredients().isEmpty()) {
+                return pending;
+            }
             Ingredient seedIngredient = recipe.getIngredients().get(0);
             // Deterministic worst case: chance outputs are counted as if they
             // always succeed, so the alarm never flickers between lazy ticks.
@@ -390,9 +393,10 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             itemHandler.deserializeNBT(registries, inventoryTag);
             catalystTicks = compound.getInt("CatalystTicks");
             if (compound.contains("ActiveCatalyst", CompoundTag.TAG_STRING)) {
-                ResourceLocation itemId = ResourceLocation.parse(compound.getString("ActiveCatalyst"));
+                ResourceLocation itemId = ResourceLocation.tryParse(compound.getString("ActiveCatalyst"));
                 lastConsumedCatalystId = itemId;
-                activeCatalystType = BuiltInRegistries.ITEM.getOptional(itemId)
+                activeCatalystType = itemId == null ? null
+                        : BuiltInRegistries.ITEM.getOptional(itemId)
                         .map(CCCatalysts::getType)
                         .orElse(null);
             } else {
@@ -514,6 +518,9 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
             if (recipeHolder.value() instanceof CultivatingRecipe recipe) {
 
 
+                if (recipe.getIngredients().isEmpty()) {
+                    return;
+                }
                 Ingredient seedIngredient = recipe.getIngredients().get(0);
                 if (recipe.getHeight() > 1 && tankBE.getHeight() < recipe.getHeight()) {
 

@@ -42,8 +42,6 @@ public final class AmbientCropManager {
     /** dimension -> packed positions of the watched outdoor crops. */
     private static final Map<ResourceKey<Level>, Set<Long>> WATCHED = new ConcurrentHashMap<>();
 
-    private static int tickCounter;
-
     private AmbientCropManager() {}
 
     /** Called from the server tick event; no-ops while the feature is disabled. */
@@ -66,7 +64,7 @@ public final class AmbientCropManager {
             }
             return;
         }
-        if (++tickCounter % CCConfig.AMBIENT_RECHECK_INTERVAL_TICKS.get() != 0) {
+        if (level.getGameTime() % CCConfig.AMBIENT_RECHECK_INTERVAL_TICKS.get() != 0) {
             return;
         }
         refreshDimension(level);

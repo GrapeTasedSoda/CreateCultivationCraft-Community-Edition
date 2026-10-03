@@ -78,13 +78,13 @@ public record GreenhouseSnapshotPayload(BlockPos pos, boolean valid, int volume,
             int humCount = buf.readInt();
             int dehumCount = buf.readInt();
             int autoMode = buf.readInt();
-            int rows = buf.readInt();
+            int rows = Math.min(buf.readInt(), 4096);
             CropRow[] crops = new CropRow[rows];
             for (int i = 0; i < rows; i++) {
                 crops[i] = new CropRow(buf.readUtf(256), buf.readInt(), buf.readInt(), buf.readInt(),
                         buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt());
             }
-            int boostCount = buf.readVarInt();
+            int boostCount = Math.min(buf.readVarInt(), 32768);
             CropBoost[] boosts = new CropBoost[boostCount];
             for (int i = 0; i < boostCount; i++) {
                 boosts[i] = new CropBoost(buf.readLong(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean());

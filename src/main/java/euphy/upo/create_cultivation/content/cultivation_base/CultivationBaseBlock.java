@@ -9,6 +9,8 @@ import euphy.upo.create_cultivation.registry.CCBlockEntities;
 import euphy.upo.create_cultivation.registry.CCBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -167,29 +169,33 @@ public class CultivationBaseBlock extends HorizontalKineticBlock implements IBE<
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
-
-            if (state.getValue(WORKING)) {
-                BlockPos posAbove = pos.above();
-                if (level.getBlockEntity(posAbove) instanceof CultivationTankBlockEntity tankBE) {
-                    tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
-                        ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
-                        if (seedOptions.length != 1) {
-                            return; // tag ingredient: no single "the seed" to drop
-                        }
-                        ItemStack seedStack = seedOptions[0].copy();
-                        seedStack.setCount(1);
-                        Containers.dropItemStack(level, posAbove.getX(), posAbove.getY(), posAbove.getZ(), seedStack);
-                    });
-                    tankBE.onHarvest();
+            if (level instanceof ServerLevel) {
+                if (state.getValue(WORKING)) {
+                    BlockPos posAbove = pos.above();
+                    if (level.getBlockEntity(posAbove) instanceof CultivationTankBlockEntity tankBE) {
+                        tankBE.getCurrentRecipe().ifPresent(recipeHolder -> {
+                            if (recipeHolder.value().getIngredients().isEmpty()) {
+                                return;
+                            }
+                            ItemStack[] seedOptions = recipeHolder.value().getIngredients().get(0).getItems();
+                            if (seedOptions.length != 1) {
+                                return;
+                            }
+                            ItemStack seedStack = seedOptions[0].copy();
+                            seedStack.setCount(1);
+                            Containers.dropItemStack(level, posAbove.getX(), posAbove.getY(), posAbove.getZ(), seedStack);
+                        });
+                        tankBE.onHarvest();
+                    }
                 }
-            }
 
-            if (level.getBlockEntity(pos) instanceof CultivationBaseBlockEntity be) {
-                IItemHandler itemHandler = be.getItemHandler();
-                for (int i = 0; i < itemHandler.getSlots(); i++) {
-                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemHandler.getStackInSlot(i));
+                if (level.getBlockEntity(pos) instanceof CultivationBaseBlockEntity be) {
+                    IItemHandler itemHandler = be.getItemHandler();
+                    for (int i = 0; i < itemHandler.getSlots(); i++) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemHandler.getStackInSlot(i));
+                    }
+                    level.updateNeighbourForOutputSignal(pos, this);
                 }
-                level.updateNeighbourForOutputSignal(pos, this);
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);

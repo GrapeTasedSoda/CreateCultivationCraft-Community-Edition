@@ -54,6 +54,8 @@ public final class ClimateController {
 
     /** True when the device's water loop lets it run right now. */
     private static boolean waterAllows(ServerLevel level, BlockPos pos, boolean humidifier) {
+        if (!level.isLoaded(pos))
+            return humidifier ? false : true;
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof DehumidifierBlockEntity dehum)
             return dehum.getTank().getFluidAmount() < dehum.getTank().getCapacity();
