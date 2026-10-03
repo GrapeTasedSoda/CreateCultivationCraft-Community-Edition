@@ -132,6 +132,8 @@ public class DehumidifierBlock extends BaseEntityBlock implements IBE<Dehumidifi
 
     /** Activation hook for the greenhouse controller (server side). */
     public static void setActive(Level level, BlockPos pos, boolean active) {
+        if (!level.isLoaded(pos))
+            return; // never sync-load a chunk just to flip the flag
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof DehumidifierBlock && state.getValue(ACTIVE) != active) {
             level.setBlock(pos, state.setValue(ACTIVE, active), 3);

@@ -37,8 +37,10 @@ public class CreateCultivationCraft {
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MODID)
             // Create-style item tooltips (shift-gated summary/behaviour lines): any
             // item with a lang file at <id>.tooltip.summary gets the full treatment,
-            // items without the key are untouched
-            .setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.GRAY_AND_BLUE))
+            // items without the key are untouched. STANDARD_CREATE is the exact
+            // palette Create itself uses (Create.java): gold primary text with a
+            // light-gold highlight for _underscored_ segments - NOT GRAY_AND_BLUE.
+            .setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE))
             .defaultCreativeTab(CCCreativeModeTabs.MAIN_TAB.getKey());
     public static ResourceLocation asResource(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
@@ -53,7 +55,7 @@ public class CreateCultivationCraft {
         CCItems.register();
         CCBlockEntities.register();
         CCMenuTypes.register();
-        CCAdvancementTriggers.register();
+        CCAdvancementTriggers.register(modEventBus);
         CCParticles.register(modEventBus);
         CCSounds.register(modEventBus);
         CCCreativeModeTabs.register(modEventBus);

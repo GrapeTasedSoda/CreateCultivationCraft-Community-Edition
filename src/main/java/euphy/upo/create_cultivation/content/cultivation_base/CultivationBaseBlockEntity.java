@@ -444,7 +444,7 @@ public class CultivationBaseBlockEntity extends KineticBlockEntity implements Me
         // "Automatic Agriculture" to the players present
         boolean workingNow = getBlockState().getValue(CultivationBaseBlock.WORKING);
         if (workingNow && !wasWorking) {
-            CCAdvancementTriggers.ACTIVATE_CULTIVATION_TANK.awardNearby((ServerLevel) level, getBlockPos());
+            CCAdvancementTriggers.ACTIVATE_CULTIVATION_TANK.get().awardNearby((ServerLevel) level, getBlockPos());
         }
         wasWorking = workingNow;
 

@@ -1,9 +1,11 @@
 package euphy.upo.create_cultivation.content.greenhouse;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import euphy.upo.create_cultivation.content.airconditioner.AirConditionerBlock;
 import euphy.upo.create_cultivation.content.climate.ClimateInterval;
@@ -58,8 +60,6 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
     /** How long (ticks) the green flash stays visible. */
     public static final int GREEN_BLINK_ON = 8;
 
-    /** Server ticks between automatic enclosure scans while powered. */
-    
     /** Default target temperature when no player setting exists (deg C). */
     public static final float DEFAULT_SET_TEMP = 20.0f;
     /** Default target humidity when no player setting exists (%RH). */
@@ -125,6 +125,13 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         }
 
         // Climate simulation every tick (server side only, level is non-null here)
+
+        // world reload: the scan (including device positions) is restored
+        // from NBT but the device classification is memory-only - rebuild
+        // it once so an unpowered controller can still switch previously
+        // active devices off; a powered controller rescans right above
+        if (lastDeviceGroups == null && lastScan != null)
+            lastDeviceGroups = classifyDevices(lastScan);
         var deviceGroups = lastDeviceGroups != null ? lastDeviceGroups : ClimateController.DeviceGroups.EMPTY;
         int volume = lastScan != null && lastScan.valid() ? lastScan.volume() : 0;
         boolean controlling = powered && volume > 0 && climate.isInitialised();
@@ -162,7 +169,7 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         // recognised greenhouse grants "Off-Season Agriculture" to the players
         // present
         if (newWorking && !wasWorking) {
-            CCAdvancementTriggers.ACTIVATE_GREENHOUSE_CONTROLLER.awardNearby((net.minecraft.server.level.ServerLevel) level, getBlockPos());
+            CCAdvancementTriggers.ACTIVATE_GREENHOUSE_CONTROLLER.get().awardNearby((net.minecraft.server.level.ServerLevel) level, getBlockPos());
         }
         wasWorking = newWorking;
 
@@ -248,16 +255,41 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
      * Block broken (or replaced): drop this controller's tracker
      * registrations and its protected interior immediately, so crops and the
      * ambient system do not keep reacting to a greenhouse that no longer
-     * exists. The registrations are memory-only and are rebuilt from the
-     * next controller's scans. ({@code setRemoved} is final in Create's
+     * exists, and switch every scanned device back to its inactive default:
+     * this controller is the only thing driving the devices' ACTIVE state,
+     * and once the block entity is gone its tick (and with it the passive
+     * cleanup in {@code ClimateController.step}) stops running - the devices
+     * would otherwise stay stuck in whatever state they had. The
+     * registrations are memory-only and are rebuilt from the next
+     * controller's scans. ({@code setRemoved} is final in Create's
      * {@code SmartBlockEntity}; {@code remove} is its overridable hook.)
      */
     @Override
     public void remove() {
         super.remove();
         if (level != null && !level.isClientSide()) {
+            deactivateLastDevices();
             clearCropRegistrations();
         }
+    }
+
+    /**
+     * Switches every device of the last scan back to its inactive default
+     * state. Used when the controller itself stops existing (block broken,
+     * replaced or picked up by a contraption); while the controller still
+     * ticks, the same cleanup happens in {@code ClimateController.step}.
+     */
+    private void deactivateLastDevices() {
+        if (lastDeviceGroups == null && lastScan != null)
+            lastDeviceGroups = classifyDevices(lastScan);
+        if (lastDeviceGroups == null)
+            return;
+        for (BlockPos pos : lastDeviceGroups.airConditioners())
+            AirConditionerBlock.setActive(level, pos, false);
+        for (BlockPos pos : lastDeviceGroups.humidifiers())
+            HumidifierBlock.setActive(level, pos, false);
+        for (BlockPos pos : lastDeviceGroups.dehumidifiers())
+            DehumidifierBlock.setActive(level, pos, false);
     }
 
     /** Chunk unloading: same cleanup as removal (state is memory-only). */
@@ -278,7 +310,21 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         } else {
             lastScan = result;
         }
-        lastDeviceGroups = classifyDevices(result);
+        if (result.valid()) {
+            // a still-valid enclosure that lost devices: switch the dropped
+            // ones off here - the reclassification below no longer knows
+            // about them, so nothing else would ever reset their state
+            deactivateDroppedDevices(result);
+            lastDeviceGroups = classifyDevices(result);
+        } else {
+            // keep the previous classification: the passive branch in
+            // ClimateController.step deactivates these devices while the
+            // greenhouse is invalid. Classifying the INVALID result (empty
+            // device list) would wipe the lists here and leave already
+            // active devices stuck on forever.
+            if (lastDeviceGroups == null)
+                lastDeviceGroups = ClimateController.DeviceGroups.EMPTY;
+        }
         // crop list changes retrigger the auto setpoint solver
         applyAutoOnCropChange();
         // tracker bookkeeping: never leave stale registrations behind when
@@ -311,6 +357,10 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         List<BlockPos> hums = new ArrayList<>();
         List<BlockPos> dehums = new ArrayList<>();
         for (BlockPos pos : scan.devices()) {
+            // never let block-entity logic sync-load a chunk (removal path,
+            // post-reload rebuild): skip positions in unloaded chunks
+            if (!level.isLoaded(pos))
+                continue;
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof AirConditionerBlock)
                 acs.add(pos);
@@ -322,13 +372,29 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         return new ClimateController.DeviceGroups(List.copyOf(acs), List.copyOf(hums), List.copyOf(dehums));
     }
 
+    /** Switches off scanned devices that fell out of the (still valid) enclosure. */
+    private void deactivateDroppedDevices(GreenhouseScanner.ScanResult newScan) {
+        if (lastDeviceGroups == null)
+            return;
+        Set<BlockPos> kept = new HashSet<>(newScan.devices());
+        for (BlockPos pos : lastDeviceGroups.airConditioners())
+            if (!kept.contains(pos))
+                AirConditionerBlock.setActive(level, pos, false);
+        for (BlockPos pos : lastDeviceGroups.humidifiers())
+            if (!kept.contains(pos))
+                HumidifierBlock.setActive(level, pos, false);
+        for (BlockPos pos : lastDeviceGroups.dehumidifiers())
+            if (!kept.contains(pos))
+                DehumidifierBlock.setActive(level, pos, false);
+    }
+
     /** Latest enclosure scan result, or null before the first scan. */
     @Nullable
     public GreenhouseScanner.ScanResult getLastScan() {
         return lastScan;
     }
 
-    /** Forces an immediate re-scan (future API hook). */
+    /** Forces an immediate re-scan. */
     public void requestScan() {
         if (level != null && !level.isClientSide() && getSpeed() != 0)
             runScan();
@@ -516,7 +582,11 @@ public class GreenhouseControllerBlockEntity extends KineticBlockEntity implemen
         int totalPlants = 0;
         for (GreenhouseSnapshotPayload.CropRow row : rows)
             totalPlants += row.count();
-        var deviceGroups = lastDeviceGroups != null ? lastDeviceGroups : ClimateController.DeviceGroups.EMPTY;
+        // device counts for the GUI: only meaningful for a valid scan -
+        // while the greenhouse is invalid the retained groups (kept for
+        // deactivating devices) must not leak stale counts into the UI
+        var deviceGroups = lastScan != null && lastScan.valid() && lastDeviceGroups != null
+                ? lastDeviceGroups : ClimateController.DeviceGroups.EMPTY;
         return new GreenhouseSnapshotPayload(
                 worldPosition,
                 lastScan != null && lastScan.valid(),

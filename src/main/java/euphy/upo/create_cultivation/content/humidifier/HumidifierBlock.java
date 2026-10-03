@@ -38,8 +38,7 @@ import java.util.Map;
 /**
  * The humidifier: a 6-way orientable machine. It stores 1000 mB of fluid and
  * "activates" by sliding its head 3px towards its front (authored =
- * blockbench north); activation is controlled by the greenhouse controller
- * (wired up later).
+ * blockbench north); activation is controlled by the greenhouse controller.
  *
  * <p>{@code facing} is the direction the opening (head) points; the fluid
  * inlet is the back plate, i.e. the opposite side. Placement: beside a fluid
@@ -154,6 +153,8 @@ public class HumidifierBlock extends BaseEntityBlock implements IBE<HumidifierBl
 
     /** Activation hook for the greenhouse controller (server side). */
     public static void setActive(Level level, BlockPos pos, boolean active) {
+        if (!level.isLoaded(pos))
+            return; // never sync-load a chunk just to flip the flag
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof HumidifierBlock && state.getValue(ACTIVE) != active) {
             level.setBlock(pos, state.setValue(ACTIVE, active), 3);

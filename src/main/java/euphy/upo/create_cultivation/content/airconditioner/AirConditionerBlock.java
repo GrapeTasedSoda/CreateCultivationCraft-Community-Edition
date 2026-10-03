@@ -100,6 +100,8 @@ public class AirConditionerBlock extends BaseEntityBlock implements IBE<AirCondi
 
     /** Controller hook: switches the running state (same pattern as the humidifier). */
     public static void setActive(Level level, BlockPos pos, boolean active) {
+        if (!level.isLoaded(pos))
+            return; // never sync-load a chunk just to flip the flag
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof AirConditionerBlock && state.getValue(ACTIVE) != active) {
             level.setBlock(pos, state.setValue(ACTIVE, active), 3);
