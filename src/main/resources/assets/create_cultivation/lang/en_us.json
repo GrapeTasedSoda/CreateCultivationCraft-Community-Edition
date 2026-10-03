@@ -111,7 +111,7 @@
   "create_cultivation.config.winterHumidityOffset": "Winter Humidity Offset (%RH)",
   "create_cultivation.stall.fertilizer_blocked": "This crop is stalled - the climate is outside its survival range, fertilizer would be wasted",
   "create_cultivation.ponder.tag.greenhouse": "Greenhouse Climate",
-  "create_cultivation.ponder.tag.greenhouse.subtitle": "Build a greenhouse, control its climate and boost your crops",
+  "create_cultivation.ponder.tag.greenhouse.description": "Build a greenhouse, control its climate and boost your crops",
   "create_cultivation.ponder.greenhouse.text_1": "The Greenhouse Controller is the brain of the greenhouse: once powered, it scans the interior and regulates the climate.",
   "create_cultivation.ponder.greenhouse.text_2": "Right-click the controller with any item to open its control panel.",
   "create_cultivation.ponder.greenhouse.text_3": "Enclose the controller with Greenhouse Glass: the controller floods outward from its own cell to map the greenhouse interior.",

@@ -23,7 +23,8 @@ public class CCPonderTags {
                 .addToIndex()
                 .item(CCBlocks.GREENHOUSE_CONTROLLER.get(), true, false)
                 .title("Greenhouse Climate")
-                .description("Build a greenhouse, control its temperature and humidity and boost your crops");
+                .description("Build a greenhouse, control its temperature and humidity and boost your crops")
+                .register();
 
         entryHelper.addToTag(GREENHOUSE_TAG)
                 .add(CCBlocks.GREENHOUSE_CONTROLLER)

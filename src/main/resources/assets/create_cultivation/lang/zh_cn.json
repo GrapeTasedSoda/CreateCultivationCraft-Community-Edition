@@ -111,7 +111,7 @@
   "create_cultivation.config.winterHumidityOffset": "冬季湿度偏移 (%RH)",
   "create_cultivation.stall.fertilizer_blocked": "该作物当前处于停滞状态，气候不适宜生长，肥料无效",
   "create_cultivation.ponder.tag.greenhouse": "温室气候",
-  "create_cultivation.ponder.tag.greenhouse.subtitle": "建设温室，控制温湿度，让作物获得气候加成",
+  "create_cultivation.ponder.tag.greenhouse.description": "建设温室，控制温湿度，让作物获得气候加成",
   "create_cultivation.ponder.greenhouse.text_1": "温室控制器是整个温室的大脑：接上动力后，它会扫描温室内部并自动调节气候。",
   "create_cultivation.ponder.greenhouse.text_2": "手持任意物品右键控制器，即可打开控制界面。",
   "create_cultivation.ponder.greenhouse.text_3": "用温室玻璃把控制器围起来：控制器会从自身所在格向外泛洪，识别温室的内部空间。",
