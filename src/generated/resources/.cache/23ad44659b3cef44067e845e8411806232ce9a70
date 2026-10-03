@@ -1,5 +1,6 @@
-// 1.21.1	2026-09-16T18:15:58.3474512	Create Cultivation Compat Recipes
+// 1.21.1	2026-10-03T22:26:45.9130745	Create Cultivation Compat Recipes
 d05d806c1863b018800f76fda583cd604231379d data/create_cultivation/recipe/compat/corndelight/corn.json
+7f6eca3dc6a61adcd7373fb63ffccc62eda40fde data/create_cultivation/recipe/compat/eclipticseasons/thermometer.json
 91f5f3a657d02a38e032c7902e9844fff02dbd8e data/create_cultivation/recipe/compat/farmersdelight/cabbage.json
 488204c6ab7da87d9358d2ee6d8d6923d4114208 data/create_cultivation/recipe/compat/farmersdelight/onion.json
 091402e3622eb77f4eb6fe3b35cb12bc1c74d0c9 data/create_cultivation/recipe/compat/farmersdelight/rice.json

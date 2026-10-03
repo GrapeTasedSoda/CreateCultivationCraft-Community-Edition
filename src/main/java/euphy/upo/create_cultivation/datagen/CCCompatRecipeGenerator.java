@@ -59,7 +59,24 @@ public class CCCompatRecipeGenerator implements DataProvider {
             futures.add(DataProvider.saveStable(cache, json, recipePath));
         });
 
+        generateEclipticSeasonsRecipes((id, json) -> {
+            Path recipePath = outputFolder.resolve("data/" + id.getNamespace() + "/recipe/compat/" + id.getPath() + ".json");
+            futures.add(DataProvider.saveStable(cache, json, recipePath));
+        });
+
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    private void generateEclipticSeasonsRecipes(RecipeAcceptor acceptor) {
+        //节气四季：温度计（工作台无序合成：1蓝冰+1玻璃；ES 自带配方要水瓶+红石，这里补一条纯原版材料的获取途径）
+        acceptor.accept(
+                ResourceLocation.fromNamespaceAndPath("create_cultivation", "eclipticseasons/thermometer"),
+                createShapelessCraftingRecipe(
+                        "eclipticseasons",
+                        new String[]{"minecraft:blue_ice", "minecraft:glass"},
+                        "eclipticseasons:thermometer"
+                )
+        );
     }
 
     private void generateKaleidoscopeCookeryRecipes(RecipeAcceptor acceptor) {
@@ -392,6 +409,39 @@ public class CCCompatRecipeGenerator implements DataProvider {
 
         json.addProperty("processingDuration", duration);
         json.addProperty("crop_block", cropBlockId);
+
+        return json;
+    }
+
+    /**
+     * Builds a vanilla shapeless crafting-table recipe with the mod-loaded
+     * condition, so an optional-integration item gets an alternative
+     * vanilla-material recipe when its owning mod is present.
+     */
+    private JsonObject createShapelessCraftingRecipe(String modIdCondition, String[] ingredientIds, String resultId) {
+        JsonObject json = new JsonObject();
+        JsonArray conditions = new JsonArray();
+        JsonObject modLoaded = new JsonObject();
+        modLoaded.addProperty("type", "neoforge:mod_loaded");
+        modLoaded.addProperty("modid", modIdCondition);
+        conditions.add(modLoaded);
+        json.add("neoforge:conditions", conditions);
+
+        json.addProperty("type", "minecraft:crafting_shapeless");
+        json.addProperty("category", "equipment");
+
+        JsonArray ingredientsArray = new JsonArray();
+        for (String ingredientId : ingredientIds) {
+            JsonObject ingredientJson = new JsonObject();
+            ingredientJson.addProperty("item", ingredientId);
+            ingredientsArray.add(ingredientJson);
+        }
+        json.add("ingredients", ingredientsArray);
+
+        JsonObject resultJson = new JsonObject();
+        resultJson.addProperty("count", 1);
+        resultJson.addProperty("id", resultId);
+        json.add("result", resultJson);
 
         return json;
     }
