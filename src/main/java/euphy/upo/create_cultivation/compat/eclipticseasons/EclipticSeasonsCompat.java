@@ -5,6 +5,7 @@ import com.teamtea.eclipticseasons.api.constant.solar.SolarTerm;
 import com.teamtea.eclipticseasons.api.util.EclipticUtil;
 import euphy.upo.create_cultivation.content.climate.CCDataMaps;
 import euphy.upo.create_cultivation.content.climate.ClimateUnits;
+import euphy.upo.create_cultivation.config.CCConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -40,6 +41,8 @@ public final class EclipticSeasonsCompat {
 
     @Nullable
     private static Float seasonTemperature(LevelReader level, Holder<Biome> biome) {
+        if (!CCConfig.ES_CLIMATE_ENABLED.get())
+            return null;
         if (!(level instanceof Level lvl) || !EclipticSeasonsApi.getInstance().isSeasonEnabled(lvl))
             return null;
         SolarTerm solarTerm = EclipticUtil.getNowSolarTerm(lvl);
@@ -52,6 +55,8 @@ public final class EclipticSeasonsCompat {
 
     @Nullable
     private static Float seasonHumidity(LevelReader level, Holder<Biome> biome) {
+        if (!CCConfig.ES_CLIMATE_ENABLED.get())
+            return null;
         if (!(level instanceof Level lvl) || !EclipticSeasonsApi.getInstance().isSeasonEnabled(lvl))
             return null;
         SolarTerm solarTerm = EclipticUtil.getNowSolarTerm(lvl);

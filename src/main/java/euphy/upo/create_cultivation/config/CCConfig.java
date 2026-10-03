@@ -132,6 +132,9 @@ public final class CCConfig {
 	// Serene Seasons section
 	// ------------------------------------------------------------------
 
+	/** Master switch: let Serene Seasons adjust this mod's ambient climate. */
+	public static final ModConfigSpec.BooleanValue SS_CLIMATE_ENABLED;
+
 	/** Humidity offset (%RH) applied to the resolved biome humidity during Spring. */
 	public static final ModConfigSpec.DoubleValue SS_SPRING_HUMIDITY_OFFSET;
 
@@ -143,6 +146,13 @@ public final class CCConfig {
 
 	/** Humidity offset (%RH) applied to the resolved biome humidity during Winter. */
 	public static final ModConfigSpec.DoubleValue SS_WINTER_HUMIDITY_OFFSET;
+
+	// ------------------------------------------------------------------
+	// Ecliptic Seasons section
+	// ------------------------------------------------------------------
+
+	/** Master switch: let Ecliptic Seasons adjust this mod's ambient climate. */
+	public static final ModConfigSpec.BooleanValue ES_CLIMATE_ENABLED;
 
 	static {
 		BUILDER.push("cultivation_tank")
@@ -387,6 +397,14 @@ public final class CCConfig {
 			.comment("follows Serene Seasons' own biome_temp_adjustment. Non-whitelisted")
 			.comment("dimensions and blacklisted biomes are never offset.");
 
+		SS_CLIMATE_ENABLED = BUILDER
+			.comment("Let Serene Seasons adjust this mod's ambient climate (season-shifted")
+			.comment("temperature and the configured seasonal humidity offsets).")
+			.comment("When disabled, this mod's ambient climate ignores Serene Seasons")
+			.comment("completely and follows the vanilla biome values. Default: true.")
+			.translation("create_cultivation.config.ssClimateEnabled")
+			.define("climateEnabled", true);
+
 		SS_SPRING_HUMIDITY_OFFSET = BUILDER
 			.comment("Humidity offset during Spring.")
 			.translation("create_cultivation.config.springHumidityOffset")
@@ -406,6 +424,21 @@ public final class CCConfig {
 			.comment("Humidity offset during Winter.")
 			.translation("create_cultivation.config.winterHumidityOffset")
 			.defineInRange("winterHumidityOffset", -15.0, -100.0, 100.0);
+
+		BUILDER.pop();
+
+		BUILDER.push("eclipticseasons")
+			.comment("Ecliptic Seasons integration: the ambient climate follows the")
+			.comment("24 solar terms, using Ecliptic Seasons' own per-biome climate")
+			.comment("settings for temperature and humidity.");
+
+		ES_CLIMATE_ENABLED = BUILDER
+			.comment("Let Ecliptic Seasons adjust this mod's ambient climate with the")
+			.comment("current solar term. When disabled, this mod's ambient climate")
+			.comment("ignores Ecliptic Seasons completely and follows the vanilla biome")
+			.comment("values. Default: true.")
+			.translation("create_cultivation.config.esClimateEnabled")
+			.define("climateEnabled", true);
 
 		BUILDER.pop();
 

@@ -52,6 +52,8 @@ public final class SereneSeasonsCompat {
     /** Season-adjusted temperature in °C, or null to defer (see class docs). */
     @Nullable
     private static Float seasonTemperature(LevelReader level, Holder<Biome> biome) {
+        if (!CCConfig.SS_CLIMATE_ENABLED.get())
+            return null;
         if (!(level instanceof Level lvl) || !ModConfig.seasons.isDimensionWhitelisted(lvl.dimension())
                 || biome.is(ModTags.Biomes.BLACKLISTED_BIOMES))
             return null;
@@ -67,6 +69,8 @@ public final class SereneSeasonsCompat {
     /** Season-adjusted humidity in %RH, or null to defer (see class docs). */
     @Nullable
     private static Float seasonHumidity(LevelReader level, Holder<Biome> biome) {
+        if (!CCConfig.SS_CLIMATE_ENABLED.get())
+            return null;
         if (!(level instanceof Level lvl) || !ModConfig.seasons.isDimensionWhitelisted(lvl.dimension())
                 || biome.is(ModTags.Biomes.BLACKLISTED_BIOMES))
             return null;
