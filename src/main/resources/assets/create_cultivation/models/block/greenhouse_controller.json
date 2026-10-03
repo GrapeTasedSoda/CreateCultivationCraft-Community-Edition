@@ -1,12 +1,14 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
+	"ambientocclusion": false,
 	"loader": "neoforge:composite",
 	"textures": {
 		"particle": "create_cultivation:block/greenhouse_controller"
 	},
 	"children": {
 		"base": {
+			"ambientocclusion": false,
 			"render_type": "minecraft:cutout_mipped",
 			"textures": {
 				"13": "create_cultivation:block/greenhouse_controller"
@@ -4153,6 +4155,7 @@
 			]
 		},
 		"bulb": {
+			"ambientocclusion": false,
 			"render_type": "minecraft:translucent",
 			"textures": {
 				"13": "create_cultivation:block/greenhouse_controller"
