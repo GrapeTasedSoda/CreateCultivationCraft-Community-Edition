@@ -48,10 +48,8 @@ public class CreateCultivationCraft {
     }
     public CreateCultivationCraft(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+        CCConfigMigrations.migrateEarly();
         modContainer.registerConfig(ModConfig.Type.COMMON, CCConfig.SPEC);
-        // config migration: upgrade old config files in place (version stamp +
-        // key moves) while preserving the user's modified values
-        modEventBus.addListener(CCConfigMigrations::onConfigLoad);
         CCBlocks.register();
         CCItems.register();
         CCBlockEntities.register();

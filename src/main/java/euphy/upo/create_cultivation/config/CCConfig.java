@@ -23,6 +23,9 @@ public final class CCConfig {
 
 	public static final ModConfigSpec SPEC;
 
+	/** Raw layout version stamp; see {@link CCConfigMigrations}. Mirrors the file's configVersion key. */
+	public static final ModConfigSpec.IntValue CONFIG_VERSION;
+
 	// ------------------------------------------------------------------
 	// Cultivation tank section
 	// ------------------------------------------------------------------
@@ -155,6 +158,11 @@ public final class CCConfig {
 	public static final ModConfigSpec.BooleanValue ES_CLIMATE_ENABLED;
 
 	static {
+		CONFIG_VERSION = BUILDER
+			.comment("Internal config layout version stamp; do not edit or lower it.")
+			.translation("create_cultivation.config.configVersion")
+			.defineInRange("configVersion", CCConfigMigrations.CURRENT_VERSION, 0, Integer.MAX_VALUE);
+
 		BUILDER.push("cultivation_tank")
 			.comment("Cultivation tank machine settings: growth speed, harvest yield,")
 			.comment("watering bonuses and the catalyst table.");
