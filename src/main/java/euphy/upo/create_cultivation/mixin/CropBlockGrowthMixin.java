@@ -71,11 +71,16 @@ public abstract class CropBlockGrowthMixin {
             rolls++;
         }
         for (int i = 0; i < rolls; i++) {
-            if (net.neoforged.neoforge.common.CommonHooks.canCropGrow(level, pos, state,
+            BlockState current = level.getBlockState(pos);
+            if (!current.is(state.getBlock()) || self.getAge(current) >= self.getMaxAge()) {
+                break;
+            }
+            BlockState grown = self.getStateForAge(self.getAge(current) + 1);
+            if (net.neoforged.neoforge.common.CommonHooks.canCropGrow(level, pos, current,
                     random.nextInt((int) (25.0F / speed) + 1) == 0)) {
-                level.setBlock(pos, self.getStateForAge(self.getAge(level.getBlockState(pos)) + 1), 2);
-                net.neoforged.neoforge.common.CommonHooks.fireCropGrowPost(level, pos, state);
-                if (self.getAge(level.getBlockState(pos)) >= self.getMaxAge()) {
+                level.setBlock(pos, grown, 2);
+                net.neoforged.neoforge.common.CommonHooks.fireCropGrowPost(level, pos, current);
+                if (grown.getBlock() != state.getBlock() || self.getAge(grown) >= self.getMaxAge()) {
                     break;
                 }
             }
