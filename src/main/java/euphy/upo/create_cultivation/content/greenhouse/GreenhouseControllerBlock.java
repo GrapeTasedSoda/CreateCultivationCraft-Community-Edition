@@ -75,7 +75,7 @@ public class GreenhouseControllerBlock extends HorizontalKineticBlock implements
             BlockHitResult hitResult) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof GreenhouseControllerBlockEntity be) {
             // no kinetic power -> no GUI (the controller is offline)
-            if (be.getSpeed() == 0) {
+            if (be.getSpeed() == 0 || be.getLastScan() == null || !be.getLastScan().valid()) {
                 return InteractionResult.PASS;
             }
             player.openMenu(be, pos);

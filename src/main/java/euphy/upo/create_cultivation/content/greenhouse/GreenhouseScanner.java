@@ -13,6 +13,7 @@ import euphy.upo.create_cultivation.registry.CCBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -36,9 +37,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * floor below, so it passes; a block replacing a wall or ceiling pane faces
  * the open sky and fails. The floor itself is reached from above and is
  * exempt. Mod devices ({@code greenhouse_device}) are always exempt.</li>
- * <li>Partial blocks (crops, farmland, vanilla glass, slabs, ...) reached from
- * the side stop the fill without a leak; they seal nothing but are common
- * interior clutter. Partial cells entered from ABOVE (the fill falls onto
+ * <li>Partial blocks (crops, farmland, glass, slabs, ...) reached from the
+ * side stop the fill and are probed like untagged full blocks: one face
+ * touching outside air fails the scan (untagged glass, slabs or pipes can no
+ * longer pose as walls), while interior clutter faces visited air and passes.
+ * Partial cells entered from ABOVE (the fill falls onto
  * tilled soil or a crop) never spread sideways - the flood only continues
  * downwards through them - so a tilled floor cannot leak around the wall
  * bases.</li>
@@ -92,6 +95,8 @@ public final class GreenhouseScanner {
                 BlockPos next = pos.relative(direction);
                 if (next.getY() < level.getMinBuildHeight() || next.getY() >= level.getMaxBuildHeight())
                     return ScanResult.INVALID; // leaked out of the world
+                if (level instanceof Level lvl && !lvl.isLoaded(next))
+                    return ScanResult.INVALID;
                 if (!visited.add(next))
                     continue;
 
@@ -123,12 +128,12 @@ public final class GreenhouseScanner {
 
                 boolean airLike = state.isAir() || !state.getFluidState().isEmpty();
                 if (!airLike && direction != Direction.DOWN) {
-                    // Partial block hit from the side (plants, farmland, glass,
-                    // slabs, ...): the fill stops here - never a leak.
                     if (device)
                         devices.add(next.immutable());
                     if (crop)
                         crops.add(next.immutable());
+                    if (!device)
+                        shellChecks.add(next.immutable());
                     continue;
                 }
                 if (cell.downOnly() && airLike) {
@@ -174,6 +179,8 @@ public final class GreenhouseScanner {
             BlockPos n = pos.relative(direction);
             if (n.getY() < level.getMinBuildHeight() || n.getY() >= level.getMaxBuildHeight())
                 return true; // build-limit or void side: open
+            if (level instanceof Level lvl && !lvl.isLoaded(n))
+                continue;
             if (visited.contains(n))
                 continue; // enclosure side
             BlockState state = level.getBlockState(n);
