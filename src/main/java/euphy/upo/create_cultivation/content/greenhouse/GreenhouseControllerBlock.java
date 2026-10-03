@@ -20,7 +20,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * Placeholder controller block for the planned greenhouse multiblock.
+ * The greenhouse controller block.
  * <p>
  * Follows Create's MechanicalCrafter pattern: a HorizontalKineticBlock that is
  * also a small ICogWheel. The rotation axis is the horizontal facing axis, so

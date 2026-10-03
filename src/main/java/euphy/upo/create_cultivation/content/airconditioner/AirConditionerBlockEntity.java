@@ -60,6 +60,5 @@ public class AirConditionerBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        // server side: nothing yet - future stress/water consumption hooks
     }
 }

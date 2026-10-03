@@ -14,7 +14,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Renderer for the greenhouse controller placeholder.
+ * Renderer for the greenhouse controller.
  * <p>
  * The static blockstate model is authored with the front (lamps + gear case)
  * facing north; the blockstate rotates it per {@code HORIZONTAL_FACING}. The

@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * BE for the humidifier: a single 1000 mB tank filled by Create pipes from
  * the block's south face, plus the "active" flag that slides the head open.
- * Fluid contents sync to the client on every change so the controller UI
- * (later) and future Ponder scenes can read them.
+ * Fluid contents sync to the client on every change so the controller UI can
+ * read them.
  */
 public class HumidifierBlockEntity extends SmartBlockEntity {
 

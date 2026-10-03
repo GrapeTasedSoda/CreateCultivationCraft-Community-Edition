@@ -224,8 +224,8 @@ public class CCBlocks {
             .build()
             .register();
 
-    // Vertical-only sprinkler: no facing property; blockstate hand-written by
-    // models_workshop/install_sprinkler.py (active=true/false variants).
+    // Sprinkler blockstate is hand-written by models_workshop/install_sprinkler.py
+    // (facing + active variants).
     public static final BlockEntry<SprinklerBlock> SPRINKLER = REGISTRATE.block("sprinkler", SprinklerBlock::new)
             .properties(p -> p
                     .mapColor(MapColor.COLOR_LIGHT_GRAY)

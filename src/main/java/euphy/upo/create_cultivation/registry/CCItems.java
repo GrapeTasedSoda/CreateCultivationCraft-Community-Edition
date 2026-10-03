@@ -6,9 +6,7 @@ import euphy.upo.create_cultivation.content.fertilizer.EfficientFertilizerItem;
 import net.minecraft.world.item.Item;
 
 /**
- * Mod items. The Cultivation Craft mod ships few standalone items - most
- * content lives on blocks - so this registry currently only holds the
- * efficient fertilizer catalyst.
+ * Mod items.
  */
 public class CCItems {
 

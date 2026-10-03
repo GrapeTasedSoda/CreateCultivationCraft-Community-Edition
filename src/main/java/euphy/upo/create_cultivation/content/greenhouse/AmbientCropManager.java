@@ -39,8 +39,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  */
 public final class AmbientCropManager {
 
-    /** Ticks between ambient rescans (biome climate can drift, e.g. seasons). */
-    
     /** dimension -> packed positions of the watched outdoor crops. */
     private static final Map<ResourceKey<Level>, Set<Long>> WATCHED = new ConcurrentHashMap<>();
 
