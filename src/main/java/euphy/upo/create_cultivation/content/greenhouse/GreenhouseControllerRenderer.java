@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import euphy.upo.create_cultivation.foundation.render.CCRenderTypes;
-import net.createmod.catnip.render.CachedBuffers;
+import euphy.upo.create_cultivation.registry.CCPartialModels;
 import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -68,7 +68,12 @@ public class GreenhouseControllerRenderer extends KineticBlockEntityRenderer<Gre
 			.getValue(GreenhouseControllerBlock.HORIZONTAL_FACING)
 			.getAxis();
 
-		SuperByteBuffer cog = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, be.getBlockState());
+		SuperByteBuffer cog = CCPartialModels.safePartial(AllPartialModels.SHAFTLESS_COGWHEEL, be.getBlockState(),
+				"the greenhouse controller cogwheel");
+		if (cog == null) {
+			// the controller's own block model still renders; decoration is skipped (see CCPartialModels#safePartial)
+			return;
+		}
 
 		// Verbatim transform sequence from MechanicalCrafterRenderer#renderFast -
 		// Create's own renderer for exactly our geometry: a Y-native cogwheel
@@ -136,8 +141,12 @@ public class GreenhouseControllerRenderer extends KineticBlockEntityRenderer<Gre
 	}
 
 	private void renderHalo(PoseStack ms, MultiBufferSource buffer, Vec3 offset, int brightness, int r, int g, int b) {
-		SuperByteBuffer halo = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW,
-				euphy.upo.create_cultivation.registry.CCBlocks.GREENHOUSE_CONTROLLER.getDefaultState());
+		SuperByteBuffer halo = CCPartialModels.safePartial(AllPartialModels.DISPLAY_LINK_GLOW,
+				euphy.upo.create_cultivation.registry.CCBlocks.GREENHOUSE_CONTROLLER.getDefaultState(),
+				"the greenhouse controller lamp halo");
+		if (halo == null) {
+			return;
+		}
 
 		// The vanilla glow shell spans -3..3 px around (0, 2.5, 0), so with
 		// uniform scale s it covers (x, 2.5s-3s .. 2.5s+3s). Scale it to 3.5 px

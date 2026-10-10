@@ -3,8 +3,8 @@ package euphy.upo.create_cultivation.content.cultivation_base;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import euphy.upo.create_cultivation.registry.CCPartialModels;
-import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -32,7 +32,12 @@ public class CultivationBaseRenderer extends KineticBlockEntityRenderer<Cultivat
         //super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
 
         BlockState blockState = be.getBlockState();
-        SuperByteBuffer cogWheelSbb = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, blockState);
+        SuperByteBuffer cogWheelSbb = CCPartialModels.safePartial(AllPartialModels.SHAFTLESS_COGWHEEL, blockState,
+                "the cultivation base cogwheel");
+        if (cogWheelSbb == null) {
+            // the base's own block model still renders; decoration is skipped (see CCPartialModels#safePartial)
+            return;
+        }
 
         Direction.Axis axis = Direction.Axis.Y;
         float angleRadians = KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), axis);
@@ -51,11 +56,14 @@ public class CultivationBaseRenderer extends KineticBlockEntityRenderer<Cultivat
 
             boolean outputFull = be.isOutputFull();
             boolean heightMismatch = be.isHeightMismatch();
-            SuperByteBuffer glowLayer = CachedBuffers.partial(
-                    heightMismatch ? CCPartialModels.CULTIVATION_BASE_GLOW_ERROR
-                            : outputFull ? CCPartialModels.CULTIVATION_BASE_GLOW_FULL
-                            : CCPartialModels.CULTIVATION_BASE_GLOW,
-                    blockState);
+            PartialModel glowPartial = heightMismatch ? CCPartialModels.CULTIVATION_BASE_GLOW_ERROR
+                    : outputFull ? CCPartialModels.CULTIVATION_BASE_GLOW_FULL
+                    : CCPartialModels.CULTIVATION_BASE_GLOW;
+            SuperByteBuffer glowLayer = CCPartialModels.safePartial(glowPartial, blockState,
+                    "the cultivation base status glow");
+            if (glowLayer == null) {
+                return;
+            }
 
 
             int fullbright = 15728880;
